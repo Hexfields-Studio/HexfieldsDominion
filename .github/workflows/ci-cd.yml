@@ -23,17 +23,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
-          cache: 'npm'
+          bun-version: latest
           
       - name: Install dependencies
-        run: npm ci
+        run: bun install
         
       - name: Run TypeScript type check
-        run: npx tsc --noEmit
+        run: bun run type-check || npx tsc --noEmit  # Fallback if type-check script doesn't exist
 
   deploy:
     name: Deploy to GitHub Pages
@@ -48,17 +47,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
-          cache: 'npm'
+          bun-version: latest
           
       - name: Install dependencies
-        run: npm ci
+        run: bun install
         
       - name: Build project
-        run: npm run build
+        run: bun run build
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
