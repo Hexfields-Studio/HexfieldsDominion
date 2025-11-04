@@ -1,0 +1,130 @@
+//https://reactcanvaskit.com/guide/
+import './App.css'
+
+const width = 1000;
+const height = 1000;
+const HEX_SIZE = 100;
+let polygonSize: number[] = [];
+
+function generateHexGrid(radius: number) {
+  const hexes = [];
+  for (let q = -radius; q <= radius; q++) {
+    for (let r = -radius; r <= radius; r++) {
+      //const s = -q - r;
+      //if (Math.abs(s) <= radius)
+      if(Math.abs(q) <= Math.abs(r)) hexes.push({ q, r });
+    }
+  }
+  return hexes;
+}
+
+function App() {
+  
+  const hexes = generateHexGrid(2);
+  console.log(hexes);
+  const textureId = "dirt-texture";
+
+  getHexPoints(hexes[0].q, hexes[0].r, HEX_SIZE); //muss 
+
+  return (
+      <canvas>
+
+      </canvas>
+  );
+}
+
+/*
+<svg width={width} height={height} style={{border: "1px solid black"}}>
+        <defs>
+          <pattern
+            id={textureId}
+            patternUnits="objectBoundingBox"
+            width={polygonSize[0]}
+            height={polygonSize[1]}
+          >
+            <image
+              href="/HexfieldsDominion/cobble.png"
+              width={polygonSize[1]}
+              height={polygonSize[1]}
+              x={0}
+              y={0}
+              style={{
+                imageRendering: "pixelated"
+              }}
+            />
+          </pattern>
+        </defs>
+
+        {hexes.map(hex => {
+          return <TexturedHex key={`q:${hex.q}, r:${hex.r}`} q={hex.q} r={hex.r} size={HEX_SIZE} textureId={textureId}/>
+        })}
+        
+      </svg>
+*/
+
+function TexturedHex({ q, r, size, textureId }: TexturedHexProps) {
+  const points = getHexPoints(q, r, size);
+  return (
+    <polygon
+      points={points}
+      fill={`url(#${textureId})`}
+      stroke="#ffffffff"
+      strokeWidth="3"
+      onClick={()=>{console.log(`q: ${q}, r: ${r}`)}}
+    />
+  );
+}
+
+interface TexturedHexProps {
+  q: number;
+  r: number;
+  size: number;
+  textureId: string;
+}
+
+//Converts axial coordinates (q, r) to Cartesian Coordinates (x, y)
+function getHexPoints(q: number, r: number, size: number): string{
+  const x_0 = (width / 2) - (size * Math.sqrt(3)) / 2;
+  const x_offset = (Math.sqrt(3) / 2) * ((r % 2 === 0) ? 1 : 0); //The (0, 0) Hexagon should be placed in the very middle.
+  const x = x_0 + size * (Math.sqrt(3) * q + x_offset);
+
+  const y_0 = (height/2);
+  const y = y_0 + size * (3 / 2 * r);
+  
+  const corners = [...Array(6)].map((_, i) => {
+    const angle = Math.PI / 180 * (60 * i - 30);
+    return [
+      x + size * Math.cos(angle),
+      y + size * Math.sin(angle)
+    ];
+  });
+  const points = corners.map(p => p.join(",")).join(" ");
+  if(polygonSize.length === 0) findPolygonSize(points);
+  return points;
+}
+
+function findPolygonSize(points: string){
+  polygonSize = [2];
+  let min: number | undefined;
+  let max: number | undefined;
+  
+  for (let i = 0; i <= 1; i++) {
+    min = undefined;
+    max = undefined;
+    points.split(" ").forEach(e =>{
+      const split: number = +e.split(",")[i];
+      if(min === undefined || max === undefined) {
+        min = split;
+        max = split
+      }
+      if(split < min) min = split;
+      if(split > max) max = split;
+    });
+    console.log(`min: ${min}, max: ${max}`);
+    if(min !== undefined && max !== undefined) polygonSize[i] = max - min;
+  }
+
+  console.log(polygonSize);
+}
+
+export default App;
