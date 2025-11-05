@@ -1,12 +1,12 @@
 import { Navigate, Outlet } from "react-router";
-import { useTestContext } from "../context/TestContext";
+import { getStorageItem, STORAGE_KEYS } from "../constants/storage";
 
 interface ProtectedRouteProps {
   redirectTo: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ redirectTo }) => {
-    const {isLoggedIn} = useTestContext();
+    const isLoggedIn = getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false);
     return isLoggedIn ? <Outlet /> : <Navigate to={redirectTo} replace />;
 };
 
