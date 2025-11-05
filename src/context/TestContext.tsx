@@ -22,3 +22,7 @@ export const useTestContext = () => {
   if (!context) throw new Error("useTest must be used within GameProvider");
   return context;
 };
+
+/*
+To be used in the future, contains variables that can be used globally.
+*/
