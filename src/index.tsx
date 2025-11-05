@@ -10,7 +10,7 @@ import { ContextProviderTEST } from "./context/TestContext";
 // https://reactrouter.com/start/declarative/routing
 
 
-const BASE_URL = import.meta.env.BASE_URL; // "HexfieldsDominion" => kommt aus vite.config.ts
+const BASE_URL = "/HexfieldsDominion/";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <ContextProviderTEST>
