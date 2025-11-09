@@ -1,0 +1,12 @@
+.dialog {
+    border-style: hidden;
+    border-radius: 25px;
+}
+
+.dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.close {
+    /*TODO*/
+}
