@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                 <Route element={<ProtectedRoute redirectTo={"home"}/>}>
                     <Route path={"play"} element={<StartMenu />} />
-                    <Route path={"lobby/:code"} element={<Lobby />} />
+                    <Route path={":code"} element={<Lobby />} />
                     <Route path={"match/:uuid"} element={<MatchPage />} />
 
                     <Route path={"lobby"} element={<Navigate to="/play" />} />
