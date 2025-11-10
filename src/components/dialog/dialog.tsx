@@ -2,6 +2,8 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import "./dialog.css";
 
 interface DialogProps {
+    title: string;
+    id?: string;
     children: React.ReactNode;
 }
 
@@ -10,7 +12,7 @@ export interface DialogHandle {
 }
 
 const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
-    const {children} = props;
+    const {title, id, children} = props;
 
     const [open, setOpen] = useState<boolean>(false);
     const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -41,11 +43,14 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
         <>
             <dialog className="dialog" ref={dialogRef} closedby="any">
                 <div className="closeContainer">
+                    <h3 className="title">{title}</h3>
                     <button className="closeButton" onClick={toggleDialog}>
                         X
                     </button>
                 </div>
-                {children}
+                <div className="childrenContainer" id={id}>
+                    {children}
+                </div>
             </dialog>
         </>
     );

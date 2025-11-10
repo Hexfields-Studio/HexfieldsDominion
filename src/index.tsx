@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import HomePage from "./pages/home";
-import StartMenu from "./pages/play";
+import StartMenu from "./pages/play/play";
 import Lobby from "./pages/lobby";
 import MatchPage from "./pages/match";
 import ProtectedRoute from "./components/protected_route";
@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                 <Route element={<ProtectedRoute redirectTo={"home"}/>}>
                     <Route path={"play"} element={<StartMenu />} />
-                    <Route path={":code"} element={<Lobby />} />
+                    <Route path={"lobby/:code"} element={<Lobby />} />
                     <Route path={"match/:uuid"} element={<MatchPage />} />
 
                     <Route path={"lobby"} element={<Navigate to="/play" />} />
