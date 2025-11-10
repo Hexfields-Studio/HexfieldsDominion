@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, type MouseEvent } from "react";
 import "./dialog.css";
 
 interface DialogProps {
@@ -20,16 +20,31 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     }));
 
     const toggleDialog = () => {
-        open ? dialogRef.current?.close() : dialogRef.current?.showModal();
-        setOpen(!open);
+        open ? closeDialog() : openDialog();
     }
+
+    const openDialog = () => {
+        dialogRef.current?.showModal();
+        setOpen(true);
+    }
+
+    const closeDialog = () => {
+        dialogRef.current?.close();
+        setOpen(false);
+    }
+
+    useEffect(() => {
+        dialogRef.current?.addEventListener("close", () => closeDialog())
+    }, [closeDialog]);
 
     return (
         <>
-            <dialog className="dialog" ref={dialogRef}>
-                <button className="close" onClick={toggleDialog}>
-                    X    
-                </button>
+            <dialog className="dialog" ref={dialogRef} closedby="any">
+                <div className="closeContainer">
+                    <button className="closeButton" onClick={toggleDialog}>
+                        X
+                    </button>
+                </div>
                 {children}
             </dialog>
         </>

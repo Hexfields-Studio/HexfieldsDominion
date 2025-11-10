@@ -8,7 +8,7 @@ const StartMenu = () => {
   return (
     <>
       <Dialog ref={dialogRef}>
-        <p>test</p>
+        <p>tests,össakas</p>
       </Dialog>
       <h1>Start Menu</h1>
       <button onClick={() => dialogRef.current?.toggleDialog()}>
