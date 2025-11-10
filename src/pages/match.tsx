@@ -7,8 +7,8 @@ const MatchPage = () => {
   
   return (
       <>
-        <h1>Match Page, UUID: "{params.uuid}"</h1>
-        <button onClick={()=>navi("/play")}>Leave</button>
+        <h1>You are in the Match with UUID: "{params.uuid}"</h1>
+        <button onClick={()=>navi(`/lobby/${params.uuid}`)}>Leave Match</button>
       </>
   );
 }
