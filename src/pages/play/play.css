@@ -7,6 +7,12 @@
     max-width: 90vw;
 }
 
+#lobbycodeDialog form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #lobbycodeDialog input {
     border: 2px solid lightgray;
     border-radius: 2px;

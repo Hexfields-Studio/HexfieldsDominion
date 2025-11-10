@@ -36,7 +36,10 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     }
 
     useEffect(() => {
-        dialogRef.current?.addEventListener("close", () => closeDialog())
+        dialogRef.current?.addEventListener("close", closeDialog);
+        return () => {
+            dialogRef.current?.removeEventListener("close", closeDialog)
+        }
     }, [closeDialog]);
 
     return (

@@ -49,9 +49,18 @@ const StartMenu = () => {
     }
   };
 
-  const joinLobby = async () => {
+  const joinLobby = async (formData: FormData) => {
+      if (!formData.get("lobbycode")) {
+        return;
+      }
+
       // curl -X GET /XXXXXXX -> lobby data 
       const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
+      if (responseData.status === 400) {
+        alert("Es wurde keine Lobby mit diesem Code gefunden.");
+        return;
+      }
+
       const reponseDataJson = await responseData.json();        
       
       // Navigiere zur Lobby
@@ -61,9 +70,11 @@ const StartMenu = () => {
   return (
       <>
         <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogRef}>
-          <p>Lobbycode eingeben:</p>
-          <input type="text" onChange={(e) => setLobbyCode(e.target.value)} placeholder="Lobby Code"/>
-          <button onClick={joinLobby}>Beitreten</button>
+          <form action={(e) => joinLobby(e)}>
+            <p>Lobbycode eingeben:</p>
+            <input type="text" name="lobbycode" onChange={(e) => setLobbyCode(e.target.value)} placeholder="Lobby Code"/>
+            <button type="submit">Beitreten</button>
+          </form>
         </Dialog>
 
         <h1>Start Menu</h1>
