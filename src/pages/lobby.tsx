@@ -7,8 +7,11 @@ const Lobby = () => {
   
   return (
       <>
-        <h1>Lobby, Code: "{params.code}"</h1>
-        <button onClick={()=>navi("/play")}>Leave</button>
+        <h1>You are in the Lobby with Code: "{params.code}"</h1>
+        
+        <button onClick={()=>{navi(`/match/${params.uuid}`);}}>Join Match</button>
+
+        <button onClick={()=>navi("/play")}>Leave Lobby</button>
       </>
   );
 }

@@ -8,6 +8,6 @@ export const getStorageItem = (storageKey: string, defaultValue: any) => {
   return saved ? JSON.parse(saved) : defaultValue;
 }
 
-export const setStorageItem = (storageKey: string, value: string) => {
+export const setStorageItem = (storageKey: string, value: any) => {
   localStorage.setItem(storageKey, JSON.stringify(value));
 }
