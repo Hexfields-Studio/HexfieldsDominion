@@ -5,6 +5,7 @@ import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/st
 import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
+import LoggedIn from "../loggedIn";
 
 const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
@@ -77,18 +78,20 @@ const StartMenu = () => {
           </form>
         </Dialog>
 
-        <h1>Start Menu</h1>
-        
-        <p>
-          Logged In: {isLoggedIn ? "true" : "false"} <br/>
-          <button onClick={handleLogout}>Log out</button><br/>
-        </p>
+        <LoggedIn>
+          <h1>Start Menu</h1>
+          
+          <p>
+            Logged In: {isLoggedIn ? "true" : "false"} <br/>
+            <button onClick={handleLogout}>Log out</button><br/>
+          </p>
 
-        <p>
-          <button onClick={createLobby}>Lobby erstellen</button>
-        </p>
+          <p>
+            <button onClick={createLobby}>Lobby erstellen</button>
+          </p>
 
-        <button onClick={() => dialogRef.current?.toggleDialog()}>Lobby beitreten</button>
+          <button onClick={() => dialogRef.current?.toggleDialog()}>Lobby beitreten</button>
+        </LoggedIn>
       </>
   );
 }

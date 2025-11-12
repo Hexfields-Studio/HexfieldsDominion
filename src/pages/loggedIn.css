@@ -1,0 +1,26 @@
+#gearButton {
+    margin: 1vw 1vw 0 auto;
+    background-image: url("./public/gear.svg");
+    background-size: cover;
+    width: 4vw;
+    height: 4vw;
+    min-width: 40px;
+    min-height: 40px;
+    border: none;
+    background-color: transparent;
+}
+
+#gearButton:hover {
+    background-color: transparent;
+}
+
+#gearDialog {
+    min-width: 150px;
+    width: 15vw;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+}
