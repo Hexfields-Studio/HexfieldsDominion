@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import Dialog, { type DialogHandle } from "../components/dialog/dialog";
+import Dialog, { type DialogHandle } from "../../components/dialog/dialog";
 import "./loggedIn.css";
 
 interface LoggedInProps {
@@ -17,7 +17,7 @@ const LoggedIn = (props: LoggedInProps) => {
             </Dialog>
 
             <div id="root">
-                <button id="gearButton" onClick={dialogRef.current?.toggleDialog}/>
+                <button id="gearButton" onClick={() => dialogRef.current?.toggleDialog()}/>
                 {children}
             </div>
         </>

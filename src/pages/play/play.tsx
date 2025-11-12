@@ -5,7 +5,7 @@ import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/st
 import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
-import LoggedIn from "../loggedIn";
+import LoggedIn from "../loggedIn/loggedIn";
 
 const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
