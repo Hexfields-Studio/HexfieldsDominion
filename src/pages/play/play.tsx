@@ -74,7 +74,7 @@ const StartMenu = () => {
           <form action={(e) => joinLobby(e)}>
             <p>Lobbycode eingeben:</p>
             <input type="text" name="lobbycode" onChange={(e) => setLobbyCode(e.target.value)} placeholder="Lobby Code"/>
-            <button type="submit">Beitreten</button>
+            <button disabled={!lobbyCode.trim()} type="submit">Beitreten</button>
           </form>
         </Dialog>
 

@@ -1,5 +1,6 @@
 :root {
     --dialog-primary-background: rgb(33,33,33);
+    --dialog-button-disabled: rgb(90, 90, 90);
 }
 
 #lobbycodeDialog {
@@ -38,6 +39,15 @@
     border: 2px solid lightgray;
     border-radius: 7px;
     padding: 7px 66px 7px 66px;
+    background-color: var(--dialog-primary-background);
+}
+
+#lobbycodeDialog button:disabled {
+    border-color: var(--dialog-button-disabled);
+    color: var(--dialog-button-disabled);
+    cursor: not-allowed;
+}
+#lobbycodeDialog button:disabled:hover {
     background-color: var(--dialog-primary-background);
 }
 
