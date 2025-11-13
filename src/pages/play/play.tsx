@@ -11,9 +11,10 @@ const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
 const StartMenu = () => {
   const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
-  const [lobbyCode, setLobbyCode] = useState("");
+  const [lobbyCode, setLobbyCode] = useState<string>("");
   const navi = useNavigate();
-  const dialogRef = useRef<DialogHandle | null>(null);
+  const dialogEnterLobbycodeRef = useRef<DialogHandle | null>(null);
+  const dialogErrorInvalidLobbycodeRef = useRef<DialogHandle | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -53,7 +54,7 @@ const StartMenu = () => {
       // curl -X GET /XXXXXXX -> lobby data 
       const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
       if (responseData.status === 400) {
-        alert("Es wurde keine Lobby mit diesem Code gefunden.");
+        dialogErrorInvalidLobbycodeRef.current?.toggleDialog();
         return;
       }
 
@@ -63,22 +64,27 @@ const StartMenu = () => {
       navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
   }
 
+  const isLobbycodeValid = (codeToCheck: string) => codeToCheck && codeToCheck.match("^([a-zA-Z0-9])+$");
+
   return (
       <>
-        <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogRef}>
+        <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogEnterLobbycodeRef}>
           <form action={(e) => joinLobby(e)}>
             <p>Lobbycode eingeben:</p>
-            <input type="text" name="lobbycode" onChange={(e) => setLobbyCode(e.target.value)} placeholder="Lobby Code"/>
-            <button disabled={!lobbyCode.trim()} type="submit">Beitreten</button>
+            <input type="text" name="lobbycode" value={lobbyCode} onChange={(e) => setLobbyCode(e.target.value.trim())} placeholder="Lobby Code"/>
+            <button disabled={!isLobbycodeValid(lobbyCode)} type="submit">Beitreten</button>
           </form>
         </Dialog>
 
+        <Dialog errorMessage="Es wurde keine Lobby mit diesem Code gefunden." ref={dialogErrorInvalidLobbycodeRef}/>
+
+        
         <LoggedIn>
           <h1>Start Menu</h1>
 
           <button onClick={createLobby}>Lobby erstellen</button>
 
-          <button onClick={() => dialogRef.current?.toggleDialog()}>Lobby beitreten</button>
+          <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
         </LoggedIn>
       </>
   );
