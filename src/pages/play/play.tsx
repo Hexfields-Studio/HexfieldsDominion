@@ -21,11 +21,6 @@ const StartMenu = () => {
     }
   }, [isLoggedIn, navi]);
 
-  const handleLogout = () => {
-    setStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false); // TypeScript/Runtime-Mismatch. Funktioniert trotz Fehler.
-    navi("/");
-  };
-
   const createLobby = async () => {
     try {
       // curl -X PATCH /lobbies -> {"lobbyCode":"XXXXXXX"}
@@ -80,15 +75,8 @@ const StartMenu = () => {
 
         <LoggedIn>
           <h1>Start Menu</h1>
-          
-          <p>
-            Logged In: {isLoggedIn ? "true" : "false"} <br/>
-            <button onClick={handleLogout}>Log out</button><br/>
-          </p>
 
-          <p>
-            <button onClick={createLobby}>Lobby erstellen</button>
-          </p>
+          <button onClick={createLobby}>Lobby erstellen</button>
 
           <button onClick={() => dialogRef.current?.toggleDialog()}>Lobby beitreten</button>
         </LoggedIn>
