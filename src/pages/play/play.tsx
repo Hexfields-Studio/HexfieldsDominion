@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "../../index.css";
 import "./play.css";
-import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/storage";
+import { getStorageItem, STORAGE_KEYS } from "../../constants/storage";
 import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
