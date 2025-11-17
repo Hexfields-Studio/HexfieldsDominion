@@ -15,14 +15,10 @@
 }
 
 #lobbycodeDialog input {
-    border: 2px solid lightgray;
-    border-radius: 2px;
-    outline: none;
     width: 130px;
     padding: 5px;
     font-size: larger;
     text-align: center;
-    background-color: var(--dialog-primary-background);
 }
 
 #lobbycodeDialog input::placeholder {
@@ -36,22 +32,5 @@
 
 #lobbycodeDialog button {
     margin: 70px 0 5px 0;
-    border: 2px solid lightgray;
-    border-radius: 7px;
     padding: 7px 66px 7px 66px;
-    background-color: var(--dialog-primary-background);
-}
-
-#lobbycodeDialog button:disabled {
-    border-color: var(--dialog-button-disabled);
-    color: var(--dialog-button-disabled);
-    cursor: not-allowed;
-}
-
-#lobbycodeDialog button:disabled:hover {
-    background-color: var(--dialog-primary-background);
-}
-
-#lobbycodeDialog button:hover {
-    background-color: rgb(40, 40, 40);
 }

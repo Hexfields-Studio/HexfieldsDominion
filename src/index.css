@@ -70,6 +70,15 @@ input:focus, textarea:focus, select:focus{
   box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-green) 12%, transparent 88%);
   transform: translateY(-1px);
 }
+button:disabled {
+    cursor: not-allowed;
+    border-color: color-mix(in srgb, var(--accent-green) 18%, var(--background) 82%);
+    background-color: color-mix(in srgb, var(--accent-green) 3%, var(--background) 97%);
+}
+button:disabled:hover {
+    box-shadow: none;
+    transform: none;
+}
 
 /* compact centered boxed paragraph */
 p.boxed{

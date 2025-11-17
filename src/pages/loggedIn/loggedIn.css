@@ -1,6 +1,6 @@
 #gearButton {
     margin: 1vw 1vw 0 auto;
-    background-image: url("./public/gear.svg");
+    background-image: url("./gear.svg");
     background-size: cover;
     width: 4vw;
     height: 4vw;
@@ -10,8 +10,11 @@
     background-color: transparent;
 }
 
-#gearButton:hover {
+#gearButton:hover,
+#gearButton:focus {
     background-color: transparent;
+    box-shadow: none;
+    transform: none;
 }
 
 #gearDialog {
