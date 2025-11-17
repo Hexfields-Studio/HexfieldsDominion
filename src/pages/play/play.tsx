@@ -21,76 +21,74 @@ const StartMenu = () => {
   }, [isLoggedIn, navi]);
 
   const handleLogout = () => {
-    setStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false); // TypeScript/Runtime-Mismatch. Funktioniert trotz Fehler.
+    setStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false);
     navi("/");
   };
 
   const createLobby = async () => {
     try {
-      // curl -X PATCH /lobbies -> {"lobbyCode":"XXXXXXX"}
       console.log("Requesting Lobby from URL: " + API_URL);
-      const responseCode = await fetch(`${API_URL}/lobbies`, {
-          method: 'PATCH'
-      });
+      const responseCode = await fetch(`${API_URL}/lobbies`, { method: "PATCH" });
       const responseCodeJson = await responseCode.json();
-
-      // Setze Lobby Code
       const fetchedLobbyCode = responseCodeJson.lobbyCode;
       setLobbyCode(fetchedLobbyCode);
 
-      // curl -X GET /XXXXXXX -> lobby data 
       const responseData = await fetch(`${API_URL}/lobbies/${fetchedLobbyCode}`);
-      const reponseDataJson = await responseData.json();        
-      
-      // Navigiere zur Lobby
+      const reponseDataJson = await responseData.json();
       navi(`/lobby/${fetchedLobbyCode}`, { state: { reponseDataJson } });
     } catch (error) {
-        console.error('Error', error);
+      console.error("Error", error);
     }
   };
 
   const joinLobby = async (formData: FormData) => {
-      if (!formData.get("lobbycode")) {
-        return;
-      }
-
-      // curl -X GET /XXXXXXX -> lobby data 
-      const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
-      if (responseData.status === 400) {
-        alert("Es wurde keine Lobby mit diesem Code gefunden.");
-        return;
-      }
-
-      const reponseDataJson = await responseData.json();        
-      
-      // Navigiere zur Lobby
-      navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
-  }
+    if (!formData.get("lobbycode")) {
+      return;
+    }
+    const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
+    if (responseData.status === 400) {
+      alert("Es wurde keine Lobby mit diesem Code gefunden.");
+      return;
+    }
+    const reponseDataJson = await responseData.json();
+    navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
+  };
 
   return (
-      <>
-        <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogRef}>
-          <form action={(e) => joinLobby(e)}>
-            <p>Lobbycode eingeben:</p>
-            <input type="text" name="lobbycode" onChange={(e) => setLobbyCode(e.target.value)} placeholder="Lobby Code"/>
+    <>
+      {/* Join Lobby Dialog */}
+      <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogRef}>
+        <form action={(e) => joinLobby(e)}>
+          <p>Lobbycode eingeben:</p>
+          <input className="input-center" type="text" name="lobbycode" onChange={(e) => setLobbyCode(e.target.value)} placeholder="Lobby Code" />
+          <div className="center-row mb-12">
             <button type="submit">Beitreten</button>
-          </form>
-        </Dialog>
+          </div>
+        </form>
+      </Dialog>
 
-        <h1>Start Menu</h1>
-        
-        <p>
-          Logged In: {isLoggedIn ? "true" : "false"} <br/>
-          <button onClick={handleLogout}>Log out</button><br/>
-        </p>
+      <h1>Start Menu</h1>
 
-        <p>
+      {/* Center box */}
+      <p className="boxed">
+        <div className="center-row mb-12">
           <button onClick={createLobby}>Lobby erstellen</button>
-        </p>
+        </div>
 
-        <button onClick={() => dialogRef.current?.toggleDialog()}>Lobby beitreten</button>
-      </>
+        <div className="center-row mb-12">
+          <button onClick={() => dialogRef.current?.toggleDialog()}>Lobby beitreten</button>
+        </div>
+
+        {lobbyCode ? <div style={{ marginTop: 8 }}>Letzter Lobby-Code: <strong>{lobbyCode}</strong></div> : null}
+      </p>
+
+      {/* Footer */}
+      <p className="footer-bottom">
+        Logged In: {isLoggedIn ? "true" : "false"} <br />
+        <button onClick={handleLogout}>Log out</button>
+      </p>
+    </>
   );
-}
+};
 
 export default StartMenu;
