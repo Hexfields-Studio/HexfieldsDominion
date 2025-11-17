@@ -5,7 +5,7 @@ import { getStorageItem, STORAGE_KEYS } from "../../constants/storage";
 import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
-import LoggedIn from "../loggedIn/loggedIn";
+import OptionsBar from "../../components/optionsBar/optionsBar";
 
 const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
@@ -68,22 +68,22 @@ const StartMenu = () => {
 
       <Dialog errorMessage="Es wurde keine Lobby mit diesem Code gefunden." ref={dialogErrorInvalidLobbycodeRef}/>
       
-      <LoggedIn>
-        <h1>Start Menu</h1>
+      <OptionsBar/>
 
-        {/* Center box */}
-        <p className="boxed">
-          <div className="center-row mb-12">
-            <button onClick={createLobby}>Lobby erstellen</button>
-          </div>
+      <h1>Start Menu</h1>
 
-          <div className="center-row mb-12">
-            <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
-          </div>
+      {/* Center box */}
+      <div className="boxed">
+        <div className="center-row mb-12">
+          <button onClick={createLobby}>Lobby erstellen</button>
+        </div>
 
-          {lobbyCode ? <div style={{ marginTop: 8 }}>Letzter Lobby-Code: <strong>{lobbyCode}</strong></div> : null}
-        </p>
-      </LoggedIn>
+        <div className="center-row mb-12">
+          <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
+        </div>
+
+        {lobbyCode ? <div style={{ marginTop: 8 }}>Letzter Lobby-Code: <strong>{lobbyCode}</strong></div> : null}
+      </div>
     </>
   );
 };

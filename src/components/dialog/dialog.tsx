@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "./dialog.css";
+import "../../index.css";
 
 interface DialogProps {
     title?: string;

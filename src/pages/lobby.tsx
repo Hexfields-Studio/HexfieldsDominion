@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../index.css";
 import { useNavigate, useParams } from "react-router";
+import OptionsBar from "../components/optionsBar/optionsBar";
 
 const Lobby = () => {
   const params = useParams();
@@ -23,6 +24,8 @@ const Lobby = () => {
 
   return (
     <>
+      <OptionsBar/>
+
       <h1>Lobby</h1>
 
       <div className="page-container">
@@ -39,7 +42,7 @@ const Lobby = () => {
 
         {/* Center: Code + Buttons */}
         <main className="col-main">
-          <p className="boxed">
+          <div className="boxed">
             <label className="field-full">
               <div className="label-note">Lobby Code</div>
 
@@ -76,7 +79,7 @@ const Lobby = () => {
                 Leave Lobby
               </button>
             </div>
-          </p>
+          </div>
         </main>
 
         {/* Right: Mods (boxed) */}
