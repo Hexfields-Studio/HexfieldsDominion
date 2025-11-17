@@ -24,70 +24,68 @@ const StartMenu = () => {
 
   const createLobby = async () => {
     try {
-      // curl -X PATCH /lobbies -> {"lobbyCode":"XXXXXXX"}
       console.log("Requesting Lobby from URL: " + API_URL);
-      const responseCode = await fetch(`${API_URL}/lobbies`, {
-          method: 'PATCH'
-      });
+      const responseCode = await fetch(`${API_URL}/lobbies`, { method: "PATCH" });
       const responseCodeJson = await responseCode.json();
-
-      // Setze Lobby Code
       const fetchedLobbyCode = responseCodeJson.lobbyCode;
       setLobbyCode(fetchedLobbyCode);
 
-      // curl -X GET /XXXXXXX -> lobby data 
       const responseData = await fetch(`${API_URL}/lobbies/${fetchedLobbyCode}`);
-      const reponseDataJson = await responseData.json();        
-      
-      // Navigiere zur Lobby
+      const reponseDataJson = await responseData.json();
       navi(`/lobby/${fetchedLobbyCode}`, { state: { reponseDataJson } });
     } catch (error) {
-        console.error('Error', error);
+      console.error("Error", error);
     }
   };
 
   const joinLobby = async (formData: FormData) => {
-      if (!formData.get("lobbycode")) {
-        return;
-      }
-
-      // curl -X GET /XXXXXXX -> lobby data 
-      const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
-      if (responseData.status === 400) {
-        dialogErrorInvalidLobbycodeRef.current?.toggleDialog();
-        return;
-      }
-
-      const reponseDataJson = await responseData.json();        
-      
-      // Navigiere zur Lobby
-      navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
-  }
+    if (!formData.get("lobbycode")) {
+      return;
+    }
+    const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
+    if (responseData.status === 400) {
+      dialogErrorInvalidLobbycodeRef.current?.toggleDialog();
+      return;
+    }
+    const reponseDataJson = await responseData.json();
+    navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
+  };
 
   const isLobbycodeValid = (codeToCheck: string) => codeToCheck && codeToCheck.match("^([a-zA-Z0-9])+$");
 
   return (
-      <>
-        <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogEnterLobbycodeRef}>
-          <form action={(e) => joinLobby(e)}>
-            <p>Lobbycode eingeben:</p>
-            <input type="text" name="lobbycode" value={lobbyCode} onChange={(e) => setLobbyCode(e.target.value.trim())} placeholder="Lobby Code"/>
+    <>
+      {/* Join Lobby Dialog */}
+      <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogEnterLobbycodeRef}>
+        <form action={(e) => joinLobby(e)}>
+          <p>Lobbycode eingeben:</p>
+          <input className="input-center" type="text" name="lobbycode" value={lobbyCode} onChange={(e) => setLobbyCode(e.target.value.trim())} placeholder="Lobby Code" />
+          <div className="center-row mb-12">
             <button disabled={!isLobbycodeValid(lobbyCode)} type="submit">Beitreten</button>
-          </form>
-        </Dialog>
+          </div>
+        </form>
+      </Dialog>
 
-        <Dialog errorMessage="Es wurde keine Lobby mit diesem Code gefunden." ref={dialogErrorInvalidLobbycodeRef}/>
+      <Dialog errorMessage="Es wurde keine Lobby mit diesem Code gefunden." ref={dialogErrorInvalidLobbycodeRef}/>
+      
+      <LoggedIn>
+        <h1>Start Menu</h1>
 
-        
-        <LoggedIn>
-          <h1>Start Menu</h1>
+        {/* Center box */}
+        <p className="boxed">
+          <div className="center-row mb-12">
+            <button onClick={createLobby}>Lobby erstellen</button>
+          </div>
 
-          <button onClick={createLobby}>Lobby erstellen</button>
+          <div className="center-row mb-12">
+            <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
+          </div>
 
-          <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
-        </LoggedIn>
-      </>
+          {lobbyCode ? <div style={{ marginTop: 8 }}>Letzter Lobby-Code: <strong>{lobbyCode}</strong></div> : null}
+        </p>
+      </LoggedIn>
+    </>
   );
-}
+};
 
 export default StartMenu;
