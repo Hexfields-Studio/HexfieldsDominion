@@ -4,6 +4,8 @@ import "./optionsBar.css";
 import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/storage";
 import { useNavigate } from "react-router";
 
+const BASE_PATH = import.meta.env.VITE_BASE_PATH;
+
 const OptionsBar = () => {
     
     const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
@@ -23,7 +25,7 @@ const OptionsBar = () => {
             </Dialog>
 
             <div id="optionsBar">
-                <button id="gearButton" onClick={() => dialogRef.current?.toggleDialog()}/>
+                <button id="gearButton" style={{backgroundImage: `url(${BASE_PATH}/gear.svg)`}} onClick={() => dialogRef.current?.toggleDialog()}/>
             </div>
         </>
     );
