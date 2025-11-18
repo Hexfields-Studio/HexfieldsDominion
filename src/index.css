@@ -100,7 +100,7 @@ div.boxed{
 /* columns & boxed side panels */
 .page-container{
   width:100%;
-  max-width:980px;
+  max-width:1200px;
   margin:.75rem auto;
   padding:0 1rem;
   display:flex;
@@ -109,7 +109,7 @@ div.boxed{
   justify-content:center;
 }
 .col-aside{
-  flex:0 0 220px;
+  flex:0 0 310px;
   display:flex;
   flex-direction:column;
   gap:12px;
@@ -130,7 +130,6 @@ div.boxed{
   align-items:flex-start;
   text-align:left;
 }
-.boxed-aside.mods{ align-items:flex-end; text-align:right; }
 
 /* lists */
 .list-vertical{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
@@ -191,6 +190,24 @@ select[data-nocolor="true"],
 }
 input[data-nocolor="true"]:focus,
 button[data-nocolor="true"]:focus{ box-shadow: 0 0 0 4px color-mix(in srgb, var(--foreground) 10%, transparent 90%); outline:none }
+
+.select {
+  color: black;
+  outline: none;
+  width: 100%;
+}
+
+.selectContainer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px 8px;
+  width: 100%;
+}
+
+.selectContainer p {
+  margin: 0;
+  align-content: center;
+}
 
 /* responsive */
 @media (max-width:600px){

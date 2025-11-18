@@ -2,6 +2,29 @@ import { useState } from "react";
 import "../index.css";
 import { useNavigate, useParams } from "react-router";
 import OptionsBar from "../components/optionsBar/optionsBar";
+import Select from "react-select";
+import type { SingleValue } from "react-select";
+
+type SelectOption = {
+    value: number;
+    label: string;
+}
+
+const selectOptionsMultiplayerMode: SelectOption[] = [
+  {value: 0, label: "Echtzeit"},
+  {value: 1, label: "Zugbasiert"}
+]
+
+const selectOptionsTurnTimeout: SelectOption[] = [
+  {value: 0, label: "1 min"},
+  {value: 1, label: "5 min"},
+  {value: 2, label: "15 min"}
+]
+
+const selectOptionsMods: SelectOption[] = [
+  {value: 0, label: "..."},
+  {value: 1, label: "..."}
+]
 
 const Lobby = () => {
   const params = useParams();
@@ -9,7 +32,14 @@ const Lobby = () => {
   const code = params.code ?? "";
   const uuid = params.uuid ?? "";
 
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<boolean>(false);
+  const [selectedMultiplayerMode, setSelectedMultiplayerMode] = useState<SelectOption | null>(null);
+  const [selectedTurnTimeout, setSelectedTurnTimeout] = useState<SelectOption | null>(null);
+  const [selectedMods, setSelectedMods] = useState<SelectOption | null>(null);
+
+  const onSelectMultiplayerMode = (selectedOption: SingleValue<SelectOption>) => setSelectedMultiplayerMode(selectedOption);
+  const onSelectTurnTimeout = (selectedOption: SingleValue<SelectOption>) => setSelectedTurnTimeout(selectedOption);
+  const onSelectMods = (selectedOption: SingleValue<SelectOption>) => setSelectedMods(selectedOption);
 
   const handleCopy = async () => {
     try {
@@ -84,12 +114,16 @@ const Lobby = () => {
 
         {/* Right: Mods (boxed) */}
         <aside className="col-aside">
-          <div className="boxed-aside mods">
-            <h3>Modifications</h3>
-            <ul className="list-vertical">
-              <li className="list-item">Classic Ruleset</li>
-              {/* OTHER MODS */}
-            </ul>
+          <div className="boxed-aside">
+            <h3>Konfiguration</h3>
+            <div className="selectContainer">
+              <p>Multiplayer-Modus</p>
+              <Select defaultValue={selectedMultiplayerMode} options={selectOptionsMultiplayerMode} onChange={onSelectMultiplayerMode} placeholder="Auswählen" className="select"/>
+              <p>Spielzug-Timeout</p>
+              <Select defaultValue={selectedTurnTimeout} options={selectOptionsTurnTimeout} onChange={onSelectTurnTimeout} placeholder="Auswählen" className="select"/>
+              <p>Mods</p>
+              <Select defaultValue={selectedMods} options={selectOptionsMods} onChange={onSelectMods} placeholder="Auswählen" className="select"/>
+            </div>
           </div>
         </aside>
       </div>
