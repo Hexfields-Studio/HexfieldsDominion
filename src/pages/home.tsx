@@ -30,7 +30,7 @@ const HomePage = () => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter username"
+            placeholder=""
           />
         </label>
 
@@ -42,7 +42,7 @@ const HomePage = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
+            placeholder=""
           />
         </label>
 
@@ -74,9 +74,9 @@ const HomePage = () => {
 
       {/* Debug Login */}
       <p className="footer-bottom">
-        Logged In: {isLoggedIn ? "true" : "false"}
+        User is logged in: {isLoggedIn ? "Yes" : "No"}
         <br />
-        <button onClick={() => setIsLoggedIn(!isLoggedIn)}>Toggle "isLoggedIn"</button>
+        <button data-nocolor="true" onClick={() => setIsLoggedIn(!isLoggedIn)}>Debug-Toggle "isLoggedIn"</button>
       </p>
     </>
   );
