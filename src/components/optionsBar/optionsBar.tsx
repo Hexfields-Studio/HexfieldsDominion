@@ -18,7 +18,7 @@ const OptionsBar = () => {
     return (
         <>
             <Dialog title="Optionen" id="gearDialog" ref={dialogRef}>
-                <p>Logged In: {isLoggedIn ? "true" : "false"}</p>
+                <p>User is logged in: {isLoggedIn ? "Yes" : "No"}</p>
                 <button onClick={handleLogout}>Log out</button>
             </Dialog>
 
