@@ -1,29 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import "../../index.css";
 import "./play.css";
-import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/storage";
+import { getStorageItem, STORAGE_KEYS } from "../../constants/storage";
 import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
+import OptionsBar from "../../components/optionsBar/optionsBar";
 
 const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
 const StartMenu = () => {
   const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
-  const [lobbyCode, setLobbyCode] = useState("");
+  const [lobbyCode, setLobbyCode] = useState<string>("");
   const navi = useNavigate();
-  const dialogRef = useRef<DialogHandle | null>(null);
+  const dialogEnterLobbycodeRef = useRef<DialogHandle | null>(null);
+  const dialogErrorInvalidLobbycodeRef = useRef<DialogHandle | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
       navi("/"); // Wenn nicht eingeloggt, zurück zur Home Page
     }
   }, [isLoggedIn, navi]);
-
-  const handleLogout = () => {
-    setStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false);
-    navi("/");
-  };
 
   const createLobby = async () => {
     try {
@@ -47,46 +44,46 @@ const StartMenu = () => {
     }
     const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
     if (responseData.status === 400) {
-      alert("Es wurde keine Lobby mit diesem Code gefunden.");
+      dialogErrorInvalidLobbycodeRef.current?.toggleDialog();
       return;
     }
     const reponseDataJson = await responseData.json();
     navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
   };
 
+  const isLobbycodeValid = (codeToCheck: string) => codeToCheck && codeToCheck.match("^([a-zA-Z0-9])+$");
+
   return (
     <>
       {/* Join Lobby Dialog */}
-      <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogRef}>
+      <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogEnterLobbycodeRef}>
         <form action={(e) => joinLobby(e)}>
           <p>Lobbycode eingeben:</p>
-          <input className="input-center" type="text" name="lobbycode" onChange={(e) => setLobbyCode(e.target.value)} placeholder="Lobby Code" />
+          <input className="input-center" type="text" name="lobbycode" value={lobbyCode} onChange={(e) => setLobbyCode(e.target.value.trim())} placeholder="Lobby Code" />
           <div className="center-row mb-12">
-            <button type="submit">Beitreten</button>
+            <button disabled={!isLobbycodeValid(lobbyCode)} type="submit">Beitreten</button>
           </div>
         </form>
       </Dialog>
 
+      <Dialog errorMessage="Es wurde keine Lobby mit diesem Code gefunden." ref={dialogErrorInvalidLobbycodeRef}/>
+      
+      <OptionsBar/>
+
       <h1>Start Menu</h1>
 
       {/* Center box */}
-      <p className="boxed">
+      <div className="boxed">
         <div className="center-row mb-12">
           <button onClick={createLobby}>Lobby erstellen</button>
         </div>
 
         <div className="center-row mb-12">
-          <button onClick={() => dialogRef.current?.toggleDialog()}>Lobby beitreten</button>
+          <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
         </div>
 
         {lobbyCode ? <div style={{ marginTop: 8 }}>Letzter Lobby-Code: <strong>{lobbyCode}</strong></div> : null}
-      </p>
-
-      {/* Footer */}
-      <p className="footer-bottom">
-        Logged In: {isLoggedIn ? "true" : "false"} <br />
-        <button onClick={handleLogout}>Log out</button>
-      </p>
+      </div>
     </>
   );
 };

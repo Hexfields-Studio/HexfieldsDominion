@@ -1,10 +1,12 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "./dialog.css";
+import "../../index.css";
 
 interface DialogProps {
-    title: string;
+    title?: string;
     id?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
+    errorMessage?: string;
 }
 
 export interface DialogHandle {
@@ -12,7 +14,12 @@ export interface DialogHandle {
 }
 
 const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
-    const {title, id, children} = props;
+    const {
+        title = "",
+        id,
+        children,
+        errorMessage
+    } = props;
 
     const [open, setOpen] = useState<boolean>(false);
     const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -44,15 +51,21 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
 
     return (
         <>
-            <dialog className="dialog" ref={dialogRef} closedby="any">
+            <dialog className={"dialog" + (errorMessage ? " errorDialog" : "")} ref={dialogRef} closedby="any">
                 <div className="closeContainer">
-                    <h3 className="title">{title}</h3>
+                    <h3 className="title">{errorMessage ? "Fehler" : title}</h3>
                     <button className="closeButton" onClick={toggleDialog}>
                         X
                     </button>
                 </div>
                 <div className="childrenContainer" id={id}>
-                    {children}
+                    {errorMessage ? (
+                        <>
+                            <p className="errorMessage">{errorMessage}</p>
+                            <button onClick={closeDialog}>OK</button>
+                        </>
+                    ) : children
+                    }
                 </div>
             </dialog>
         </>

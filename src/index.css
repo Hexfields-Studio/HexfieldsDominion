@@ -70,9 +70,18 @@ input:focus, textarea:focus, select:focus{
   box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-green) 12%, transparent 88%);
   transform: translateY(-1px);
 }
+button:disabled {
+    cursor: not-allowed;
+    border-color: color-mix(in srgb, var(--accent-green) 18%, var(--background) 82%);
+    background-color: color-mix(in srgb, var(--accent-green) 3%, var(--background) 97%);
+}
+button:disabled:hover {
+    box-shadow: none;
+    transform: none;
+}
 
-/* compact centered boxed paragraph */
-p.boxed{
+/* compact centered boxed div */
+div.boxed{
   background-color: var(--panel-bg);
   color: var(--foreground);
   padding: .75rem 1rem;
@@ -91,7 +100,7 @@ p.boxed{
 /* columns & boxed side panels */
 .page-container{
   width:100%;
-  max-width:980px;
+  max-width:1200px;
   margin:.75rem auto;
   padding:0 1rem;
   display:flex;
@@ -100,7 +109,7 @@ p.boxed{
   justify-content:center;
 }
 .col-aside{
-  flex:0 0 220px;
+  flex:0 0 310px;
   display:flex;
   flex-direction:column;
   gap:12px;
@@ -121,7 +130,6 @@ p.boxed{
   align-items:flex-start;
   text-align:left;
 }
-.boxed-aside.mods{ align-items:flex-end; text-align:right; }
 
 /* lists */
 .list-vertical{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
@@ -183,11 +191,29 @@ select[data-nocolor="true"],
 input[data-nocolor="true"]:focus,
 button[data-nocolor="true"]:focus{ box-shadow: 0 0 0 4px color-mix(in srgb, var(--foreground) 10%, transparent 90%); outline:none }
 
+.select {
+  color: black;
+  outline: none;
+  width: 100%;
+}
+
+.selectContainer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px 8px;
+  width: 100%;
+}
+
+.selectContainer p {
+  margin: 0;
+  align-content: center;
+}
+
 /* responsive */
 @media (max-width:600px){
   body{ padding:1rem; justify-content:flex-start; align-items:stretch }
   h1{ font-size:2rem }
-  p.boxed{ width:100%; max-width:100%; border-radius:10px; padding:.65rem .85rem }
+  div.boxed{ width:100%; max-width:100%; border-radius:10px; padding:.65rem .85rem }
   button, input[type="text"], input[type="search"], input[type="email"],
   input[type="password"], textarea, select{ width:100% }
   .page-container{ flex-direction:column; gap:12px }

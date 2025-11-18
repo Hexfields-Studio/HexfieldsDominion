@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "../index.css";
 import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../constants/storage";
 import { useNavigate } from "react-router";
+import OptionsBar from "../components/optionsBar/optionsBar";
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
@@ -15,9 +16,11 @@ const HomePage = () => {
 
   return (
     <>
+      <OptionsBar/>
+
       <h1>Home Page</h1>
 
-      <p className="boxed">
+      <div className="boxed">
         {/* Username + Password */}
         <label className="field-full">
           Username
@@ -67,7 +70,7 @@ const HomePage = () => {
           <button type="button" >Register</button>
           <button type="button" >Password forgotten</button>
         </div>
-      </p>
+      </div>
 
       {/* Debug Login */}
       <p className="footer-bottom">
