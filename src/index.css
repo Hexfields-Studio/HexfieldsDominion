@@ -60,6 +60,7 @@ select{
   border:2px solid var(--accent-green);
   border-radius:8px;
   padding:.5rem .75rem;
+  margin: 5px 5px;
   background-color: color-mix(in srgb, var(--accent-green) 8%, var(--background) 92%);
   color:var(--foreground);
   transition: box-shadow .12s ease, transform .08s ease, background-color .12s ease;
@@ -169,7 +170,7 @@ div.boxed{
 .footer-bottom{
   width:100%;
   text-align:center;
-  margin-top:.75rem;
+  margin-top: 50px;
   /* optional: match boxed style or spacing */
   color:var(--foreground);
 }

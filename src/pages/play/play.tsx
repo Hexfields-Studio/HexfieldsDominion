@@ -11,7 +11,8 @@ const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
 const StartMenu = () => {
   const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
-  const [lobbyCode, setLobbyCode] = useState<string>("");
+  const LAST_LOBBY_KEY = "LAST_LOBBY_CODE";
+  const [lobbyCode, setLobbyCode] = useState<string>(() => localStorage.getItem(LAST_LOBBY_KEY) ?? "");
   const navi = useNavigate();
   const dialogEnterLobbycodeRef = useRef<DialogHandle | null>(null);
   const dialogErrorInvalidLobbycodeRef = useRef<DialogHandle | null>(null);
@@ -29,6 +30,7 @@ const StartMenu = () => {
       const responseCodeJson = await responseCode.json();
       const fetchedLobbyCode = responseCodeJson.lobbyCode;
       setLobbyCode(fetchedLobbyCode);
+      localStorage.setItem(LAST_LOBBY_KEY, fetchedLobbyCode);
 
       const responseData = await fetch(`${API_URL}/lobbies/${fetchedLobbyCode}`);
       const reponseDataJson = await responseData.json();
@@ -48,6 +50,7 @@ const StartMenu = () => {
       return;
     }
     const reponseDataJson = await responseData.json();
+    localStorage.setItem(LAST_LOBBY_KEY, lobbyCode);
     navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
   };
 
@@ -82,7 +85,9 @@ const StartMenu = () => {
           <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
         </div>
 
-        {lobbyCode ? <div style={{ marginTop: 8 }}>Letzter Lobby-Code: <strong>{lobbyCode}</strong></div> : null}
+        <div style={{ marginTop: 8 }}>
+          Last Lobby Code: <strong>{lobbyCode ? lobbyCode : "None"}</strong>
+        </div>
       </div>
     </>
   );
