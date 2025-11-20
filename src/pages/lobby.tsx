@@ -4,11 +4,8 @@ import { useNavigate, useParams } from "react-router";
 import OptionsBar from "../components/optionsBar/optionsBar";
 import Select from "react-select";
 import type { SingleValue } from "react-select";
-
-type SelectOption = {
-    value: number;
-    label: string;
-}
+import type { SelectOption } from "../constants/customTypes";
+import { DefaultSelectStyle } from "../constants/selectStyles";
 
 const selectOptionsMultiplayerMode: SelectOption[] = [
   {value: 0, label: "Echtzeit"},
@@ -118,11 +115,11 @@ const Lobby = () => {
             <h3>Konfiguration</h3>
             <div className="selectContainer">
               <p>Multiplayer-Modus</p>
-              <Select defaultValue={selectedMultiplayerMode} options={selectOptionsMultiplayerMode} onChange={onSelectMultiplayerMode} placeholder="Auswählen" className="select"/>
+              <Select defaultValue={selectedMultiplayerMode} options={selectOptionsMultiplayerMode} onChange={onSelectMultiplayerMode} placeholder="Auswählen" styles={DefaultSelectStyle} isSearchable={false}/>
               <p>Spielzug-Timeout</p>
-              <Select defaultValue={selectedTurnTimeout} options={selectOptionsTurnTimeout} onChange={onSelectTurnTimeout} placeholder="Auswählen" className="select"/>
+              <Select defaultValue={selectedTurnTimeout} options={selectOptionsTurnTimeout} onChange={onSelectTurnTimeout} placeholder="Auswählen" styles={DefaultSelectStyle} isSearchable={false}/>
               <p>Mods</p>
-              <Select defaultValue={selectedMods} options={selectOptionsMods} onChange={onSelectMods} placeholder="Auswählen" className="select"/>
+              <Select defaultValue={selectedMods} options={selectOptionsMods} onChange={onSelectMods} placeholder="Auswählen" styles={DefaultSelectStyle} isSearchable={false}/>
             </div>
           </div>
         </aside>
