@@ -10,6 +10,9 @@
   --foreground: var(--fg-dark);
   --panel-bg: var(--panel-bg-dark);
 
+  --input-background: color-mix(in srgb, var(--background) 92%, var(--foreground) 8%);
+  --input-border: color-mix(in srgb, var(--foreground) 20%, transparent 80%);
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -184,19 +187,13 @@ select[data-nocolor="true"],
 .desaturate,
 [data-desaturate="true"]{
   filter: saturate(0);
-  background-color: color-mix(in srgb, var(--background) 92%, var(--foreground) 8%);
-  border-color: color-mix(in srgb, var(--foreground) 20%, transparent 80%);
+  background-color: var(--input-background);
+  border-color: var(--input-border);
   color: var(--foreground);
   transition: filter .18s ease, background-color .18s ease, border-color .18s ease;
 }
 input[data-nocolor="true"]:focus,
 button[data-nocolor="true"]:focus{ box-shadow: 0 0 0 4px color-mix(in srgb, var(--foreground) 10%, transparent 90%); outline:none }
-
-.select {
-  color: black;
-  outline: none;
-  width: 100%;
-}
 
 .selectContainer {
   display: grid;
