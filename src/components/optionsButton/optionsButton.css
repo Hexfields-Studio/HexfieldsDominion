@@ -1,12 +1,15 @@
 #gearButton {
-    margin: 1vw 1vw 0 auto;
-    background-size: cover;
+    position: fixed;
+    z-index: 50;
+    right: 0;
+    margin: 1vw 1vw 0 0;
     width: 4vw;
     height: 4vw;
     min-width: 40px;
     min-height: 40px;
     border: none;
     background-color: transparent;
+    background-size: cover;
     background-image: url(/HexfieldsDominion/gear.svg);
 }
 
@@ -20,13 +23,4 @@
 #gearDialog {
     min-width: 150px;
     width: 15vw;
-}
-
-#optionsBar {
-    position: fixed;
-    z-index: 50;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: right;
 }

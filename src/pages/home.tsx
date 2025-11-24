@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "../index.css";
 import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../constants/storage";
 import { useNavigate } from "react-router";
-import OptionsBar from "../components/optionsBar/optionsBar";
+import OptionsButton from "../components/optionsButton/optionsButton";
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
@@ -16,7 +16,7 @@ const HomePage = () => {
 
   return (
     <>
-      <OptionsBar/>
+      <OptionsButton/>
 
       <h1>Home Page</h1>
 

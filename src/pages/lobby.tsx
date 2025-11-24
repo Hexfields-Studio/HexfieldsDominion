@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../index.css";
 import { useNavigate, useParams } from "react-router";
-import OptionsBar from "../components/optionsBar/optionsBar";
+import OptionsButton from "../components/optionsButton/optionsButton";
 import Select from "react-select";
 import type { SingleValue } from "react-select";
 import type { SelectOption } from "../constants/customTypes";
@@ -51,7 +51,7 @@ const Lobby = () => {
 
   return (
     <>
-      <OptionsBar/>
+      <OptionsButton/>
 
       <h1>Lobby</h1>
 

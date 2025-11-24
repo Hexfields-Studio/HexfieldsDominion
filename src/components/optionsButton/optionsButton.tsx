@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "../dialog/dialog";
-import "./optionsBar.css";
+import "./optionsButton.css";
 import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/storage";
 import { useNavigate } from "react-router";
 
-const OptionsBar = () => {
+const OptionsButton = () => {
     const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
     const navigate = useNavigate();
     const dialogRef = useRef<DialogHandle | null>(null);
@@ -21,11 +21,9 @@ const OptionsBar = () => {
                 <button onClick={handleLogout}>Log out</button>
             </Dialog>
 
-            <div id="optionsBar">
-                <button id="gearButton" onClick={() => dialogRef.current?.toggleDialog()}/>
-            </div>
+            <button id="gearButton" onClick={() => dialogRef.current?.toggleDialog()}/>
         </>
     );
 }
 
-export default OptionsBar;
+export default OptionsButton;
