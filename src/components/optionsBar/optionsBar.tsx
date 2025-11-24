@@ -5,7 +5,6 @@ import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/st
 import { useNavigate } from "react-router";
 
 const OptionsBar = () => {
-    
     const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
     const navigate = useNavigate();
     const dialogRef = useRef<DialogHandle | null>(null);
@@ -25,7 +24,7 @@ const OptionsBar = () => {
             <div id="optionsBar">
                 <button id="gearButton"
                     // background-image here because path not valid in css prod
-                    style={{backgroundImage: "url(./gear.svg)"}}
+                    //style={{backgroundImage: "url(/HexfieldsDominion/gear.svg)"}}
                     onClick={() => dialogRef.current?.toggleDialog()}/>
             </div>
         </>
