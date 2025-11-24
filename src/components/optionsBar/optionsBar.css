@@ -7,6 +7,7 @@
     min-height: 40px;
     border: none;
     background-color: transparent;
+    background-image: url(/HexfieldsDominion/gear.svg);
 }
 
 #gearButton:hover,
@@ -22,6 +23,8 @@
 }
 
 #optionsBar {
+    position: fixed;
+    z-index: 50;
     width: 100vw;
     display: flex;
     flex-direction: column;
