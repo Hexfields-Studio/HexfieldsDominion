@@ -3,6 +3,12 @@ import { Layer, RegularPolygon, Stage } from "react-konva";
 import "./game_field.css";
 import type Konva from "konva";
 
+const radius: number = 100;
+
+const MIN_SCALE = 0.75;
+const MAX_SCALE = 2;
+const SCALE_BY = 1.1;
+
 interface hexagon{
     x: number,
     y: number,
@@ -13,10 +19,7 @@ interface GameFieldProps {
     boardRadius: number
 }
 
-const radius: number = 100;
-
 function generateHexagons(newHexagons: hexagon[], boardRadius: number) {
-    console.log("Generating")
     for (let q = -boardRadius + 1; q <= boardRadius - 1; q++) {
         const r1 = Math.max(-boardRadius + 1, -q - boardRadius + 1);
         const r2 = Math.min(boardRadius - 1, -q + boardRadius - 1);
@@ -40,6 +43,9 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x_mouse: 0, y_mouse: 0 });
     const [containerClientSize, setContainerClientSize] = useState({width: 0, height: 0});
+
+    //For Mousewheel zoom
+    const [scale, setScale] = useState(1);
 
     useEffect(() => {
         cameraOffsetRef.current = cameraOffset;
@@ -65,7 +71,10 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
     useEffect(() => {
         const container: HTMLDivElement | null = containerRef.current;
         if (container) {
-            setContainerClientSize({width: container.clientWidth, height: container.clientHeight});
+            setContainerClientSize({
+                width: container.clientWidth,
+                height: container.clientHeight
+            });
             setDimensions({
                 width: container.offsetWidth,
                 height: container.offsetHeight,
@@ -80,19 +89,67 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
         return () => window.removeEventListener("resize", ()=>handleResize(container));
     }, []);
 
-    function moveCamera({x_mouse, y_mouse}: {x_mouse: number, y_mouse: number}) {
+    function moveCamera(e: Konva.KonvaEventObject<MouseEvent>) {
         const halfWidth = containerClientSize.width / 2;
         const halfHeight = containerClientSize.height / 2;
 
-        let newCameraOffsetX: number = x_mouse - dragStart.x_mouse;
+        let newCameraOffsetX: number = e.evt.clientX - dragStart.x_mouse;
         newCameraOffsetX = Math.max(-halfWidth, Math.min(newCameraOffsetX, halfWidth));
-        let newCameraOffsetY: number =  y_mouse - dragStart.y_mouse;
+        let newCameraOffsetY: number =  e.evt.clientY - dragStart.y_mouse;
         newCameraOffsetY = Math.max(-halfHeight, Math.min(newCameraOffsetY, halfHeight));
         setCameraOffset({
             x: newCameraOffsetX,
             y: newCameraOffsetY,
         });
     }
+
+    const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
+        
+        e.evt.preventDefault(); // Prevents standard scrooling in browsers
+        const stage = e.target.getStage();
+        if (!stage) return;
+
+        const oldScale = scale;
+        const pointer = stage.getPointerPosition();
+        if (!pointer) return;
+
+        // Cursor position relative to the stage center
+        const mousePointTo = {
+            x: (pointer.x - stage.width() / 2 - cameraOffset.x) / oldScale,
+            y: (pointer.y - stage.height() / 2 - cameraOffset.y) / oldScale,
+        };
+
+        // Zoom direction
+        const direction = e.evt.deltaY > 0 ? 1 : -1;
+        const newScale = Math.max(MIN_SCALE, Math.min(oldScale * (direction > 0 ? 1 / SCALE_BY : SCALE_BY), MAX_SCALE));
+        setScale(newScale);
+
+        // Compute new camera offset so zoom centers on cursor
+        const halfWidth = containerClientSize.width / 2;
+        const halfHeight = containerClientSize.height / 2;
+        
+        const newCameraOffset = {
+            x: Math.max(-halfWidth, Math.min(pointer.x - stage.width() / 2 - mousePointTo.x * newScale, halfWidth)),
+            y: Math.max(-halfHeight, Math.min(pointer.y - stage.height() / 2 - mousePointTo.y * newScale, halfHeight))
+        };
+
+        setCameraOffset(newCameraOffset);
+
+        // If the user is currently dragging the camera, update dragStart so
+        // subsequent mouse moves remain relative to the new camera offset.
+        // This prevents the view from jumping when zooming while dragging.
+        if (isDragging) {
+            // e.evt.clientX / clientY are in viewport pixels, same units used when
+            // dragStart was set during onMouseDown (clientX - cameraOffset.x).
+            setDragStart({
+                x_mouse: (e.evt as WheelEvent).clientX - newCameraOffset.x,
+                y_mouse: (e.evt as WheelEvent).clientY - newCameraOffset.y,
+            });
+
+            // Keep the ref in sync for immediate calculations elsewhere.
+            cameraOffsetRef.current = newCameraOffset;
+        }
+    };
 
     return (
         <div ref={containerRef} className="full-page-container">
@@ -108,12 +165,19 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                 }}
                 onMouseMove={(e: Konva.KonvaEventObject<MouseEvent>) => {
                     if (!isDragging) return;
-                    moveCamera({x_mouse: e.evt.clientX, y_mouse: e.evt.clientY});
+                    moveCamera(e);
                 }}
+                onWheel={handleWheel}
                 onMouseUp={()=>setIsDragging(false)}
                 onMouseLeave={()=>setIsDragging(false)}
             >
-                <Layer x={cameraOffset.x + dimensions.width / 2} y={cameraOffset.y + dimensions.height / 2}>
+                <Layer
+                x={cameraOffset.x + dimensions.width / 2}
+                y={cameraOffset.y + dimensions.height / 2}
+                scaleX={scale}
+                scaleY={scale}
+                
+                >
                     {hexagons.map((hex, i) => (
                     <RegularPolygon
                         key={i}
