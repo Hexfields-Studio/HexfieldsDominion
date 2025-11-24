@@ -22,10 +22,7 @@ const OptionsBar = () => {
             </Dialog>
 
             <div id="optionsBar">
-                <button id="gearButton"
-                    // background-image here because path not valid in css prod
-                    //style={{backgroundImage: "url(/HexfieldsDominion/gear.svg)"}}
-                    onClick={() => dialogRef.current?.toggleDialog()}/>
+                <button id="gearButton" onClick={() => dialogRef.current?.toggleDialog()}/>
             </div>
         </>
     );
