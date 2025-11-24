@@ -5,7 +5,7 @@ import { getStorageItem, STORAGE_KEYS } from "../../constants/storage";
 import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
-import OptionsBar from "../../components/optionsBar/optionsBar";
+import OptionsButton from "../../components/optionsButton/optionsButton";
 
 const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
@@ -71,7 +71,7 @@ const StartMenu = () => {
 
       <Dialog errorMessage="Es wurde keine Lobby mit diesem Code gefunden." ref={dialogErrorInvalidLobbycodeRef}/>
       
-      <OptionsBar/>
+      <OptionsButton/>
 
       <h1>Start Menu</h1>
 
