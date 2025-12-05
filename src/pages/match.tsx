@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import "../index.css";
-import GameField from "../components/game_field";
+import GameField from "../components/gameField/game_field";
 import OptionsButton from "../components/optionsButton/optionsButton";
 
 const MatchPage = () => {

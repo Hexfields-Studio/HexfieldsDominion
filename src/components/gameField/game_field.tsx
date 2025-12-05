@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Layer, RegularPolygon, Stage } from "react-konva";
+import { Layer, Stage } from "react-konva";
 import "./game_field.css";
 import type Konva from "konva";
+import { Hexagon, type hexagonProps } from "./hexagon";
 
 const radius: number = 100;
 
@@ -9,30 +10,32 @@ const MIN_SCALE = 0.75;
 const MAX_SCALE = 2;
 const SCALE_BY = 1.1;
 
-interface hexagon{
-    x: number,
-    y: number,
-    fill: string
-}
+const numberChips: number[] = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
+numberChips.sort(() => Math.random() - 0.5); // Shuffle
 
 interface GameFieldProps {
     boardRadius: number
 }
 
-function generateHexagons(newHexagons: hexagon[], boardRadius: number) {
+function generateHexagons(newHexagons: hexagonProps[], boardRadius: number) {
     for (let q = -boardRadius + 1; q <= boardRadius - 1; q++) {
         const r1 = Math.max(-boardRadius + 1, -q - boardRadius + 1);
         const r2 = Math.min(boardRadius - 1, -q + boardRadius - 1);
         for (let r = r1; r <= r2; r++) {
             const x = (q + r/2) * Math.sqrt(3) * radius;
             const y = r * (3/2) * radius;
-            newHexagons.push({x, y, fill: "gold"});
+            if (q === 0 && r === 0) { // center hex  
+                newHexagons.push({x, y, fill: "gold", radius: radius, label: ""});
+            }else{  
+                newHexagons.push({x, y, fill: "green", radius: radius, label: numberChips.pop()!.toString()});
+            }
         }
     }
 }
 
 const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
-    const [hexagons, setHexagons] = useState<hexagon[]>([]);
+
+    const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -81,7 +84,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
             });
         }
 
-        const newHexagons: hexagon[] = []
+        const newHexagons: hexagonProps[] = []
         generateHexagons(newHexagons, boardRadius)
         setHexagons(newHexagons);
 
@@ -179,16 +182,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                 
                 >
                     {hexagons.map((hex, i) => (
-                    <RegularPolygon
-                        key={i}
-                        x={hex.x}
-                        y={hex.y}
-                        sides={6} // Hexagon has 6 sides
-                        radius={radius}
-                        fill={hex.fill}
-                        stroke="black"
-                        strokeWidth={2}
-                    />
+                            <Hexagon key={i} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
                     ))}
                 </Layer>
             </Stage>
