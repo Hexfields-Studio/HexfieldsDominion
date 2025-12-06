@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Image } from "react-konva";
 
-interface BuildingProps {
+export interface StructureProps {
     x: number;
     y: number;
     rotation: number; // degrees
@@ -12,7 +12,7 @@ interface BuildingProps {
     scale?: number;
 }
 
-export const Building: React.FC<BuildingProps> =
+export const Structure: React.FC<StructureProps> =
     ({x, y, rotation, src, width = 48, height = 32, scale = 1}) => {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
 
