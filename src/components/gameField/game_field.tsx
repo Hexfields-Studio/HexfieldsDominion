@@ -5,6 +5,8 @@ import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 
+const ASSET_URL = import.meta.env.VITE_ASSET_BASE_URL; // .env Dateien
+
 type Corner = { disabled: boolean, d: number; x: number; y: number; adjacentHexes: { q: number; r: number }[] };
 type CornerOffset = { direction: number; dx: number; dy: number };
 const cornerOffsetToAdjacentHexDeltas = [
@@ -251,7 +253,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                                         x: corner.x,
                                         y: corner.y,
                                         rotation: 0,
-                                        src: "/HexfieldsDominion/public/structures/mario-star.png",
+                                        src: `${ASSET_URL}/structures/mario-star.png`,
                                         width: 48,
                                         height: 48,
                                         scale: 1,
