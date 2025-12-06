@@ -251,7 +251,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                                         x: corner.x,
                                         y: corner.y,
                                         rotation: 0,
-                                        src: "/HexfieldsDominion/public/structures/mario-star.png",
+                                        src: "../structures/mario-star.png",
                                         width: 48,
                                         height: 48,
                                         scale: 1,
