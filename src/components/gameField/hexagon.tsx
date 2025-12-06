@@ -1,6 +1,8 @@
 import { Group, RegularPolygon, Text } from "react-konva";
 
 export interface hexagonProps {
+    q: number,
+    r: number,
     x: number,
     y: number,
     fill: string,

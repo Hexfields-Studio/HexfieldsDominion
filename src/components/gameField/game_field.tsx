@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Layer, Stage } from "react-konva";
+import { Circle, Layer, Stage } from "react-konva";
 import "./game_field.css";
 import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
@@ -13,8 +13,64 @@ const SCALE_BY = 1.1;
 const numberChips: number[] = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
 numberChips.sort(() => Math.random() - 0.5); // Shuffle
 
-interface GameFieldProps {
-    boardRadius: number
+type Corner = { d: number; x: number; y: number; adjacentHexes: { q: number; r: number }[] };
+
+type CornerOffset = { direction: number; dx: number; dy: number };
+
+const cornerOffsetToAdjacentHexDeltas = [
+    [{q: 0, r: -1}, {q: 1, r: -1}],
+    [{q: 1, r: -1}, {q: 1, r: 0}],
+    [{q: 1, r: 0}, {q: 0, r: 1}],
+    [{q: 0, r: 1}, {q: -1, r: 1}],
+    [{q: -1, r: 1}, {q: -1, r: 0}],
+    [{q: -1, r: 0}, {q: 0, r: -1}],
+];
+
+const cornerCubeOffsets = [
+    { x:  1, y: -1, z:  0 }, // top
+    { x:  1, y:  0, z: -1 }, // top-right
+    { x:  0, y:  1, z: -1 }, // bottom-right
+    { x: -1, y:  1, z:  0 }, // bottom
+    { x: -1, y:  0, z:  1 }, // bottom-left
+    { x:  0, y: -1, z:  1 }, // top-left
+];
+
+function computeUniqueCorners(hexagons: hexagonProps[], radius: number): Corner[] {
+    const cornerMap = new Map<string, Corner>();
+
+    // Precompute the 6 unit corner offsets for this radius
+    const cornerOffsets: CornerOffset[] = [];
+    for (let i = 0; i < 6; i++) {
+        // Start at top (-90°), move clockwise by adding 60° each step
+        const angle = (Math.PI / 180) * (-90 + 60 * i);
+        cornerOffsets.push({
+            direction: i,
+            dx: radius * Math.cos(angle),
+            dy: radius * Math.sin(angle)
+        });
+    }
+
+    for (const hex of hexagons) {
+        const { x, y, q, r } = hex;
+
+        for (const c of cornerOffsets) {
+            const corner_x = x + c.dx;
+            const corner_y = y + c.dy;
+            const adjacentHexes = [{ q, r }, ...cornerOffsetToAdjacentHexDeltas[c.direction].map(delta => ({ q: q + delta.q, r: r + delta.r }))];
+            const key = adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|");
+
+            if (!cornerMap.has(key)) {
+                cornerMap.set(key, {
+                    d: c.direction,
+                    x: corner_x,
+                    y: corner_y,
+                    adjacentHexes: adjacentHexes
+                });
+            }
+        }
+    }
+
+    return [...cornerMap.values()];
 }
 
 function generateHexagons(newHexagons: hexagonProps[], boardRadius: number) {
@@ -25,17 +81,22 @@ function generateHexagons(newHexagons: hexagonProps[], boardRadius: number) {
             const x = (q + r/2) * Math.sqrt(3) * radius;
             const y = r * (3/2) * radius;
             if (q === 0 && r === 0) { // center hex  
-                newHexagons.push({x, y, fill: "gold", radius: radius, label: ""});
+                newHexagons.push({q, r, x, y, fill: "gold", radius: radius, label: ""});
             }else{  
-                newHexagons.push({x, y, fill: "green", radius: radius, label: numberChips.pop()!.toString()});
+                newHexagons.push({q, r, x, y, fill: "green", radius: radius, label: numberChips.pop()!.toString()});
             }
         }
     }
 }
 
+interface GameFieldProps {
+    boardRadius: number
+}
+
 const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
 
     const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
+    const [corners, setCorners] = useState<Corner[]>([]);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -86,6 +147,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
 
         const newHexagons: hexagonProps[] = []
         generateHexagons(newHexagons, boardRadius)
+        setCorners(computeUniqueCorners(newHexagons, radius));
         setHexagons(newHexagons);
 
         window.addEventListener("resize", ()=>handleResize(container));
@@ -182,7 +244,10 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                 
                 >
                     {hexagons.map((hex, i) => (
-                            <Hexagon key={i} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
+                            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
+                    ))}
+                    {corners.map((corner, i) => (
+                        <Circle key={`corner-${i}`} x={corner.x} y={corner.y} radius={20} fill={"white"} opacity={0.5} onClick={()=>{console.log(corner.adjacentHexes, corner.d)}}/>
                     ))}
                 </Layer>
             </Stage>
