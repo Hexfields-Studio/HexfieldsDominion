@@ -1,23 +1,21 @@
-import { useRef, useState } from "react";
+import { useRef  } from "react";
 import Dialog, { type DialogHandle } from "../dialog/dialog";
 import "./optionsButton.css";
-import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../../constants/storage";
-import { useNavigate } from "react-router";
+import { useAuth } from "../../contexts/AuthContext";
 
 const OptionsButton = () => {
-    const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
-    const navigate = useNavigate();
+    const {logout} = useAuth();
+    
     const dialogRef = useRef<DialogHandle | null>(null);
 
     const handleLogout = () => {
-        setStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false); // TypeScript/Runtime-Mismatch. Funktioniert trotz Fehler.
-        navigate("/");
-    };
+        logout();
+        dialogRef.current?.toggleDialog();
+    }
 
     return (
         <>
             <Dialog title="Optionen" id="gearDialog" ref={dialogRef}>
-                <p>User is logged in: {isLoggedIn ? "Yes" : "No"}</p>
                 <button onClick={handleLogout}>Log out</button>
             </Dialog>
 

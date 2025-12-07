@@ -1,13 +1,18 @@
 import { Navigate, Outlet } from "react-router";
-import { getStorageItem, STORAGE_KEYS } from "../constants/storage";
+import { useAuth } from "../contexts/AuthContext";
 
 interface ProtectedRouteProps {
   redirectTo: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ redirectTo }) => {
-    const isLoggedIn = getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false);
-    return isLoggedIn ? <Outlet /> : <Navigate to={redirectTo} replace />;
+  let {token} = useAuth();
+  
+  if (!token) {
+    token = localStorage.getItem("token");
+  }
+
+  return token ? <Outlet /> : <Navigate to={redirectTo} replace />;
 };
 
 export default ProtectedRoute;

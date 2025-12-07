@@ -1,5 +1,4 @@
 export const STORAGE_KEYS = {
-  IS_LOGGED_IN: "isLoggedIn",
   LAST_LOBBY_CODE: "lastLobbyCode",
 };
 
