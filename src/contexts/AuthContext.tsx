@@ -51,6 +51,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
 
         localStorage.setItem("token", token);
         setToken(token);
+        const decodedToken: JwtDecoded = jwtDecode(token);
+        setUser(decodedToken.user);
         
         navigate("/play");
     }
