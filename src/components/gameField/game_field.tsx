@@ -43,8 +43,7 @@ const MIN_SCALE = 0.75;
 const MAX_SCALE = 2;
 const SCALE_BY = 1.1;
 
-const numberChips: number[] = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
-numberChips.sort(() => Math.random() - 0.5); // Shuffle
+let numberChips: number[];
 
 function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
     const edgeMap = new Map<string, Edge>();
@@ -173,6 +172,9 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
             });
         }
 
+        numberChips = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
+        numberChips.sort(() => Math.random() - 0.5); // Shuffle
+
         const newHexagons: hexagonProps[] = []
         generateHexagons(newHexagons, boardRadius)
         setCorners(computeUniqueCorners(newHexagons));
@@ -269,18 +271,18 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                 onMouseLeave={()=>setIsDragging(false)}
             >
                 <Layer
-                x={cameraOffset.x + dimensions.width / 2}
-                y={cameraOffset.y + dimensions.height / 2}
-                scaleX={scale}
-                scaleY={scale}
-                
+                    x={cameraOffset.x + dimensions.width / 2}
+                    y={cameraOffset.y + dimensions.height / 2}
+                    scaleX={scale}
+                    scaleY={scale}
+                    imageSmoothingEnabled={false}
                 >
                     {hexagons.map((hex, i) => (
-                            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
+                        <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
                     ))}
 
                     {edges.map((edge, i) => (
-                        <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{x: edge.width/2, y: edge.height/2}} fill={"blue"} opacity={0.2} rotation={edgeDirectionInDegrees[edge.direction]}/>
+                        <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{x: edge.width/2, y: edge.height/2}} fill={"gold"} opacity={0.3} rotation={edgeDirectionInDegrees[edge.direction]}/>
                     ))}
 
                     {corners.map((corner, i) => {
@@ -288,17 +290,20 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                         const isDisabled: boolean = disabledCorners.has(id);
 
                         return (
-                            <Circle key={id} x={corner.x} y={corner.y} radius={20} fill={"white"} opacity={isDisabled ? 0.0 : 0.2} 
+                            <Circle key={id} x={corner.x} y={corner.y} radius={20} opacity={isDisabled ? 0.0 : 1}
+                            fillLinearGradientStartPoint={{ x: -20, y: -20 }}
+                            fillLinearGradientEndPoint={{ x: 20, y: 20 }}
+                            fillLinearGradientColorStops={[0, 'turquoise', 1, 'blue']}
                                 onClick={()=>{
                                     if (isDisabled) return;
                                     setStructures([... structures, {
                                         x: corner.x,
                                         y: corner.y,
                                         rotation: 0,
-                                        src: "../structures/mario-star.png",
-                                        width: 48,
-                                        height: 48,
-                                        scale: 1,
+                                        src: "../structures/pixel_house_32x32.png",
+                                        width: 32,
+                                        height: 32,
+                                        scale: 1.5,
                                     }])
                                     setDisabledCorners(new Set(disabledCorners).add(id));
                             }}/>
