@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Circle, Layer, Stage } from "react-konva";
+import { Circle, Layer, Rect, Stage } from "react-konva";
 import "./game_field.css";
 import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 
-type Corner = { disabled: boolean, d: number; x: number; y: number; adjacentHexes: { q: number; r: number }[] };
+const radius: number = 100;
+
+type Corner = { disabled: boolean, direction: number; x: number; y: number; adjacentHexes: { q: number; r: number }[] };
 type CornerOffset = { direction: number; dx: number; dy: number };
 const cornerOffsetToAdjacentHexDeltas = [
     [{q: 0, r: -1}, {q: 1, r: -1}],
@@ -15,8 +17,27 @@ const cornerOffsetToAdjacentHexDeltas = [
     [{q: -1, r: 1}, {q: -1, r: 0}],
     [{q: -1, r: 0}, {q: 0, r: -1}],
 ];
+const cornerOffsets: CornerOffset[] = [];
+for (let i = 0; i < 6; i++) {   // Precompute the 6 unit corner offsets for this radius
+    // Start at top (-90°), move clockwise by adding 60° each step
+    const angle = (Math.PI / 180) * (-90 + 60 * i);
+    cornerOffsets.push({
+        direction: i,
+        dx: radius * Math.cos(angle),
+        dy: radius * Math.sin(angle)
+    });
+}
 
-const radius: number = 100;
+type Edge = {direction: number; x: number, y: number; width: number; height: number; adjacentHexes: { q: number; r: number }[]};
+const edgeDirectionToAdjacentHexDelta = [
+    {q: 1, r: -1},
+    {q: 1, r: 0},
+    {q: 0, r: 1},
+    {q: -1, r: 1},
+    {q: -1, r: 0},
+    {q: 0, r: -1}
+]
+const edgeDirectionInDegrees: number[] = [30, 90, 150, 210, 270, 330];
 
 const MIN_SCALE = 0.75;
 const MAX_SCALE = 2;
@@ -25,20 +46,33 @@ const SCALE_BY = 1.1;
 const numberChips: number[] = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
 numberChips.sort(() => Math.random() - 0.5); // Shuffle
 
-function computeUniqueCorners(hexagons: hexagonProps[], radius: number): Corner[] {
-    const cornerMap = new Map<string, Corner>();
-
-    // Precompute the 6 unit corner offsets for this radius
-    const cornerOffsets: CornerOffset[] = [];
-    for (let i = 0; i < 6; i++) {
-        // Start at top (-90°), move clockwise by adding 60° each step
-        const angle = (Math.PI / 180) * (-90 + 60 * i);
-        cornerOffsets.push({
-            direction: i,
-            dx: radius * Math.cos(angle),
-            dy: radius * Math.sin(angle)
-        });
+function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
+    const edgeMap = new Map<string, Edge>();
+    
+    for (const hex of hexagons) {
+        for (let direction = 0; direction < 6; direction++) {
+            const {x, y, q, r} = hex;
+            const start = {x: x + cornerOffsets[direction].dx, y: y + cornerOffsets[direction].dy};
+            const end = {x: x + cornerOffsets[(direction+1) % 6].dx, y: y + cornerOffsets[(direction+1) % 6].dy};
+            const adjacentHexes = [{q, r}, {q: q + edgeDirectionToAdjacentHexDelta[direction].q, r: r + edgeDirectionToAdjacentHexDelta[direction].r}];
+            const mapKey = adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|");
+            
+            if (!edgeMap.has(mapKey)) edgeMap.set(mapKey,{
+                direction: direction,
+                x: (start.x + end.x) / 2,
+                y: (start.y + end.y) / 2,
+                width: radius,
+                height: radius / 3,
+                adjacentHexes: adjacentHexes
+            });
+        }
     }
+    
+    return [...edgeMap.values()];
+}
+
+function computeUniqueCorners(hexagons: hexagonProps[]): Corner[] {
+    const cornerMap = new Map<string, Corner>();
 
     for (const hex of hexagons) {
         const { x, y, q, r } = hex;
@@ -52,7 +86,7 @@ function computeUniqueCorners(hexagons: hexagonProps[], radius: number): Corner[
             if (!cornerMap.has(mapKey)) {
                 cornerMap.set(mapKey, {
                     disabled: false,
-                    d: c.direction,
+                    direction: c.direction,
                     x: corner_x,
                     y: corner_y,
                     adjacentHexes: adjacentHexes
@@ -88,6 +122,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
 
     const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
     const [corners, setCorners] = useState<Corner[]>([]);
+    const [edges, setEdges] = useState<Edge[]>([]);
     const [disabledCorners, setDisabledCorners] = useState<Set<string>>(new Set());
     const [structures, setStructures] = useState<StructureProps[]>([]);
 
@@ -140,7 +175,8 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
 
         const newHexagons: hexagonProps[] = []
         generateHexagons(newHexagons, boardRadius)
-        setCorners(computeUniqueCorners(newHexagons, radius));
+        setCorners(computeUniqueCorners(newHexagons));
+        setEdges(computeUniqueEdges(newHexagons));
         setHexagons(newHexagons);
 
         window.addEventListener("resize", ()=>handleResize(container));
@@ -221,11 +257,14 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                         y_mouse: e.evt.clientY - cameraOffset.y,
                     });
                 }}
+
                 onMouseMove={(e: Konva.KonvaEventObject<MouseEvent>) => {
                     if (!isDragging) return;
                     moveCamera(e);
                 }}
                 onWheel={handleWheel}
+                
+                onTouchEnd={()=>setIsDragging(false)}
                 onMouseUp={()=>setIsDragging(false)}
                 onMouseLeave={()=>setIsDragging(false)}
             >
@@ -239,6 +278,11 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                     {hexagons.map((hex, i) => (
                             <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
                     ))}
+
+                    {edges.map((edge, i) => (
+                        <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{x: edge.width/2, y: edge.height/2}} fill={"blue"} opacity={0.2} rotation={edgeDirectionInDegrees[edge.direction]}/>
+                    ))}
+
                     {corners.map((corner, i) => {
                         const id: string = `corner-${i}`;
                         const isDisabled: boolean = disabledCorners.has(id);
@@ -260,6 +304,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                             }}/>
                         );
                     })}
+                    
                     {structures.map((structure, i) => (
                         <Structure key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
                     ))}
