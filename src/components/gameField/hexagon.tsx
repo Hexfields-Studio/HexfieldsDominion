@@ -17,7 +17,7 @@ export const Hexagon: React.FC<hexagonProps> = ({x, y, fill, radius, label}) => 
             <RegularPolygon
                 x={0}
                 y={0}
-                sides={6} // Hexagon has 6 sides
+                sides={6}
                 radius={radius}
                 fill={fill}
                 stroke="black"
