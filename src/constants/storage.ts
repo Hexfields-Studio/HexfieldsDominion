@@ -1,5 +1,6 @@
 export const STORAGE_KEYS = {
   LAST_LOBBY_CODE: "lastLobbyCode",
+  LAST_MATCH_UUID: "lastMatchUUID",
 };
 
 

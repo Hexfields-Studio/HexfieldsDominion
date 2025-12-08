@@ -6,6 +6,7 @@ import Select from "react-select";
 import type { SingleValue } from "react-select";
 import type { SelectOption } from "../constants/customTypes";
 import { DefaultSelectStyle } from "../constants/selectStyles";
+import {STORAGE_KEYS} from "../constants/storage";
 
 const selectOptionsMultiplayerMode: SelectOption[] = [
   {value: 0, label: "Echtzeit"},
@@ -23,12 +24,41 @@ const selectOptionsMods: SelectOption[] = [
   {value: 1, label: "..."}
 ]
 
+const generateUUID = () => {
+  const hexDigits = '0123456789abcdef';
+  let uuid = '';
+  
+  // Erzeuge 32 zufällige Hex-Zeichen
+  for (let i = 0; i < 32; i++) {
+    // Füge Bindestriche an den richtigen Stellen ein (8-4-4-4-12)
+    if (i === 8 || i === 12 || i === 16 || i === 20) {
+      uuid += '-';
+    }
+    
+    // Bei Position 12 muss die Version auf 4 gesetzt werden (Bit 12-15 = 0100)
+    if (i === 12) {
+      uuid += '4';
+    } 
+    // Bei Position 16 muss das Variant-Feld auf 10xx gesetzt werden (8, 9, a, b)
+    else if (i === 16) {
+      const variants = ['8', '9', 'a', 'b'];
+      uuid += variants[Math.floor(Math.random() * 4)];
+    }
+    // Normale zufällige Hex-Ziffer
+    else {
+      uuid += hexDigits[Math.floor(Math.random() * 16)];
+    }
+  }
+  
+  return uuid;
+};
+
 const Lobby = () => {
   const params = useParams();
   const navi = useNavigate();
   const code = params.code ?? "";
-  const uuid = params.uuid ?? "";
 
+  const [matchUUID, setMatchUUID] = useState<string>(() => localStorage.getItem(STORAGE_KEYS.LAST_MATCH_UUID) ?? "");
   const [copied, setCopied] = useState<boolean>(false);
   const [selectedMultiplayerMode, setSelectedMultiplayerMode] = useState<SelectOption | null>(null);
   const [selectedTurnTimeout, setSelectedTurnTimeout] = useState<SelectOption | null>(null);
@@ -89,12 +119,14 @@ const Lobby = () => {
 
             <div className="spacer-sm" aria-hidden="true" />
 
-            <div className="center-row mb-12">
+            <div className="center-row">
               <button className="btn-wide" type="button" onClick={() => {
-                if (!uuid) {
-                  alert("Match UUID not available.");
-                  return;
-                }
+                // wrong, uuid should be requested from server
+                const uuid = generateUUID();
+                
+                setMatchUUID(uuid);
+                localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, uuid);
+                
                 navi(`/match/${uuid}`);
               }}>
                 Join Match

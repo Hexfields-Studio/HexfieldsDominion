@@ -6,13 +6,15 @@ import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
 import OptionsButton from "../../components/optionsButton/optionsButton";
 import { useAuth } from "../../contexts/AuthContext";
+import {STORAGE_KEYS} from "../../constants/storage";
 
 const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
 const StartMenu = () => {
   const {token} = useAuth();
-  const LAST_LOBBY_KEY = "LAST_LOBBY_CODE";
-  const [lobbyCode, setLobbyCode] = useState<string>(() => localStorage.getItem(LAST_LOBBY_KEY) ?? "");
+
+  const [lobbyCode, setLobbyCode] = useState<string>(() => localStorage.getItem(STORAGE_KEYS.LAST_LOBBY_CODE) ?? "");
+
   const navi = useNavigate();
   const dialogEnterLobbycodeRef = useRef<DialogHandle | null>(null);
   const dialogErrorInvalidLobbycodeRef = useRef<DialogHandle | null>(null);
@@ -29,8 +31,9 @@ const StartMenu = () => {
       });
       const responseCodeJson = await responseCode.json();
       const fetchedLobbyCode = responseCodeJson.lobbyCode;
+
       setLobbyCode(fetchedLobbyCode);
-      localStorage.setItem(LAST_LOBBY_KEY, fetchedLobbyCode);
+      localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, fetchedLobbyCode);
 
       const responseData = await fetch(`${API_URL}/lobbies/${fetchedLobbyCode}`, {
         headers: {
@@ -60,7 +63,7 @@ const StartMenu = () => {
       return;
     }
     const reponseDataJson = await responseData.json();
-    localStorage.setItem(LAST_LOBBY_KEY, lobbyCode);
+    localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, lobbyCode);
     navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
   };
 
