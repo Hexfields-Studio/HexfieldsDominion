@@ -1,38 +1,43 @@
 import { useEffect, useRef, useState } from "react";
 import "../../index.css";
 import "./play.css";
-import { getStorageItem, STORAGE_KEYS } from "../../constants/storage";
 import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
 import OptionsButton from "../../components/optionsButton/optionsButton";
+import { useAuth } from "../../contexts/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
 
 const StartMenu = () => {
-  const [isLoggedIn] = useState(getStorageItem(STORAGE_KEYS.IS_LOGGED_IN, false));
+  const {token} = useAuth();
   const LAST_LOBBY_KEY = "LAST_LOBBY_CODE";
   const [lobbyCode, setLobbyCode] = useState<string>(() => localStorage.getItem(LAST_LOBBY_KEY) ?? "");
   const navi = useNavigate();
   const dialogEnterLobbycodeRef = useRef<DialogHandle | null>(null);
   const dialogErrorInvalidLobbycodeRef = useRef<DialogHandle | null>(null);
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navi("/"); // Wenn nicht eingeloggt, zurück zur Home Page
-    }
-  }, [isLoggedIn, navi]);
-
   const createLobby = async () => {
     try {
       console.log("Requesting Lobby from URL: " + API_URL);
-      const responseCode = await fetch(`${API_URL}/lobbies`, { method: "PATCH" });
+      const responseCode = await fetch(`${API_URL}/lobbies`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
       const responseCodeJson = await responseCode.json();
       const fetchedLobbyCode = responseCodeJson.lobbyCode;
       setLobbyCode(fetchedLobbyCode);
       localStorage.setItem(LAST_LOBBY_KEY, fetchedLobbyCode);
 
-      const responseData = await fetch(`${API_URL}/lobbies/${fetchedLobbyCode}`);
+      const responseData = await fetch(`${API_URL}/lobbies/${fetchedLobbyCode}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
       const reponseDataJson = await responseData.json();
       navi(`/lobby/${fetchedLobbyCode}`, { state: { reponseDataJson } });
     } catch (error) {
@@ -44,7 +49,12 @@ const StartMenu = () => {
     if (!formData.get("lobbycode")) {
       return;
     }
-    const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`);
+    const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`, {
+      headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+      }
+    });
     if (responseData.status === 400) {
       dialogErrorInvalidLobbycodeRef.current?.toggleDialog();
       return;

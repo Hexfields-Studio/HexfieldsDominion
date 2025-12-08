@@ -33,7 +33,7 @@ export const DefaultSelectStyle: StylesConfig<SelectOption, false> = ({
         ...base,
         cursor: "pointer",
         backgroundColor: "var(--input-background)",
-        '&:nth-child(n+2)': {
+        '&:nth-of-type(n+2)': {
             borderTop: "1px solid var(--input-border)"
         },
         '&:hover': {
