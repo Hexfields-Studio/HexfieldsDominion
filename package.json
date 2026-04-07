@@ -16,6 +16,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-konva": "^19.2.0",
+    "react-konva-utils": "^2.0.0",
     "react-router": "^7.9.5",
     "react-select": "^5.10.2"
   },

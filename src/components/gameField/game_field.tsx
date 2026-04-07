@@ -4,6 +4,7 @@ import "./game_field.css";
 import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
+import GameGui from "./gameGui/GameGui";
 
 const radius: number = 100;
 
@@ -314,6 +315,7 @@ const GameField: React.FC<GameFieldProps> = ({boardRadius}) => {
                         <Structure key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
                     ))}
                 </Layer>
+                <GameGui/>
             </Stage>
         </div>
     );
