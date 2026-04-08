@@ -1,9 +1,10 @@
 .dialog {
     border-radius: 25px;
-    border: 1px solid rgb(60, 60, 60);
+    border: 1px solid var(--input-border);
     padding: 10px;
     max-height: 90vh;
-    background-color: rgb(35, 35, 35);
+    background-color: var(--panel-bg);
+    color: var(--foreground);
 }
 
 .dialog::backdrop {
@@ -42,7 +43,7 @@
 }
 
 .errorMessage {
-    color: white;
+    color: var(--foreground);
 }
 
 .errorDialog {

@@ -2,9 +2,11 @@ import { useRef  } from "react";
 import Dialog, { type DialogHandle } from "../dialog/dialog";
 import "./optionsButton.css";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const OptionsButton = () => {
     const {logout} = useAuth();
+    const { toggleTheme, theme } = useTheme();
     
     const dialogRef = useRef<DialogHandle | null>(null);
 
@@ -13,10 +15,17 @@ const OptionsButton = () => {
         dialogRef.current?.toggleDialog();
     }
 
+    const handleThemeToggle = () => {
+        toggleTheme();
+    }
+
     return (
         <>
             <Dialog title="Optionen" id="gearDialog" ref={dialogRef}>
                 <button onClick={handleLogout}>Log out</button>
+                <button onClick={handleThemeToggle}>
+                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </button>
             </Dialog>
 
             <button id="gearButton" onClick={() => dialogRef.current?.toggleDialog()}/>
