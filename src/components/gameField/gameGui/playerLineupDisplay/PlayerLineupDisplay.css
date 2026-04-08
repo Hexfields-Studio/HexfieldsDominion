@@ -1,0 +1,15 @@
+.lineupDisplay{
+    width:100%;
+    display: flex;
+    justify-content: center;   /* center horizontally */
+}
+
+.img-wrapper{
+    height: 100px;
+    background-color:greenyellow;
+    border: 5px solid green;
+    box-sizing: border-box; /* include border inside the div */
+}
+.img-wrapper img{
+    height:100%
+}

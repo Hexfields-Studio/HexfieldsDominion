@@ -1,0 +1,14 @@
+.gui{
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* necessary to make the transparent/empty part of all flexboxes unclickable */
+}
+
+.flexboxes > * {
+    position: absolute;
+}
+
+.flexboxes > * > *{
+    position: relative;
+    pointer-events: all; /* provides the children from flexboxes the ability to get clicked */
+}
