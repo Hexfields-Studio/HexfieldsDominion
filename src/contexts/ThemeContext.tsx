@@ -15,15 +15,13 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [preference, setPreferenceState] = useState<ThemePreference>(() =>
+  const [preferenceState, setPreferenceState] = useState<ThemePreference>(() =>
     getStorageItem(STORAGE_KEYS.LIGHT_DARK_MODE, null)
   );
 
-  const getSystemTheme = (): Theme => {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  };
+  const getSystemTheme = (): Theme =>  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
-  const theme = preference || getSystemTheme();
+  const theme: ThemePreference = preferenceState || getSystemTheme();
 
   const setPreference = (newPreference: ThemePreference) => {
     setPreferenceState(newPreference);
@@ -31,9 +29,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const toggleTheme = () => {
-    if (preference === 'light') {
+    if (preferenceState === 'light') {
       setPreference('dark');
-    } else if (preference === 'dark') {
+    } else if (preferenceState === 'dark') {
       setPreference('light');
     } else {
       // If system, toggle to opposite of current system
@@ -48,20 +46,16 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   // Listen for system theme changes if preference is null
   useEffect(() => {
-    if (preference !== null) return;
+    if (preferenceState !== null) return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      // Force re-render by updating state, but since preference is null, theme will update
-      setPreferenceState(null);
-    };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [preference]);
+    mediaQuery.addEventListener('change', ()=>setPreferenceState(null));
+    return () => mediaQuery.removeEventListener('change', ()=>setPreferenceState(null));
+  }, [preferenceState]);
 
   return (
-    <ThemeContext.Provider value={{ theme, preference, setPreference, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, preference: preferenceState, setPreference, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
