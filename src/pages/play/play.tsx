@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import "../../index.css";
 import "./play.css";
 import { useNavigate } from "react-router";
