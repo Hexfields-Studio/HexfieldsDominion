@@ -2,6 +2,7 @@ import { jwtDecode } from "jwt-decode";
 import { createContext, useContext, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { STORAGE_KEYS } from "../constants/storage";
+import { ACCESS_TOKEN_REFRESH_TIME_FRAME } from "../constants/constants";
 
 type AuthContextType = {
     guest: () => void;
@@ -87,8 +88,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         }
         const expiresAt = new Date(jwtDecoded.exp * 1000);
 
-        const refreshTimeFrame = 5000; // 5s to make sure there is always a valid token (backend needs some time to process refresh request)
-        if ((expiresAt.getTime() - new Date().getTime()) < refreshTimeFrame) {
+        
+        if ((expiresAt.getTime() - new Date().getTime()) < ACCESS_TOKEN_REFRESH_TIME_FRAME) {
             // request new token
             const refreshTokenResponse = await fetch(`${API_URL}/auth/refresh`);
             if (refreshTokenResponse.status !== 200) {
