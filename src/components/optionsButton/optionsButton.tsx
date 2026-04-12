@@ -4,7 +4,13 @@ import "./optionsButton.css";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const OptionsButton = () => {
+interface OptionsButtonProps {
+    showLogOut?: boolean;
+}
+
+const OptionsButton = (props: OptionsButtonProps) => {
+    const {showLogOut = true} = props;
+
     const {logout} = useAuth();
     const { toggleTheme, theme } = useTheme();
     
@@ -22,7 +28,7 @@ const OptionsButton = () => {
     return (
         <>
             <Dialog title="Optionen" id="gearDialog" ref={dialogRef}>
-                <button onClick={handleLogout}>Log out</button>
+                {showLogOut && <button onClick={handleLogout}>Log out</button>}
                 <button onClick={handleThemeToggle}>
                     {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                 </button>

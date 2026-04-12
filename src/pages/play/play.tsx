@@ -8,12 +8,10 @@ import OptionsButton from "../../components/optionsButton/optionsButton";
 import { useAuth } from "../../contexts/AuthContext";
 import {STORAGE_KEYS} from "../../constants/storage";
 
-const API_URL = import.meta.env.VITE_API_URL; // .env Dateien
-
 const StartMenu = () => {
-  const {token} = useAuth();
+  const {fetchWithAuth} = useAuth();
 
-  const [lobbyCode, setLobbyCode] = useState<string>(() => localStorage.getItem(STORAGE_KEYS.LAST_LOBBY_CODE) ?? "");
+  const [lobbyCode, setLobbyCode] = useState<string>(localStorage.getItem(STORAGE_KEYS.LAST_LOBBY_CODE) ?? "");
 
   const navi = useNavigate();
   const dialogEnterLobbycodeRef = useRef<DialogHandle | null>(null);
@@ -21,26 +19,22 @@ const StartMenu = () => {
 
   const createLobby = async () => {
     try {
-      console.log("Requesting Lobby from URL: " + API_URL);
-      const responseCode = await fetch(`${API_URL}/lobbies`, {
-        method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
+      // create lobby
+      const responseCode = await fetchWithAuth("/lobbies", "PATCH");
+      if (responseCode === undefined) {
+        return;
+      }
       const responseCodeJson = await responseCode.json();
       const fetchedLobbyCode = responseCodeJson.lobbyCode;
 
       setLobbyCode(fetchedLobbyCode);
       localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, fetchedLobbyCode);
 
-      const responseData = await fetch(`${API_URL}/lobbies/${fetchedLobbyCode}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
+      // go to lobby
+      const responseData = await fetchWithAuth(`/lobbies/${fetchedLobbyCode}`, "GET");
+      if (responseData === undefined) {
+        return;
+      }
       const reponseDataJson = await responseData.json();
       navi(`/lobby/${fetchedLobbyCode}`, { state: { reponseDataJson } });
     } catch (error) {
@@ -52,17 +46,17 @@ const StartMenu = () => {
     if (!formData.get("lobbycode")) {
       return;
     }
-    const responseData = await fetch(`${API_URL}/lobbies/${lobbyCode}`, {
-      headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-      }
-    });
+
+    const responseData = await fetchWithAuth(`/lobbies/${lobbyCode}`, "GET");
+    if (responseData === undefined) {
+      return;
+    }
     if (responseData.status === 400) {
       dialogErrorInvalidLobbycodeRef.current?.toggleDialog();
       return;
     }
     const reponseDataJson = await responseData.json();
+
     localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, lobbyCode);
     navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
   };
