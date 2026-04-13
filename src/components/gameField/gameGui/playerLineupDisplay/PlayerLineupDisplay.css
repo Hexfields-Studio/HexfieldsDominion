@@ -4,12 +4,28 @@
     justify-content: center;   /* center horizontally */
 }
 
-.img-wrapper{
-    height: 100px;
-    background-color:greenyellow;
-    border: 5px solid green;
+.lineupDisplay-img-wrapper{
+    height: 90px;
+    background-color:darkslategray;
+    border: 3px solid black;
     box-sizing: border-box; /* include border inside the div */
 }
-.img-wrapper img{
-    height:100%
+.lineupDisplay-img-wrapper img{
+    height:100%;
+    filter: brightness(0.7);
+    opacity: 0.7;
+}
+
+.highlightPlayer{
+    height: 100px;
+}
+
+.highlightPlayer img{
+    filter: brightness(1);
+    opacity: 1;
+}
+
+.portraitText{
+    padding: 0%;
+    margin: 0;
 }

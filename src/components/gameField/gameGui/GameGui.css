@@ -4,11 +4,32 @@
     pointer-events: none; /* necessary to make the transparent/empty part of all flexboxes unclickable */
 }
 
-.flexboxes > * {
+.flexboxes > *{
     position: absolute;
 }
 
 .flexboxes > * > *{
     position: relative;
-    pointer-events: all; /* provides the children from flexboxes the ability to get clicked */
+}
+
+.endTurnButton{
+    pointer-events: all;
+    bottom: 0;
+    right: 0;
+    font-size:xxx-large;
+    box-sizing: border-box; /* include border inside the div */
+}
+
+.endTurnButton-active{
+    background-color:crimson;
+    border: 5px solid red;
+}
+
+.endTurnButton-inactive{
+    background-color:grey;
+    border: 5px solid darkgrey;
+}
+
+.font{
+    font-family: fantasy;
 }

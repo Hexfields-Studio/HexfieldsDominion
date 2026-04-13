@@ -5,7 +5,7 @@ import StartMenu from "./pages/play/play";
 import Lobby from "./pages/lobby";
 import MatchPage from "./pages/match";
 import ProtectedRoute from "./components/protectedRoute";
-import { ContextProviderTEST } from "./contexts/TestContext";
+import { RepositoryContextProvider } from "./contexts/MatchRepositoryContext";
 import { AuthProvider } from "./contexts/AuthContext";
 
 // https://reactrouter.com/start/declarative/routing
@@ -14,7 +14,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 const BASE_URL = "/HexfieldsDominion/";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <ContextProviderTEST>
+    <RepositoryContextProvider>
         <BrowserRouter basename={BASE_URL}>
             <AuthProvider>
                 <Routes>
@@ -41,5 +41,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </Routes>
             </AuthProvider>
         </BrowserRouter>
-    </ContextProviderTEST>
+    </RepositoryContextProvider>
 );
