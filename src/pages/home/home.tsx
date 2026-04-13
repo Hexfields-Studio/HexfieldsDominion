@@ -5,22 +5,26 @@ import OptionsButton from "../../components/optionsButton/optionsButton";
 import { useAuth } from "../../contexts/AuthContext";
 
 const HomePage = () => {
-  const {register, login} = useAuth();
+  const {register, login, guest} = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = () => {
-    register(email, password);
+    register({email, password});
   }
 
   const handleLogin = () => {
-    login(email, password);
+    login({email, password});
+  }
+
+  const handlePlayAsGuest = () => {
+    guest();
   }
 
   return (
     <>
-      <OptionsButton/>
+      <OptionsButton showLogOut={false}/>
 
       <h1>Home Page</h1>
 
@@ -61,7 +65,7 @@ const HomePage = () => {
 
         {/* Guest login */}
         <div className="form-row small row-seperated">
-          <button>
+          <button onClick={handlePlayAsGuest}>
             Als Gast spielen
           </button>
         </div>

@@ -5,7 +5,6 @@ import StartMenu from "./pages/play/play";
 import Lobby from "./pages/lobby";
 import MatchPage from "./pages/match";
 import ProtectedRoute from "./components/protectedRoute";
-import { ContextProviderTEST } from "./contexts/TestContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
@@ -16,9 +15,8 @@ const BASE_URL = "/HexfieldsDominion/";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <ThemeProvider>
-        <ContextProviderTEST>
-            <BrowserRouter basename={BASE_URL}>
-                <AuthProvider>
+        <BrowserRouter basename={BASE_URL}>
+            <AuthProvider>
                 <Routes>
 
                     {/*
@@ -43,6 +41,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </Routes>
             </AuthProvider>
         </BrowserRouter>
-    </ContextProviderTEST>
     </ThemeProvider>
 );
