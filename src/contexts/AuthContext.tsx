@@ -40,7 +40,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const response = await fetch(API_URL + path, {
             method: "POST",
             body: (credentials ? JSON.stringify(credentials) : null),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            credentials: "include"
         });
         const responseJson = await response.json();
       
@@ -52,7 +53,10 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
 
     const logout = async () => {
-        await fetch(`${API_URL}/auth/logout`, {method: "POST"});
+        await fetch(`${API_URL}/auth/logout`, {
+                method: "POST",
+                credentials: "include"
+            });
 
         localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
 
@@ -70,7 +74,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             headers: {
                 "Authorization": `Bearer ${getAccessToken()}`,
                 "Content-Type": "application/json"
-            }
+            },
+            credentials: "include"
         });
     };
 
@@ -91,7 +96,10 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         
         if ((expiresAt.getTime() - new Date().getTime()) < ACCESS_TOKEN_REFRESH_TIME_FRAME) {
             // request new token
-            const refreshTokenResponse = await fetch(`${API_URL}/auth/refresh`);
+            const refreshTokenResponse = await fetch(`${API_URL}/auth/refresh`, {
+                method: "GET",
+                credentials: "include"
+            });
             if (refreshTokenResponse.status !== 200) {
                 await logout();
                 return false;
