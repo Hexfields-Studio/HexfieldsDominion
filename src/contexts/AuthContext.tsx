@@ -92,7 +92,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             return false;
         }
         const expiresAt = new Date(jwtDecoded.exp * 1000);
-
         
         if ((expiresAt.getTime() - new Date().getTime()) < ACCESS_TOKEN_REFRESH_TIME_FRAME) {
             // request new token
