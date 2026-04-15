@@ -10,31 +10,31 @@ export interface hexagonProps {
     label: string
 }
 
-export const Hexagon: React.FC<hexagonProps> = ({x, y, fill, radius, label}) => {
+export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label }) => {
 
-    return (
-        <Group x={x} y={y}>
-            <RegularPolygon
-                x={0}
-                y={0}
-                sides={6}
-                radius={radius}
-                fill={fill}
-                stroke="black"
-                strokeWidth={2}
-            />
+  return (
+    <Group x={x} y={y}>
+      <RegularPolygon
+        x={0}
+        y={0}
+        sides={6}
+        radius={radius}
+        fill={fill}
+        stroke="black"
+        strokeWidth={2}
+      />
 
-            <Text
-                x={0}
-                y={0}
-                text={label}
-                fontSize={30}
-                fontStyle="bold"
-                align="center"
-                offsetX={15}
-                offsetY={15}
-            />
+      <Text
+        x={0}
+        y={0}
+        text={label}
+        fontSize={30}
+        fontStyle="bold"
+        align="center"
+        offsetX={15}
+        offsetY={15}
+      />
             
-        </Group>
-    );
-}
+    </Group>
+  );
+};

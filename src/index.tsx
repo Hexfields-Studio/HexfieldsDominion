@@ -15,32 +15,34 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 const BASE_URL = "/HexfieldsDominion/";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <RepositoryContextProvider>
-        <BrowserRouter basename={BASE_URL}>
-            <AuthProvider>
-                <Routes>
+  <RepositoryContextProvider>
+    <ThemeProvider>
+      <BrowserRouter basename={BASE_URL}>
+        <AuthProvider>
+          <Routes>
 
-                    {/*
+            {/*
                         / or /home = Home Page
                         /play = Start menu
                         /lobby = Lobby
                         /match = Match Page
                     */}
-                    <Route path={"/"} element={<HomePage />} />
-                    <Route path={"home"} element={<HomePage />} />
+            <Route path={"/"} element={<HomePage />} />
+            <Route path={"home"} element={<HomePage />} />
 
-                    <Route element={<ProtectedRoute redirectTo={"home"}/>}>
-                        <Route path={"play"} element={<StartMenu />} />
-                        <Route path={"lobby/:code"} element={<Lobby />} />
-                        <Route path={"match/:uuid"} element={<MatchPage />} />
+            <Route element={<ProtectedRoute redirectTo={"home"}/>}>
+              <Route path={"play"} element={<StartMenu />} />
+              <Route path={"lobby/:code"} element={<Lobby />} />
+              <Route path={"match/:uuid"} element={<MatchPage />} />
 
-                        <Route path={"lobby"} element={<Navigate to="/play" />} />
-                        <Route path={"match"} element={<Navigate to="/play" />} />
-                        {//Ohne code auf Start Page zurückweisen oder so
-                        }
-                    </Route>
-                </Routes>
-            </AuthProvider>
-        </BrowserRouter>
-    </RepositoryContextProvider>
+              <Route path={"lobby"} element={<Navigate to="/play" />} />
+              <Route path={"match"} element={<Navigate to="/play" />} />
+              {//Ohne code auf Start Page zurückweisen oder so
+              }
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
+  </RepositoryContextProvider>,
 );

@@ -7,13 +7,13 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ redirectTo }) => {
-  const {isAuthValid} = useAuth();
+  const { isAuthValid } = useAuth();
 
   const [authValidLoader, setAuthValidLoader] = useState<Promise<boolean> | undefined>(undefined);
 
   useEffect(() => {
-    setAuthValidLoader(new Promise(resolve => resolve(isAuthValid())))
-  }, [])
+    setAuthValidLoader(new Promise(resolve => resolve(isAuthValid())));
+  }, []);
 
   return authValidLoader && (
     <React.Suspense>

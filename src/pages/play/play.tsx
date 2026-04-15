@@ -6,10 +6,10 @@ import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
 import OptionsButton from "../../components/optionsButton/optionsButton";
 import { useAuth } from "../../contexts/AuthContext";
-import {STORAGE_KEYS} from "../../constants/storage";
+import { STORAGE_KEYS } from "../../constants/storage";
 
 const StartMenu = () => {
-  const {fetchWithAuth} = useAuth();
+  const { fetchWithAuth } = useAuth();
 
   const [lobbyCode, setLobbyCode] = useState<string>(localStorage.getItem(STORAGE_KEYS.LAST_LOBBY_CODE) ?? "");
 
