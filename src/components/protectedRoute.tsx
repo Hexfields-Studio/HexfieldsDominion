@@ -1,18 +1,27 @@
-import { Navigate, Outlet } from "react-router";
+import { Await, Navigate, Outlet } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
+import React, { useEffect, useState } from "react";
 
 interface ProtectedRouteProps {
   redirectTo: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ redirectTo }) => {
-  let {token} = useAuth();
-  
-  if (!token) {
-    token = localStorage.getItem("token");
-  }
+  const {isAuthValid} = useAuth();
 
-  return token ? <Outlet /> : <Navigate to={redirectTo} replace />;
+  const [authValidLoader, setAuthValidLoader] = useState<Promise<boolean> | undefined>(undefined);
+
+  useEffect(() => {
+    setAuthValidLoader(new Promise(resolve => resolve(isAuthValid())))
+  }, [])
+
+  return authValidLoader && (
+    <React.Suspense>
+      <Await resolve={authValidLoader}>
+        {valid => (valid ? <Outlet/> : <Navigate to={redirectTo} replace />)}
+      </Await>
+    </React.Suspense>
+  );
 };
 
 export default ProtectedRoute;

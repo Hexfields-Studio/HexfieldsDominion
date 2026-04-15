@@ -7,6 +7,7 @@ import MatchPage from "./pages/match";
 import ProtectedRoute from "./components/protectedRoute";
 import { RepositoryContextProvider } from "./contexts/MatchRepositoryContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 // https://reactrouter.com/start/declarative/routing
 

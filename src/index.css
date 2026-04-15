@@ -25,8 +25,8 @@
 }
 
 /* Light Mode Override */
-/* Usage: document.documentElement.dataset.light = "true" (-> Light mode) */
-:root[data-light="true"]{
+/* Usage: document.documentElement.dataset.theme = "light" (-> Light mode) */
+:root[data-theme="light"]{
   --background: var(--bg-light);
   --foreground: var(--fg-light);
   --panel-bg: var(--panel-bg-light);

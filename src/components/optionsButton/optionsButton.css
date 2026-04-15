@@ -11,6 +11,11 @@
     background-color: transparent;
     background-size: cover;
     background-image: url(/HexfieldsDominion/gear.svg);
+    filter: invert(0);
+}
+
+:root[data-theme="light"] #gearButton {
+    filter: invert(1); /* Invert for Light mode */
 }
 
 #gearButton:hover,
