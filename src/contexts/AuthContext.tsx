@@ -20,111 +20,111 @@ type Credentials = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({children}: {children: ReactNode}) => {
-    const navigate = useNavigate();
-    const API_URL = import.meta.env.VITE_API_URL;
+export const AuthProvider = ({ children }: {children: ReactNode}) => {
+  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
-    const guest = async () => {
-        await doLoginRequest("/auth/guest");
-    };
+  const guest = async () => {
+    await doLoginRequest("/auth/guest");
+  };
 
-    const register = async (credentials: Credentials) => {
-        await doLoginRequest("/auth/register", credentials);
-    }
+  const register = async (credentials: Credentials) => {
+    await doLoginRequest("/auth/register", credentials);
+  };
 
-    const login = async (credentials: Credentials) => {
-        await doLoginRequest("/auth/login", credentials);
-    };
+  const login = async (credentials: Credentials) => {
+    await doLoginRequest("/auth/login", credentials);
+  };
 
-    const doLoginRequest = async (path: string, credentials?: Credentials) => {
-        const response = await fetch(API_URL + path, {
-            method: "POST",
-            body: (credentials ? JSON.stringify(credentials) : null),
-            headers: { 'Content-Type': 'application/json' },
-            credentials: "include"
-        });
-        const responseJson = await response.json();
+  const doLoginRequest = async (path: string, credentials?: Credentials) => {
+    const response = await fetch(API_URL + path, {
+      method: "POST",
+      body: (credentials ? JSON.stringify(credentials) : null),
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    const responseJson = await response.json();
       
-        const token = responseJson.accessToken;
+    const token = responseJson.accessToken;
 
-        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
 
-        navigate("/play");
+    navigate("/play");
+  };
+
+  const logout = async () => {
+    await fetch(`${API_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+
+    navigate("/");
+  };
+
+  const fetchWithAuth = async (input: RequestInfo | URL, method: string) => {
+    const isValid = await isAuthValid();
+    if (!isValid) {
+      return;
     }
 
-    const logout = async () => {
-        await fetch(`${API_URL}/auth/logout`, {
-                method: "POST",
-                credentials: "include"
-            });
+    return await fetch(API_URL + input, {
+      method: method,
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+  };
 
-        localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+  // ls necessary for immediate access (in e.g. fetchWithAuth for multiple calls in a row) without async set... of useState
+  const getAccessToken = () => localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
-        navigate("/");
-    };
-
-    const fetchWithAuth = async (input: RequestInfo | URL, method: string) => {
-        const isValid = await isAuthValid();
-        if (!isValid) {
-            return;
-        }
-
-        return await fetch(API_URL + input, {
-            method: method,
-            headers: {
-                "Authorization": `Bearer ${getAccessToken()}`,
-                "Content-Type": "application/json"
-            },
-            credentials: "include"
-        });
-    };
-
-    // ls necessary for immediate access (in e.g. fetchWithAuth for multiple calls in a row) without async set... of useState
-    const getAccessToken = () => localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-
-    const isAuthValid = async () => {
-        const jwt = getAccessToken();
-        if (jwt === null) {
-            return false;
-        }
-        const jwtDecoded = jwtDecode(jwt);
-        if (jwtDecoded.exp === undefined) {
-            return false;
-        }
-        const expiresAt = new Date(jwtDecoded.exp * 1000);
+  const isAuthValid = async () => {
+    const jwt = getAccessToken();
+    if (jwt === null) {
+      return false;
+    }
+    const jwtDecoded = jwtDecode(jwt);
+    if (jwtDecoded.exp === undefined) {
+      return false;
+    }
+    const expiresAt = new Date(jwtDecoded.exp * 1000);
         
-        if ((expiresAt.getTime() - new Date().getTime()) < ACCESS_TOKEN_REFRESH_TIME_FRAME) {
-            // request new token
-            const refreshTokenResponse = await fetch(`${API_URL}/auth/refresh`, {
-                method: "GET",
-                credentials: "include"
-            });
-            if (refreshTokenResponse.status !== 200) {
-                await logout();
-                return false;
-            }
-            const responseJson = await refreshTokenResponse.json();
-            const newToken = responseJson.accessToken;
+    if ((expiresAt.getTime() - new Date().getTime()) < ACCESS_TOKEN_REFRESH_TIME_FRAME) {
+      // request new token
+      const refreshTokenResponse = await fetch(`${API_URL}/auth/refresh`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (refreshTokenResponse.status !== 200) {
+        await logout();
+        return false;
+      }
+      const responseJson = await refreshTokenResponse.json();
+      const newToken = responseJson.accessToken;
 
-            localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newToken);
-        }
-
-        return true;
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newToken);
     }
 
-    return (
-        <AuthContext.Provider value={{guest, register, login, logout, fetchWithAuth, isAuthValid}}>
-            {children}
-        </AuthContext.Provider>
-    );
-}
+    return true;
+  };
+
+  return (
+    <AuthContext.Provider value={{ guest, register, login, logout, fetchWithAuth, isAuthValid }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
+  const context = useContext(AuthContext);
     
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
     
-    return context;
+  return context;
 };

@@ -9,21 +9,21 @@ import InMemoryMatchRepository from "../repository/InMemoryMatchRepository";
 const MatchPage = () => {
   const params = useParams();
   const navi = useNavigate();
-  const {repository, setRepository} = useMatchRepository();
+  const { repository, setRepository } = useMatchRepository();
 
   useEffect(()=>{
-    repository.closeConnection()
-    setRepository(new InMemoryMatchRepository)
+    repository.closeConnection();
+    setRepository(new InMemoryMatchRepository);
     return () => repository.closeConnection();
-  },[])
+  },[]);
 
   return (
-      <>
-        <OptionsButton/>
+    <>
+      <OptionsButton/>
         
-        <GameField boardRadius={3}/>
-      </>
+      <GameField boardRadius={3}/>
+    </>
   );
-}
+};
 
 export default MatchPage;

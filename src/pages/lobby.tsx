@@ -6,42 +6,42 @@ import Select from "react-select";
 import type { SingleValue } from "react-select";
 import type { SelectOption } from "../constants/customTypes";
 import { DefaultSelectStyle } from "../constants/selectStyles";
-import {STORAGE_KEYS} from "../constants/storage";
+import { STORAGE_KEYS } from "../constants/storage";
 
 const selectOptionsMultiplayerMode: SelectOption[] = [
-  {value: 0, label: "Echtzeit"},
-  {value: 1, label: "Zugbasiert"}
-]
+  { value: 0, label: "Echtzeit" },
+  { value: 1, label: "Zugbasiert" },
+];
 
 const selectOptionsTurnTimeout: SelectOption[] = [
-  {value: 0, label: "1 min"},
-  {value: 1, label: "5 min"},
-  {value: 2, label: "15 min"}
-]
+  { value: 0, label: "1 min" },
+  { value: 1, label: "5 min" },
+  { value: 2, label: "15 min" },
+];
 
 const selectOptionsMods: SelectOption[] = [
-  {value: 0, label: "..."},
-  {value: 1, label: "..."}
-]
+  { value: 0, label: "..." },
+  { value: 1, label: "..." },
+];
 
 const generateUUID = () => {
-  const hexDigits = '0123456789abcdef';
-  let uuid = '';
+  const hexDigits = "0123456789abcdef";
+  let uuid = "";
   
   // Erzeuge 32 zufällige Hex-Zeichen
   for (let i = 0; i < 32; i++) {
     // Füge Bindestriche an den richtigen Stellen ein (8-4-4-4-12)
     if (i === 8 || i === 12 || i === 16 || i === 20) {
-      uuid += '-';
+      uuid += "-";
     }
     
     // Bei Position 12 muss die Version auf 4 gesetzt werden (Bit 12-15 = 0100)
     if (i === 12) {
-      uuid += '4';
+      uuid += "4";
     } 
     // Bei Position 16 muss das Variant-Feld auf 10xx gesetzt werden (8, 9, a, b)
     else if (i === 16) {
-      const variants = ['8', '9', 'a', 'b'];
+      const variants = ["8", "9", "a", "b"];
       uuid += variants[Math.floor(Math.random() * 4)];
     }
     // Normale zufällige Hex-Ziffer

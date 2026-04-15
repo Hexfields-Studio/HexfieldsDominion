@@ -5,22 +5,22 @@ import OptionsButton from "../../components/optionsButton/optionsButton";
 import { useAuth } from "../../contexts/AuthContext";
 
 const HomePage = () => {
-  const {register, login, guest} = useAuth();
+  const { register, login, guest } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = () => {
-    register({email, password});
-  }
+    register({ email, password });
+  };
 
   const handleLogin = () => {
-    login({email, password});
-  }
+    login({ email, password });
+  };
 
   const handlePlayAsGuest = () => {
     guest();
-  }
+  };
 
   return (
     <>
