@@ -75,7 +75,6 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": "application/json",
       },
-      credentials: "include",
     });
   };
 
