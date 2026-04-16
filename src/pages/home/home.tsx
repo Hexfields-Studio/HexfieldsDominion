@@ -22,6 +22,8 @@ const HomePage = () => {
     guest();
   };
 
+  const isEmailOrPwValid = (input: string) => input && input.match("^([a-zA-Z0-9*._\\-+=()!%@])+$");
+
   return (
     <>
       <OptionsButton showLogOut={false}/>
@@ -54,11 +56,11 @@ const HomePage = () => {
 
         {/* Login + Register */}
         <div className="form-row">
-          <button onClick={handleLogin}>
+          <button onClick={handleLogin} disabled={!isEmailOrPwValid(email) || !isEmailOrPwValid(password)}>
             Login
           </button>
 
-          <button onClick={handleRegister}>
+          <button onClick={handleRegister} disabled={!isEmailOrPwValid(email) || !isEmailOrPwValid(password)}>
             Registrieren
           </button>
         </div>
