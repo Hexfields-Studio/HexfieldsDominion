@@ -1,6 +1,6 @@
 import { Await, Navigate, Outlet } from "react-router";
-import { useAuth } from "../contexts/AuthContext";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../contexts/contexts";
 
 interface ProtectedRouteProps {
   redirectTo: string;

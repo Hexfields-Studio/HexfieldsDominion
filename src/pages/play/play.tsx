@@ -5,8 +5,8 @@ import { useNavigate } from "react-router";
 import type { DialogHandle } from "../../components/dialog/dialog";
 import Dialog from "../../components/dialog/dialog";
 import OptionsButton from "../../components/optionsButton/optionsButton";
-import { useAuth } from "../../contexts/AuthContext";
 import { STORAGE_KEYS } from "../../constants/storage";
+import { useAuth } from "../../contexts/contexts";
 
 const StartMenu = () => {
   const { fetchWithAuth } = useAuth();

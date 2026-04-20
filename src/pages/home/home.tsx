@@ -2,27 +2,27 @@ import { useState } from "react";
 import "../../index.css";
 import "./home.css";
 import OptionsButton from "../../components/optionsButton/optionsButton";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/contexts";
 
 const HomePage = () => {
   const { register, login, guest } = useAuth();
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = () => {
-    register({ email, password });
+    register({ username, password });
   };
 
   const handleLogin = () => {
-    login({ email, password });
+    login({ username, password });
   };
 
   const handlePlayAsGuest = () => {
     guest();
   };
 
-  const isEmailOrPwValid = (input: string) => input && input.match("^([a-zA-Z0-9*._\\-+=()!%@])+$");
+  const isUsernameOrPwValid = (input: string) => input && input.match("^([a-zA-Z0-9*._\\-+=()!%@])+$");
 
   return (
     <>
@@ -31,15 +31,15 @@ const HomePage = () => {
       <h1>Home Page</h1>
 
       <div className="boxed">
-        {/* Email + Password */}
+        {/* Username + Password */}
         <label className="field-full">
-          Email
+          Username
           <br />
           <input
             className="input-center"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </label>
 
@@ -56,11 +56,11 @@ const HomePage = () => {
 
         {/* Login + Register */}
         <div className="form-row">
-          <button onClick={handleLogin} disabled={!isEmailOrPwValid(email) || !isEmailOrPwValid(password)}>
+          <button onClick={handleLogin} disabled={!isUsernameOrPwValid(username) || !isUsernameOrPwValid(password)}>
             Login
           </button>
 
-          <button onClick={handleRegister} disabled={!isEmailOrPwValid(email) || !isEmailOrPwValid(password)}>
+          <button onClick={handleRegister} disabled={!isUsernameOrPwValid(username) || !isUsernameOrPwValid(password)}>
             Registrieren
           </button>
         </div>
