@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useMatchRepository } from "../../../../contexts/MatchRepositoryContext";
 import "./PlayerLineupDisplay.css";
+import { useMatchRepository } from "../../../../contexts/contexts";
 
 const PlayerLineupDisplay: React.FC = () => {
 

@@ -1,18 +1,17 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../constants/storage";
+import { ThemeContext } from "./contexts";
 
 type Theme = "light" | "dark";
 
 type ThemePreference = Theme | null; // null means follow system
 
-interface ThemeContextType {
+export interface ThemeContextType {
   theme: Theme;
   preference: ThemePreference;
   setPreference: (preference: ThemePreference) => void;
   toggleTheme: () => void;
 }
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [preferenceState, setPreferenceState] = useState<ThemePreference>(() =>
@@ -59,10 +58,4 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error("useTheme must be used within ThemeProvider");
-  return context;
 };

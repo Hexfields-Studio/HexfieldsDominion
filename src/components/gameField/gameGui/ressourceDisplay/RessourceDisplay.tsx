@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useMatchRepository } from "../../../../contexts/MatchRepositoryContext";
 import type { PlayerRessources } from "../../../../repository/MatchRepository";
 import "./RessourceDisplay.css";
+import { useMatchRepository } from "../../../../contexts/contexts";
 
 const RessourceDisplay: React.FC = () => {
 

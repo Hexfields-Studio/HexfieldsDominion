@@ -3,8 +3,8 @@ import PlayerLineupDisplay from "./playerLineupDisplay/PlayerLineupDisplay";
 import RessourceDisplay from "./ressourceDisplay/RessourceDisplay";
 import "./GameGui.css";
 import { Html } from "react-konva-utils";
-import { useMatchRepository } from "../../../contexts/MatchRepositoryContext";
 import { useEffect, useState } from "react";
+import { useMatchRepository } from "../../../contexts/contexts";
 
 const GameGui: React.FC = () => {
 
