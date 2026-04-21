@@ -1,10 +1,11 @@
 import { jwtDecode } from "jwt-decode";
-import { createContext, useContext, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { STORAGE_KEYS } from "../constants/storage";
 import { ACCESS_TOKEN_REFRESH_TIME_FRAME } from "../constants/constants";
+import { AuthContext } from "./contexts";
 
-type AuthContextType = {
+export type AuthContextType = {
     guest: () => void;
     register: (credentials: Credentials) => void;
     login: (credentials: Credentials) => void;
@@ -14,11 +15,9 @@ type AuthContextType = {
 }
 
 type Credentials = {
-    email: string;
+    username: string;
     password: string;
 }
-
-const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const navigate = useNavigate();
@@ -116,14 +115,4 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-    
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-    
-  return context;
 };
