@@ -1,7 +1,7 @@
 import { useRef  } from "react";
-import Dialog, { type DialogHandle } from "../dialog/dialog";
+import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import "./optionsButton.css";
-import { useAuth, useTheme } from "../../contexts/contexts";
+import { useAuth, useTheme } from "@/contexts/contexts";
 
 interface OptionsButtonProps {
     showLogOut?: boolean;

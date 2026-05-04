@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import type { PlayerRessources } from "../../../../repository/MatchRepository";
-import "./RessourceDisplay.css";
-import { useMatchRepository } from "../../../../contexts/contexts";
+import type { PlayerRessources } from "@/repository/MatchRepository";
+import styles from "./RessourceDisplay.module.scss";
+import { useMatchRepository } from "@/contexts/contexts";
+
+const ressources: string[] = ["wood", "brick", "wheat", "sheep"];
 
 const RessourceDisplay: React.FC = () => {
 
@@ -22,25 +24,15 @@ const RessourceDisplay: React.FC = () => {
     <>
       {
         myRessources ? (
-          <div className="ressourceDisplay">
-            <div className="ressourceDisplay-img-wrapper" style={{ backgroundColor: "darkolivegreen" }}>
-              <img src="../ressources/wood.png"></img>
-              <span className="ressourceCountNumber">{myRessources.get("wood")}</span>
-            </div>
-            <div className="ressourceDisplay-img-wrapper" style={{ backgroundColor: "darkred" }}>
-              <img src="../ressources/brick.png"></img>
-              <span className="ressourceCountNumber">{myRessources.get("brick")}</span>
-            </div>
-            <div className="ressourceDisplay-img-wrapper" style={{ backgroundColor: "darkkhaki" }}>
-              <img src="../ressources/wheat.png"></img>
-              <span className="ressourceCountNumber">{myRessources.get("wheat")}</span>
-            </div>
-            <div className="ressourceDisplay-img-wrapper" style={{ backgroundColor: "ThreeDDarkShadow" }}>
-              <img src="../ressources/sheep.png"></img>
-              <span className="ressourceCountNumber">{myRessources.get("sheep")}</span>
-            </div>
-            <button className="ressourceDisplay-img-wrapper bankButton">
-              <img src="../ressources/bank.png"></img>
+          <div className={styles.ressourceDisplayLayout}>
+            {ressources.map(ressource => 
+              <div key={ressource} className={`${styles.ressource} ${styles[ressource]}`}>
+                <img src={`${import.meta.env.BASE_URL}ressources/${ressource}.png`}></img>
+                <span className={styles.ressourceCountNumber}>{myRessources.get("wood")}</span>
+              </div>
+            )}
+            <button className={styles.bankButton}>
+              <img src={`${import.meta.env.BASE_URL}ressources/bank.png`}></img>
             </button>
           </div>
         ) : (

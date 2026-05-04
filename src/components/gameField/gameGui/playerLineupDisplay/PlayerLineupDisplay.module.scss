@@ -1,0 +1,33 @@
+.lineupDisplay {
+    width: 100%;
+    display: flex;
+    justify-content: center;    //Center horizontally
+
+    .playerPortrait {
+        height: 90px;
+        background-color: map.get($gameGui, lineupDisplay, backgroundColor);
+        border: 3px solid map.get($gameGui, lineupDisplay, borderColor);
+        box-sizing: border-box;     //Include border inside the element
+        transition: all 0.2s ease;
+
+        img {
+            height: 100%;
+            filter: brightness(0.7);
+            opacity: 0.7;
+        }
+
+        &.highlightPlayer {
+            height: 100px;
+
+            img {
+                filter: brightness(1);
+                opacity: 1;
+            }
+        }
+
+        .portraitText {
+            padding: 0;
+            margin: 0;
+        }
+    }
+}
