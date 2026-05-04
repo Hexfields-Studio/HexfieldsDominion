@@ -8,5 +8,18 @@ $gameGui: (
     brick: darkred,
     wheat: darkkhaki,
     sheep: ThreeDDarkShadow
+  ),
+  endTurnButton: (
+    borderWidth: 3px,
+    borderStyle: solid,
+    
+    active: (
+      backgroundColor: crimson,
+      borderColor: red
+    ),
+    inactive: (
+      backgroundColor: grey,
+      borderColor: darkgrey
+    )
   )
 )

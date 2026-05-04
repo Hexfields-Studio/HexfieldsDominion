@@ -20,14 +20,17 @@
         box-sizing: border-box; /* include border inside the div */
         font-family: fantasy;
 
+        border-width: map.get($gameGui, endTurnButton, borderWidth);
+        border-style: map.get($gameGui, endTurnButton, borderStyle);
+
         &.gui__endTurnButton--active{
-            background-color:crimson;
-            border: 5px solid red;
+            background-color: map.get($gameGui, endTurnButton, active, backgroundColor);
+            border-color: map.get($gameGui, endTurnButton, active, borderColor);
         }
 
         &.gui__endTurnButton--inactive{
-            background-color:grey;
-            border: 5px solid darkgrey;
+            background-color: map.get($gameGui, endTurnButton, inactive, backgroundColor);
+            border-color: map.get($gameGui, endTurnButton, inactive, borderColor);
         }
     }
 }
