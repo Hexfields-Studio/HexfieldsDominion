@@ -78,6 +78,8 @@ const Lobby = () => {
   const onSelectMods = (selectedOption: SingleValue<SelectOption>) => setSelectedMods(selectedOption);
 
   useEffect(() => {
+    let eventSource: EventSource;
+
     // Fetch initial players
     const fetchPlayers = async () => {
       const response = await fetchWithAuth(`/lobbies/${code}`, "GET");
@@ -85,20 +87,28 @@ const Lobby = () => {
         const data = await response.json();
         setPlayers(data.players || []);
       }
+
+      // Set up SSE for real-time updates
+      const responseSseToken = await fetchWithAuth("/auth/ssetoken", "GET");
+      if (!responseSseToken) {
+        return;
+      }
+
+      const sseToken = await responseSseToken.json();
+      console.log(sseToken);
+      
+      eventSource = new EventSource(`${import.meta.env.VITE_API_URL}/lobbies/${code}/events?ssetoken=${sseToken}`);
+      eventSource.addEventListener('lobbyUpdate', (event) => {
+        const data = JSON.parse(event.data);
+        setPlayers(data);
+      });
+
+      eventSource.onerror = (err) => {
+        console.error("SSE error:", err);
+      };
     };
 
     fetchPlayers();
-
-    // Set up SSE for real-time updates
-    const eventSource = new EventSource(`${import.meta.env.VITE_API_URL}/lobbies/${code}/events`);
-    eventSource.addEventListener('lobbyUpdate', (event) => {
-      const data = JSON.parse(event.data);
-      setPlayers(data);
-    });
-
-    eventSource.onerror = (err) => {
-      console.error("SSE error:", err);
-    };
 
     return () => {
       eventSource.close();
