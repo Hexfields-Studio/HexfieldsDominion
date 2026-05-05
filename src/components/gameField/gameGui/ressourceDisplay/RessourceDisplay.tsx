@@ -1,24 +1,13 @@
 import { useEffect, useState } from "react";
 import type { PlayerRessources } from "@/repository/MatchRepository";
 import styles from "./RessourceDisplay.module.scss";
-import { useMatchRepository } from "@/contexts/contexts";
+import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
 
 const ressources: string[] = ["wood", "brick", "wheat", "sheep"];
 
 const RessourceDisplay: React.FC = () => {
 
-  const { repository } = useMatchRepository();
-  const [matchData, setMatchData] = useState(repository.getMatchData());
-  const [myRessources, setMyRessources] = useState<PlayerRessources>();
-
-  useEffect(()=>{
-    repository.keepMeUpdated(setMatchData);
-  }, []);
-
-  useEffect(()=>{
-    const myRessources: PlayerRessources | undefined = matchData.find(playerRessource => playerRessource.publicId === repository.getMyPublicId())?.ressources;
-    if (myRessources) setMyRessources(myRessources);
-  }, [matchData]);
+  const myRessources: PlayerRessources | undefined = useMyRessources();
 
   return (
     <>
