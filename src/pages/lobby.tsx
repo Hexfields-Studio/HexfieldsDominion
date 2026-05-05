@@ -89,18 +89,19 @@ const Lobby = () => {
       }
 
       // Set up SSE for real-time updates
-      const responseSseToken = await fetchWithAuth("/auth/ssetoken", "GET");
-      if (!responseSseToken) {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        console.error("No access token found for SSE");
         return;
       }
 
-      const sseToken = await responseSseToken.json();
-      console.log(sseToken);
-      
-      eventSource = new EventSource(`${import.meta.env.VITE_API_URL}/lobbies/${code}/events?ssetoken=${sseToken}`);
-      eventSource.addEventListener('lobbyUpdate', (event) => {
+      eventSource = new EventSource(`${import.meta.env.VITE_API_URL}/lobbies/${code}/events?accessToken=${token}`);
+      eventSource.addEventListener("lobbyUpdate", (event) => {
         const data = JSON.parse(event.data);
         setPlayers(data);
+      });
+      eventSource.addEventListener("heartbeat", () => {
+        // Keep-alive event from the backend to detect stale SSE connections.
       });
 
       eventSource.onerror = (err) => {
