@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import type { PlayerRessources } from "@/repository/MatchRepository";
 import styles from "./RessourceDisplay.module.scss";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
