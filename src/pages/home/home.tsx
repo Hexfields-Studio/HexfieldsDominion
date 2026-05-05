@@ -1,8 +1,8 @@
 import { useState } from "react";
-import "../../index.css";
+import "@/index.css";
 import "./home.css";
-import OptionsButton from "../../components/optionsButton/optionsButton";
-import { useAuth } from "../../contexts/contexts";
+import OptionsButton from "@/components/optionsButton/optionsButton";
+import { useAuth } from "@/contexts/contexts";
 
 const HomePage = () => {
   const { register, login, guest } = useAuth();

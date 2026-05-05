@@ -1,0 +1,36 @@
+.gui{
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* necessary to make the transparent/empty part of all flexboxes unclickable */
+
+    .flexboxes > *{
+        position: absolute;
+    }
+
+    .flexboxes > * > *{
+        position: relative;
+    }
+
+    .gui__endTurnButton{
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        pointer-events: all;
+        font-size:xxx-large;
+        box-sizing: border-box; /* include border inside the div */
+        font-family: fantasy;
+
+        border-width: map.get($gameGui, endTurnButton, borderWidth);
+        border-style: map.get($gameGui, endTurnButton, borderStyle);
+
+        &.gui__endTurnButton--active{
+            background-color: map.get($gameGui, endTurnButton, active, backgroundColor);
+            border-color: map.get($gameGui, endTurnButton, active, borderColor);
+        }
+
+        &.gui__endTurnButton--inactive{
+            background-color: map.get($gameGui, endTurnButton, inactive, backgroundColor);
+            border-color: map.get($gameGui, endTurnButton, inactive, borderColor);
+        }
+    }
+}

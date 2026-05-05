@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Circle, Layer, Rect, Stage } from "react-konva";
-import "./game_field.css";
+import "./game_field.scss";
 import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";

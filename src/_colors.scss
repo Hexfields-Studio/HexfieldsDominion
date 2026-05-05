@@ -1,0 +1,25 @@
+$gameGui: (
+  lineupDisplay: (
+    backgroundColor: darkslategray,
+    borderColor: black
+  ),
+  ressourceDisplay: (
+    wood: darkolivegreen,
+    brick: darkred,
+    wheat: darkkhaki,
+    sheep: ThreeDDarkShadow
+  ),
+  endTurnButton: (
+    borderWidth: 3px,
+    borderStyle: solid,
+    
+    active: (
+      backgroundColor: crimson,
+      borderColor: red
+    ),
+    inactive: (
+      backgroundColor: grey,
+      borderColor: darkgrey
+    )
+  )
+)

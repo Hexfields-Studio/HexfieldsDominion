@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from "react-router";
-import "../index.css";
-import GameField from "../components/gameField/game_field";
-import OptionsButton from "../components/optionsButton/optionsButton";
+import "@/index.css";
+import GameField from "@/components/gameField/game_field";
+import OptionsButton from "@/components/optionsButton/optionsButton";
 import { useEffect } from "react";
-import InMemoryMatchRepository from "../repository/InMemoryMatchRepository";
-import { useMatchRepository } from "../contexts/contexts";
+import InMemoryMatchRepository from "@/repository/InMemoryMatchRepository";
+import { useMatchRepository } from "@/contexts/contexts";
 
 const MatchPage = () => {
   const params = useParams();

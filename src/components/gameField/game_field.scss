@@ -1,4 +1,4 @@
-/* Make html and body take up full height */
+// Make html and body take up full height
 html, body {
   margin: 0;
   padding: 0;
@@ -6,12 +6,12 @@ html, body {
   width: 100%;
 }
 
-body {
+body{
   overflow: hidden;
 }
 
 /* Container for the canvas */
-#root, .full-page-container {
+#root, .full-page-container{
   height: 100%;
   width: 100%;
 }
