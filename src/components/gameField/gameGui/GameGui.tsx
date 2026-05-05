@@ -3,22 +3,11 @@ import PlayerLineupDisplay from "./playerLineupDisplay/PlayerLineupDisplay";
 import RessourceDisplay from "./ressourceDisplay/RessourceDisplay";
 import "./GameGui.css";
 import { Html } from "react-konva-utils";
-import { useEffect, useState } from "react";
-import { useMatchRepository } from "../../../contexts/contexts";
+import { useIsMyTurn } from "../../../hooks/matchHooks/useIsMyTurn";
 
 const GameGui: React.FC = () => {
 
-  const { repository } = useMatchRepository();
-  const [matchData, setMatchData] = useState(repository.getMatchData());
-  const [isThisPlayersTurn, setIsThisPlayersTurn] = useState<boolean>(false);
-
-  useEffect(()=>{
-    repository.keepMeUpdated(setMatchData);
-  }, []);
-
-  useEffect(()=>{
-    setIsThisPlayersTurn(repository.isItMyTurn());
-  }, [matchData]);
+  const isThisPlayersTurn = useIsMyTurn();
 
   return (
     <Layer>

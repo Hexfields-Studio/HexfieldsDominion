@@ -1,20 +1,11 @@
-import { useState, useEffect } from "react";
 import "./PlayerLineupDisplay.css";
-import { useMatchRepository } from "../../../../contexts/contexts";
+import { useIsMyTurn } from "../../../../hooks/matchHooks/useIsMyTurn";
+import { useMatchData } from "../../../../hooks/matchHooks/useMatchData";
 
 const PlayerLineupDisplay: React.FC = () => {
 
-  const { repository } = useMatchRepository();
-  const [matchData, setMatchData] = useState(repository.getMatchData());
-  const [isItMyTurn, setIsItMyTurn] = useState<boolean>(false);
-
-  useEffect(()=>{
-    repository.keepMeUpdated(setMatchData);
-  }, []);
-
-  useEffect(()=>{
-    setIsItMyTurn(repository.isItMyTurn());
-  }, [matchData]);
+  const matchData = useMatchData();
+  const isItMyTurn = useIsMyTurn();
 
   return(
     <div className="lineupDisplay">
