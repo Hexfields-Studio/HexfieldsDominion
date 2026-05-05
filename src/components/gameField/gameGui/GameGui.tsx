@@ -3,7 +3,7 @@ import PlayerLineupDisplay from "./playerLineupDisplay/PlayerLineupDisplay";
 import RessourceDisplay from "./ressourceDisplay/RessourceDisplay";
 import "./GameGui.css";
 import { Html } from "react-konva-utils";
-import { useIsMyTurn } from "../../../hooks/useIsMyTurn";
+import { useIsMyTurn } from "../../../hooks/matchHooks/useIsMyTurn";
 
 const GameGui: React.FC = () => {
 

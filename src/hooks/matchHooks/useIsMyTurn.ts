@@ -1,11 +1,11 @@
 import { useSyncExternalStore } from "react";
-import { useMatchRepository } from "../contexts/contexts";
+import { useMatchRepository } from "../../contexts/contexts";
 
-export const useMyRessources = () => {
+export const useIsMyTurn = () => {
   const { repository } = useMatchRepository();
 
   return useSyncExternalStore(
     repository.subscribe,
-    repository.getMyRessources
+    repository.isItMyTurn
   );
 };

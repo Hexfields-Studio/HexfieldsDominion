@@ -1,6 +1,6 @@
 import type { PlayerRessources } from "../../../../repository/MatchRepository";
 import "./RessourceDisplay.css";
-import { useMyRessources } from "../../../../hooks/useMyRessources";
+import { useMyRessources } from "../../../../hooks/matchHooks/useMyRessources";
 
 const RessourceDisplay: React.FC = () => {
 

@@ -1,6 +1,6 @@
 import "./PlayerLineupDisplay.css";
-import { useIsMyTurn } from "../../../../hooks/useIsMyTurn";
-import { useMatchData } from "../../../../hooks/useMatchData";
+import { useIsMyTurn } from "../../../../hooks/matchHooks/useIsMyTurn";
+import { useMatchData } from "../../../../hooks/matchHooks/useMatchData";
 
 const PlayerLineupDisplay: React.FC = () => {
 
