@@ -21,5 +21,4 @@ const GameGui: React.FC = () => {
     </Layer>
   );
 };
-
 export default GameGui;

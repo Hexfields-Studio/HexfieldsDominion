@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import styles from "./PlayerLineupDisplay.module.scss";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import { useMatchData } from "@/hooks/matchHooks/useMatchData";
