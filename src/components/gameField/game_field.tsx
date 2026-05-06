@@ -5,6 +5,7 @@ import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
+import Dice from "./gameGui/dice/dice";
 
 const radius: number = 100;
 
@@ -250,6 +251,7 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
 
   return (
     <div ref={containerRef} className="full-page-container">
+      <Dice/>
       <Stage
         width={dimensions.width}
         height={dimensions.height}
