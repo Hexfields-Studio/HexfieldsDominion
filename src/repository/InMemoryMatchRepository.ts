@@ -1,18 +1,18 @@
-import type { MatchRepository, PlayerRepresentation, Ressource } from "./MatchRepository";
+import type { MatchRepository, PlayerRepresentation, PlayerRessources, Ressource } from "./MatchRepository";
 
 class InMemoryMatchRepository implements MatchRepository{
   eventSource: EventSource | undefined;
-  keepTheeseHooksUpdated: React.Dispatch<React.SetStateAction<any>>[] = [];
+  subscribers: any[] = [];
   matchData: PlayerRepresentation[] = [   // This is just mock data
     {
       username: "Faker",
       isThisPlayersTurn: true,
       publicId: 1,
       ressources: new Map<Ressource, number>([
-        ["wood", 6],
+        ["wood", 9],
         ["brick", 9],
         ["wheat", 6],
-        ["sheep", 9],
+        ["sheep", 6],
       ]),
       chosenPortrait: "KingMale",
     },
@@ -48,21 +48,28 @@ class InMemoryMatchRepository implements MatchRepository{
         
   }
 
+  /* useSyncExternalStore setup */
+  subscribe = (listener: any) => {
+    this.subscribers.push(listener);
+    return () => {
+      this.subscribers.filter(l => l !== listener);
+    }
+  };
+
+  getMatchData = () => this.matchData;
+
+  emitChange = (): void => {
+    this.subscribers.forEach(listener => listener());
+  };
+  /*############################*/
+
   getMyPublicId = (): number => {
     return 1;
   };
 
-  getMatchData = (): PlayerRepresentation[] => this.matchData;
+  getMyRessources = (): PlayerRessources | undefined => this.matchData.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.ressources;
     
   isItMyTurn = (): boolean => this.matchData.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.isThisPlayersTurn ?? false;
-
-  keepMeUpdated = (setStateAction: React.Dispatch<React.SetStateAction<any>>) => this.keepTheeseHooksUpdated.push(setStateAction);
-
-  updateThem = (): void => {
-    this.keepTheeseHooksUpdated.forEach((setStateAction)=>{
-      setStateAction(this.matchData);
-    });
-  };
 
   // Always invoke this when unmounting from Match Page
   closeConnection = (): void => this.eventSource?.close();

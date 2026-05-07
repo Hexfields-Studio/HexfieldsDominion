@@ -2,8 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+# Prevent double deployment on pull request merge by only running deploy job on push to main
+# The typecheck job will still run on pull requests, deploy is skipped
 
 permissions:
   contents: read

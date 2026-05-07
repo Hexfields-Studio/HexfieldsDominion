@@ -1,33 +1,22 @@
 import { Layer } from "react-konva";
 import PlayerLineupDisplay from "./playerLineupDisplay/PlayerLineupDisplay";
 import RessourceDisplay from "./ressourceDisplay/RessourceDisplay";
-import "./GameGui.css";
+import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
-import { useEffect, useState } from "react";
-import { useMatchRepository } from "../../../contexts/contexts";
+import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 
 const GameGui: React.FC = () => {
 
-  const { repository } = useMatchRepository();
-  const [matchData, setMatchData] = useState(repository.getMatchData());
-  const [isThisPlayersTurn, setIsThisPlayersTurn] = useState<boolean>(false);
-
-  useEffect(()=>{
-    repository.keepMeUpdated(setMatchData);
-  }, []);
-
-  useEffect(()=>{
-    setIsThisPlayersTurn(repository.isItMyTurn());
-  }, [matchData]);
+  const isThisPlayersTurn = useIsMyTurn();
 
   return (
     <Layer>
-      <Html divProps={{ className: "gui" }}>
-        <div className="flexboxes">
+      <Html divProps={{ className: styles.gui }}>
+        <div className={styles.flexboxes}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
-          <button className={`endTurnButton ${isThisPlayersTurn ? "endTurnButton-active" : "endTurnButton-inactive"} font`}>End Turn</button>
         </div>
+        <button className={`${styles["gui__endTurnButton"]} ${isThisPlayersTurn ? styles["gui__endTurnButton--active"] : styles["gui__endTurnButton--inctive"]}`}>End Turn</button>
       </Html>
     </Layer>
   );

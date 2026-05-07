@@ -13,10 +13,12 @@ export type PlayerRepresentation = {
 }
 
 export interface MatchRepository{
+    subscribe: (subscriber: any)=>void
+    getMatchData: ()=>PlayerRepresentation[]
+    emitChange: ()=>void
+    
     getMyPublicId: ()=>number
-    getMatchData: ()=>void
+    getMyRessources: ()=>PlayerRessources | undefined
     isItMyTurn: ()=>boolean
-    keepMeUpdated: (setStateAction: React.Dispatch<React.SetStateAction<any>>)=>void    //This method adds SetStateAction functions to a list. All functions from that list get called with the new data when available.
-    updateThem: ()=>void
     closeConnection: ()=>void
 }

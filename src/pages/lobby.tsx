@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import "../index.css";
+import "@/index.css";
 import { useNavigate, useParams } from "react-router";
-import OptionsButton from "../components/optionsButton/optionsButton";
+import OptionsButton from "@/components/optionsButton/optionsButton";
 import Select from "react-select";
 import type { SingleValue } from "react-select";
-import type { SelectOption } from "../constants/customTypes";
-import { DefaultSelectStyle } from "../constants/selectStyles";
-import { STORAGE_KEYS } from "../constants/storage";
-import { useAuth } from "../contexts/contexts";
+import type { SelectOption } from "@/constants/customTypes";
+import { DefaultSelectStyle } from "@/constants/selectStyles";
+import { STORAGE_KEYS } from "@/constants/storage";
+import { useAuth } from "@/contexts/contexts";
 
 interface Player {
   id: number;

@@ -1,8 +1,8 @@
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { STORAGE_KEYS } from "../constants/storage";
-import { ACCESS_TOKEN_REFRESH_TIME_FRAME } from "../constants/constants";
+import { STORAGE_KEYS } from "@/constants/storage";
+import { ACCESS_TOKEN_REFRESH_TIME_FRAME } from "@/constants/constants";
 import { AuthContext } from "./contexts";
 
 export type AuthContextType = {

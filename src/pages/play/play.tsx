@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
-import "../../index.css";
+import "@/index.css";
 import "./play.css";
 import { useNavigate } from "react-router";
-import type { DialogHandle } from "../../components/dialog/dialog";
-import Dialog from "../../components/dialog/dialog";
-import OptionsButton from "../../components/optionsButton/optionsButton";
-import { STORAGE_KEYS } from "../../constants/storage";
-import { useAuth } from "../../contexts/contexts";
+import type { DialogHandle } from "@/components/dialog/dialog";
+import Dialog from "@/components/dialog/dialog";
+import OptionsButton from "@/components/optionsButton/optionsButton";
+import { STORAGE_KEYS } from "@/constants/storage";
+import { useAuth } from "@/contexts/contexts";
 
 const StartMenu = () => {
   const { fetchWithAuth } = useAuth();

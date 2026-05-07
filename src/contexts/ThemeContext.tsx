@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { getStorageItem, setStorageItem, STORAGE_KEYS } from "../constants/storage";
+import { getStorageItem, setStorageItem, STORAGE_KEYS } from "@/constants/storage";
 import { ThemeContext } from "./contexts";
 
 type Theme = "light" | "dark";
