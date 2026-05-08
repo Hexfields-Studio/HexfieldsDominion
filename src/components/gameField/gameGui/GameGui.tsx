@@ -4,15 +4,21 @@ import RessourceDisplay from "./ressourceDisplay/RessourceDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
+import Dice from "./dice/dice";
 
 const GameGui: React.FC = () => {
 
   const isThisPlayersTurn = useIsMyTurn();
 
+  const test = styles["dice"];
+
+  //debugger;
+
   return (
     <Layer>
       <Html divProps={{ className: styles.gui }}>
-        <div className={styles.flexboxes}>
+        <Dice className={test} rolledSide={6}/>
+        <div className={styles["flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
         </div>
