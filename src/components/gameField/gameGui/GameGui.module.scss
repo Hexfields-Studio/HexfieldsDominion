@@ -3,12 +3,15 @@
     height: 100%;
     pointer-events: none; /* necessary to make the transparent/empty part of all flexboxes unclickable */
 
-    .dice{
+    .diceContainer{
         position: fixed;
         top: 50%;
         left: 50%;
-        pointer-events: all; /* make dice clickable */
+        display: flex;
+        justify-content: space-between;
+        width: 15%;
         transform: translate(-50%, -50%);
+        pointer-events: all; /* make the dices clickable */ /*TODO: make only the dices clickable, exclude the diceContainer*/
     }
 
     .flexboxes > *{
