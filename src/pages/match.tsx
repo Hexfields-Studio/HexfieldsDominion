@@ -20,7 +20,6 @@ const MatchPage = () => {
   return (
     <>
       <OptionsButton/>
-        
       <GameField boardRadius={3}/>
     </>
   );
