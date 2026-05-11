@@ -50,3 +50,8 @@ dialog::backdrop {
     border-color: rgb(168, 0, 0);
     color: rgb(210, 58, 58);
 }
+
+.noBorderAndBackground {
+    border: none;
+    background: none;
+}

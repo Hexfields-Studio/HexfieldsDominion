@@ -45,46 +45,25 @@ const Dice: React.FC<DiceProps> = ({ rolledSide, rollDice, animationTrigger }) =
                 sideDefault[rolledSide as keyof typeof sideDefault] :
                 sideChaotic[rolledSide as keyof typeof sideChaotic]
         });
-        console.log("DICE SIDE:", rolledSide, useDefaultSide ? "DEFAULT" : "CHAOTIC");
-        //console.log("REROLL:", reRoll);
     }, [useDefaultSide]);
+
+    const range = (i: number) => Array.from({ length: i }, (_, j) => j + 1);
 
         //<div id="dice" data-side={diceSide} onClick={rollDice}>
     return (//className={reRoll ? "reRoll" : ""}
         <div id="dice" onClick={rollDice} style={style}>
-            <div className="sides side-1">
-                <span className="dot dot-1"></span>
-            </div>
-            <div className="sides side-2">
-                <span className="dot dot-1"></span>
-                <span className="dot dot-2"></span>
-            </div>
-            <div className="sides side-3">
-                <span className="dot dot-1"></span>
-                <span className="dot dot-2"></span>  
-                <span className="dot dot-3"></span>
-            </div>
-            <div className="sides side-4">
-                <span className="dot dot-1"></span>
-                <span className="dot dot-2"></span>  
-                <span className="dot dot-3"></span>
-                <span className="dot dot-4"></span>
-            </div>
-            <div className="sides side-5">
-                <span className="dot dot-1"></span>
-                <span className="dot dot-2"></span>  
-                <span className="dot dot-3"></span>
-                <span className="dot dot-4"></span>
-                <span className="dot dot-5"></span>
-            </div>
-            <div className="sides side-6">
-                <span className="dot dot-1"></span>
-                <span className="dot dot-2"></span>  
-                <span className="dot dot-3"></span>
-                <span className="dot dot-4"></span>
-                <span className="dot dot-5"></span>
-                <span className="dot dot-6"></span>
-            </div>
+            {
+                [1,2,3,4,5,6].map((i) => (
+                    <div className={`sides side-${i}`} key={`side-${i}`}>
+                        {
+                            range(i).map((j) => {
+                                return <span className={`dot dot-${j}`} key={`side-${i}-dot-${j}`}></span>;
+                            })
+                        }
+                    </div>
+                ))
+            }
+            
         </div>
     );
 }

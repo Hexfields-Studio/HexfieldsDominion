@@ -58,7 +58,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
 
   return (
     <>
-      <dialog className={`${useDefaultStyling ? "dialog" : ""} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} closedby={closedBy}>
+      <dialog className={`${useDefaultStyling ? "dialog" : "noBorderAndBackground"} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} closedby={closedBy}>
         {showHeader && (
           <div className="closeContainer">
             {headerTitle && (
