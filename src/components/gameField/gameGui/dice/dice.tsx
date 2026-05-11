@@ -1,66 +1,89 @@
 import { useEffect, useState } from "react";
 import "./dice.css";
-import type { DiceProps } from "./DiceProps";
 
-const Dice: React.FC<DiceProps> = ({ className, rolledSide }) => {
-    const [diceSide, setDiceSide] = useState(1);
+//TODO: Refactor this so it doesnt store big strings
+
+const sideDefault = {
+    0: "rotateX(0deg) rotateY(0deg) rotateZ(0deg)",
+    1: "rotateX(0deg) rotateY(0deg) rotateZ(0deg)",
+    2: "rotateX(0deg) rotateY(180deg) rotateZ(0deg)",
+    3: "rotateX(0deg) rotateY(270deg) rotateZ(0deg)",
+    4: "rotateX(0deg) rotateY(90deg) rotateZ(0deg)",
+    5: "rotateX(270deg) rotateY(0deg) rotateZ(0deg)",
+    6: "rotateX(90deg) rotateY(0deg) rotateZ(0deg)"
+}
+
+const sideChaotic = {
+    0: "rotateX(720deg) rotateY(720deg) rotateZ(720deg)",
+    1: "rotateX(360deg) rotateY(360deg) rotateZ(720deg)",
+    2: "rotateX(360deg) rotateY(540deg) rotateZ(720deg)",
+    3: "rotateX(360deg) rotateY(630deg) rotateZ(720deg)",
+    4: "rotateX(360deg) rotateY(450deg) rotateZ(720deg)",
+    5: "rotateX(630deg) rotateY(360deg) rotateZ(720deg)",
+    6: "rotateX(450deg) rotateY(360deg) rotateZ(720deg)"
+}
+
+type DiceProps = {
+    rolledSide: number;
+    rollDice: () => void;
+    animationTrigger: number;
+}
+
+// 37:30 für Zwei dice und fix rfandom number immer animation
+const Dice: React.FC<DiceProps> = ({ rolledSide, rollDice, animationTrigger }) => {
     const [style, setStyle] = useState<React.CSSProperties>();
-    const [reRoll, setReRoll] = useState<boolean>(false);
+    const [useDefaultSide, setUseDefaultSide] = useState<boolean>(false);
 
-    const rollDice = () => {
-        if(diceSide === 6) setDiceSide(1);
-        else setDiceSide(diceSide + 1)
-    };
-
-    const test = () => {
-        setReRoll(!reRoll);
-        console.log("test")
-    }
+    useEffect(()=>{
+        setUseDefaultSide(!useDefaultSide);
+        console.log("Update");
+    }, [animationTrigger]);
     
     useEffect(()=>{
         setStyle({
-            transform: "rotateX(720deg) rotateZ(720deg) rotateY(720deg)"
+            transform: useDefaultSide ? 
+                sideDefault[rolledSide as keyof typeof sideDefault] :
+                sideChaotic[rolledSide as keyof typeof sideChaotic]
         });
-        console.log("style", reRoll, className);
-    }, [reRoll]);
+        console.log("DICE SIDE:", rolledSide, useDefaultSide ? "DEFAULT" : "CHAOTIC");
+        //console.log("REROLL:", reRoll);
+    }, [useDefaultSide]);
 
         //<div id="dice" data-side={diceSide} onClick={rollDice}>
-    return (
-        <div className={className} style={{}}>
-            <div id="dice" className={reRoll ? "reRoll" : ""} onClick={test} style={!reRoll ? style : undefined}>
-                <div className="sides side-1">
-                    <span className="dot dot-1"></span>
-                </div>
-                <div className="sides side-2">
-                    <span className="dot dot-1"></span>
-                    <span className="dot dot-2"></span>
-                </div>
-                <div className="sides side-3">
-                    <span className="dot dot-1"></span>
-                    <span className="dot dot-2"></span>  
-                    <span className="dot dot-3"></span>
-                </div>
-                <div className="sides side-4">
-                    <span className="dot dot-1"></span>
-                    <span className="dot dot-2"></span>  
-                    <span className="dot dot-3"></span>
-                    <span className="dot dot-4"></span>
-                </div>
-                <div className="sides side-5">
-                    <span className="dot dot-1"></span>
-                    <span className="dot dot-2"></span>  
-                    <span className="dot dot-3"></span>
-                    <span className="dot dot-4"></span>
-                    <span className="dot dot-5"></span>
-                </div>
-                <div className="sides side-6">
-                    <span className="dot dot-1"></span>
-                    <span className="dot dot-2"></span>  
-                    <span className="dot dot-3"></span>
-                    <span className="dot dot-4"></span>
-                    <span className="dot dot-5"></span>
-                    <span className="dot dot-6"></span>
-                </div>
+    return (//className={reRoll ? "reRoll" : ""}
+        <div id="dice" onClick={rollDice} style={style}>
+            <div className="sides side-1">
+                <span className="dot dot-1"></span>
+            </div>
+            <div className="sides side-2">
+                <span className="dot dot-1"></span>
+                <span className="dot dot-2"></span>
+            </div>
+            <div className="sides side-3">
+                <span className="dot dot-1"></span>
+                <span className="dot dot-2"></span>  
+                <span className="dot dot-3"></span>
+            </div>
+            <div className="sides side-4">
+                <span className="dot dot-1"></span>
+                <span className="dot dot-2"></span>  
+                <span className="dot dot-3"></span>
+                <span className="dot dot-4"></span>
+            </div>
+            <div className="sides side-5">
+                <span className="dot dot-1"></span>
+                <span className="dot dot-2"></span>  
+                <span className="dot dot-3"></span>
+                <span className="dot dot-4"></span>
+                <span className="dot dot-5"></span>
+            </div>
+            <div className="sides side-6">
+                <span className="dot dot-1"></span>
+                <span className="dot dot-2"></span>  
+                <span className="dot dot-3"></span>
+                <span className="dot dot-4"></span>
+                <span className="dot dot-5"></span>
+                <span className="dot dot-6"></span>
             </div>
         </div>
     );
