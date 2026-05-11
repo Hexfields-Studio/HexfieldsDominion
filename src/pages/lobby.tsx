@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "@/index.css";
 import { useNavigate, useParams } from "react-router";
 import OptionsButton from "@/components/optionsButton/optionsButton";
@@ -7,6 +7,13 @@ import type { SingleValue } from "react-select";
 import type { SelectOption } from "@/constants/customTypes";
 import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
+import { useAuth } from "@/contexts/contexts";
+
+interface Player {
+  id: number;
+  username: string;
+  isAccount: boolean;
+}
 
 const selectOptionsMultiplayerMode: SelectOption[] = [
   { value: 0, label: "Echtzeit" },
@@ -56,6 +63,7 @@ const generateUUID = () => {
 const Lobby = () => {
   const params = useParams();
   const navi = useNavigate();
+  const { fetchWithAuth } = useAuth();
   const code = params.code ?? "";
 
   const [matchUUID, setMatchUUID] = useState<string>(() => localStorage.getItem(STORAGE_KEYS.LAST_MATCH_UUID) ?? "");
@@ -63,10 +71,47 @@ const Lobby = () => {
   const [selectedMultiplayerMode, setSelectedMultiplayerMode] = useState<SelectOption | null>(null);
   const [selectedTurnTimeout, setSelectedTurnTimeout] = useState<SelectOption | null>(null);
   const [selectedMods, setSelectedMods] = useState<SelectOption | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
 
   const onSelectMultiplayerMode = (selectedOption: SingleValue<SelectOption>) => setSelectedMultiplayerMode(selectedOption);
   const onSelectTurnTimeout = (selectedOption: SingleValue<SelectOption>) => setSelectedTurnTimeout(selectedOption);
   const onSelectMods = (selectedOption: SingleValue<SelectOption>) => setSelectedMods(selectedOption);
+
+  useEffect(() => {
+    let eventSource: EventSource;
+
+    // Fetch initial players
+    const fetchPlayers = async () => {
+      const response = await fetchWithAuth(`/lobbies/${code}`, "GET");
+      if (response) {
+        const data = await response.json();
+        setPlayers(data.players || []);
+      }
+
+      // Set up SSE for real-time updates
+      const responseSseToken = await fetchWithAuth("/auth/ssetoken", "GET");
+      if (!responseSseToken) {
+        return;
+      }
+      const sseToken = await responseSseToken.text();
+
+      eventSource = new EventSource(`${import.meta.env.VITE_API_URL}/lobbies/${code}/events?sseToken=${sseToken}`);
+      eventSource.addEventListener("lobbyUpdate", (event) => {
+        const data = JSON.parse(event.data);
+        setPlayers(data);
+      });
+
+      eventSource.onerror = (err) => {
+        console.error("SSE error:", err);
+      };
+    };
+
+    fetchPlayers();
+
+    return () => {
+      eventSource.close();
+    };
+  }, [code, fetchWithAuth]);
 
   const handleCopy = async () => {
     try {
@@ -91,8 +136,15 @@ const Lobby = () => {
           <div className="boxed-aside">
             <h3>Players</h3>
             <ul className="list-vertical">
-              <li className="list-item">Gaming_123</li>
-              {/* PLAYERS */}
+              {players.length > 0 ? (
+                players.map((player) => (
+                  <li key={player.id} className="list-item">
+                    {player.username}
+                  </li>
+                ))
+              ) : (
+                <li className="list-item">No players yet</li>
+              )}
             </ul>
           </div>
         </aside>
