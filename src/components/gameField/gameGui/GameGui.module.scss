@@ -9,7 +9,7 @@
         left: 50%;
         display: flex;
         justify-content: space-between;
-        width: 15%;
+        width: 20%;
         transform: translate(-50%, -50%);
         pointer-events: all; /* make the dices clickable */ /*TODO: make only the dices clickable, exclude the diceContainer*/
     }

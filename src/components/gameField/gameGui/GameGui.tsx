@@ -30,8 +30,8 @@ const GameGui: React.FC = () => {
       <Html divProps={{ className: styles.gui }}>
         <Dialog id="diceContainer" useDefaultStyling={false} ref={dialogRef} closedBy="none">
           <div className={styles["diceContainer"]}>
-            <Dice rolledSide={rolledSides[0]} animationTrigger={animationTrigger} rollDice={rollDice}/>
-            <Dice rolledSide={rolledSides[1]} animationTrigger={animationTrigger} rollDice={rollDice}/>
+            <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger} rollDice={rollDice}/>
+            <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger} rollDice={rollDice}/>
           </div>
         </Dialog>
         <button onClick={()=>dialogRef.current?.toggleDialog()} style={{pointerEvents: "all"}}>Test</button>
