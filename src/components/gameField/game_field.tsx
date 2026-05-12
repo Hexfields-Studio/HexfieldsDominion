@@ -5,6 +5,7 @@ import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
+import { Background } from "./background";
 
 const radius: number = 100;
 
@@ -278,6 +279,7 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
           scaleY={scale}
           imageSmoothingEnabled={false}
         >
+          <Background imagePath="ressources/waterSeamless.png" />
           {hexagons.map((hex, i) => (
             <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
           ))}
