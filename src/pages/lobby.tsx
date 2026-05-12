@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "@/index.css";
 import { useNavigate, useParams } from "react-router";
 import OptionsButton from "@/components/optionsButton/optionsButton";
@@ -8,6 +8,7 @@ import type { SelectOption } from "@/constants/customTypes";
 import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { useSseEventSource } from "@/hooks/useSseEventSource";
+import { useAuth } from "@/contexts/contexts";
 
 interface Player {
   id: number;
@@ -63,6 +64,7 @@ const generateUUID = () => {
 const Lobby = () => {
   const params = useParams();
   const navi = useNavigate();
+  const { fetchWithAuth } = useAuth();
   const code = params.code ?? "";
   const eventSource = useSseEventSource(`lobbies/${code}/events`, code);
 
@@ -81,6 +83,24 @@ const Lobby = () => {
     const data = JSON.parse(event.data);
     setPlayers(data);
   });
+
+  useEffect(() => {
+    const executeJoin = async (lobbyCode: string) => {
+      const response = await fetchWithAuth(`/lobbies/${lobbyCode}`, "POST");
+      if (!response || response.status !== 200) {
+        return;
+      }
+
+      const responseJson = await response.json();
+
+      //TODO: replace with LobbyContext
+      localStorage.setItem("playerId", responseJson.id);
+
+      localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, lobbyCode);
+    };
+
+    executeJoin(code);
+  }, [code, fetchWithAuth]);
 
   const handleCopy = async () => {
     try {
