@@ -43,17 +43,15 @@ export const useSseEventSource = (path: string, lobbyCode: string) => {
     });
 
     const scheduleHeartbeat = () => {
-      const playerIdRaw = localStorage.getItem("playerId");
-      if (!playerIdRaw) {
-        return;
-      }
-
-      const body = JSON.stringify({
-        "playerId": Number.parseInt(playerIdRaw),
-      });
-
       heartbeatIntervalId = setInterval(() => {
-        fetchWithAuth(`/lobbies/${lobbyCode}/heartbeat`, "POST", body);
+        const playerIdRaw = localStorage.getItem("playerId");
+        if (!playerIdRaw) {
+          return;
+        }
+
+        fetchWithAuth(`/lobbies/${lobbyCode}/heartbeat`, "POST", JSON.stringify({
+          "playerId": Number.parseInt(playerIdRaw),
+        }));
       }, HEARTBEAT_INTERVAL);
     };
 
