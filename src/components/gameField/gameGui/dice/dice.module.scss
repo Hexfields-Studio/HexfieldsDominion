@@ -11,8 +11,8 @@
             width: 100%;
             height: 100%;
             box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(100px);
+            -webkit-backdrop-filter: blur(100px);
 
 
             .dot {
@@ -26,17 +26,16 @@
             }
     }
 
-    .side::before { /* Blur inside the dice in an attempt to simulate a jelly like material */
+    .side::before { /* Adds a "white shadow" in the middle of each side */
         content: "";
         position: absolute;
         inset: 0;
         background: radial-gradient(
             circle at 50% 50%,
-            rgba(255, 255, 255, 0.15),
-            rgba(0, 0, 0, 0.05)
+            rgba(0, 0, 0, 0.2),
+            rgba(255, 255, 255, 0.2)
         );
-        filter: blur(2px);
-        pointer-events: none;
+        filter: blur(6px);
     }
 
   .side-1 {

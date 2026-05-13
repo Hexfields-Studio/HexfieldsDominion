@@ -21,6 +21,10 @@ const GameGui: React.FC = () => {
   const dialogRef = useRef<DialogHandle | null>(null);
 
   useEffect(()=>{
+    rollDice();
+  }, [])
+
+  useEffect(()=>{
     console.log("Rolled:", rolledSides);
     setAnimationTrigger(animationTrigger + 1);
   }, [rolledSides]);
@@ -28,7 +32,7 @@ const GameGui: React.FC = () => {
   return (
     <Layer>
       <Html divProps={{ className: styles.gui }}>
-        <Dialog id="diceContainer" useDefaultStyling={false} ref={dialogRef} closedBy="none">
+        <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none" onClick={()=>console.log("TestKlappt")}>
           <div className={styles["diceContainer"]}>
             <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger} rollDice={rollDice}/>
             <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger} rollDice={rollDice}/>

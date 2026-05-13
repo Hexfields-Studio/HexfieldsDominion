@@ -38,7 +38,6 @@ const Dice: React.FC<DiceProps> = ({ theme, rolledSide, rollDice, animationTrigg
 
     useEffect(()=>{
         setUseDefaultSide(!useDefaultSide);
-        console.log("Update");
     }, [animationTrigger]);
     
     useEffect(()=>{
