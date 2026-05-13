@@ -7,6 +7,8 @@ interface DialogProps {
     id?: string;
     children?: React.ReactNode;
     errorMessage?: string;
+    closedBy?: "none" | "any";
+    useDefaultStyling?: boolean;
 }
 
 export interface DialogHandle {
@@ -19,6 +21,8 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     id,
     children,
     errorMessage,
+    closedBy = "any",
+    useDefaultStyling = true,
   } = props;
 
   const [open, setOpen] = useState<boolean>(false);
@@ -49,16 +53,27 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     };
   }, [closeDialog]);
 
+  const showHeader = closedBy === "any" || errorMessage || title;
+  const headerTitle: string = errorMessage ? "Fehler" : title;
+
   return (
     <>
-      <dialog className={"dialog" + (errorMessage ? " errorDialog" : "")} ref={dialogRef} closedby="any">
-        <div className="closeContainer">
-          <h3 className="title">{errorMessage ? "Fehler" : title}</h3>
-          <button className="closeButton" onClick={toggleDialog}>
-                        X
-          </button>
-        </div>
-        <div className="childrenContainer" id={id}>
+      <dialog className={`${useDefaultStyling ? "dialog" : ""} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} closedby={closedBy}>
+        {showHeader && (
+          <div className="closeContainer">
+            {headerTitle && (
+              <h3 className="title">{headerTitle}</h3>
+            )}
+
+            {closedBy === "any" && (
+              <button className="closeButton" onClick={toggleDialog}>
+                X
+              </button>
+            )}
+          </div>
+        )}
+        
+        <div className={useDefaultStyling ? "childrenContainer" : ""} id={id}>
           {errorMessage ? (
             <>
               <p className="errorMessage">{errorMessage}</p>

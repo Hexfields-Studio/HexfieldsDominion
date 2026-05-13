@@ -15,12 +15,11 @@ const MatchPage = () => {
     repository.closeConnection();
     setRepository(new InMemoryMatchRepository);
     return () => repository.closeConnection();
-  },[]);
+  },[repository, setRepository]);
 
   return (
     <>
       <OptionsButton/>
-        
       <GameField boardRadius={3}/>
     </>
   );
