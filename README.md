@@ -1,3 +1,4 @@
+[![CI/CD Pipeline](https://github.com/Hexfields-Studio/HexfieldsDominion/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Hexfields-Studio/HexfieldsDominion/actions/workflows/ci-cd.yml)
 # 🎮 Hexfields: Dominion
 
 This is the frontend for our game **Hexfields: Dominion**, an alternative to Settlers of Catan.
