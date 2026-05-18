@@ -1,15 +1,12 @@
-import { HEARTBEAT_INTERVAL } from "@/constants/constants";
-import { useAuth, useMatchRepository } from "@/contexts/contexts";
+import { useAuth } from "@/contexts/contexts";
 import { useEffect, useState } from "react";
 
-export const useSseEventSource = (path: string, lobbyCode: string) => {
+export const useSseEventSource = (path: string) => {
   const [eventSource, setEventSource] = useState<undefined | EventSource>();
   const { fetchWithAuth } = useAuth();
-  const { repository } = useMatchRepository();
 
   useEffect(() => {
     let eventSource: EventSource;
-    let heartbeatIntervalId: number;
 
     const connect = async () => {
       const sseToken = await fetchSseToken();
@@ -38,28 +35,12 @@ export const useSseEventSource = (path: string, lobbyCode: string) => {
       };
     };
 
-    connect().then(() => {
-      scheduleHeartbeat();
-    });
-
-    const scheduleHeartbeat = () => {
-      heartbeatIntervalId = setInterval(() => {
-        const playerIdRaw = localStorage.getItem("playerId");
-        if (!playerIdRaw) {
-          return;
-        }
-
-        fetchWithAuth(`/lobbies/${lobbyCode}/heartbeat`, "POST", JSON.stringify({
-          "playerId": Number.parseInt(playerIdRaw),
-        }));
-      }, HEARTBEAT_INTERVAL);
-    };
+    connect();
 
     return () => {
       eventSource.close();
-      clearInterval(heartbeatIntervalId);
     };
-  }, [fetchWithAuth, path, lobbyCode, repository]);
+  }, [fetchWithAuth, path, setEventSource]);
 
   return eventSource;
 };

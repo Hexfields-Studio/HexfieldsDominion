@@ -9,6 +9,7 @@ import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { useSseEventSource } from "@/hooks/useSseEventSource";
 import { useAuth } from "@/contexts/contexts";
+import { useHeartbeat } from "@/hooks/useHeartbeat";
 
 interface Player {
   id: number;
@@ -32,41 +33,13 @@ const selectOptionsMods: SelectOption[] = [
   { value: 1, label: "..." },
 ];
 
-const generateUUID = () => {
-  const hexDigits = "0123456789abcdef";
-  let uuid = "";
-  
-  // Erzeuge 32 zufällige Hex-Zeichen
-  for (let i = 0; i < 32; i++) {
-    // Füge Bindestriche an den richtigen Stellen ein (8-4-4-4-12)
-    if (i === 8 || i === 12 || i === 16 || i === 20) {
-      uuid += "-";
-    }
-    
-    // Bei Position 12 muss die Version auf 4 gesetzt werden (Bit 12-15 = 0100)
-    if (i === 12) {
-      uuid += "4";
-    } 
-    // Bei Position 16 muss das Variant-Feld auf 10xx gesetzt werden (8, 9, a, b)
-    else if (i === 16) {
-      const variants = ["8", "9", "a", "b"];
-      uuid += variants[Math.floor(Math.random() * 4)];
-    }
-    // Normale zufällige Hex-Ziffer
-    else {
-      uuid += hexDigits[Math.floor(Math.random() * 16)];
-    }
-  }
-  
-  return uuid;
-};
-
 const Lobby = () => {
   const params = useParams();
   const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
   const code = params.code ?? "";
-  const eventSource = useSseEventSource(`lobbies/${code}/events`, code);
+  const eventSource = useSseEventSource(`lobbies/${code}/events`);
+  useHeartbeat(code);
 
   const [matchUUID, setMatchUUID] = useState<string>(() => localStorage.getItem(STORAGE_KEYS.LAST_MATCH_UUID) ?? "");
   const [copied, setCopied] = useState<boolean>(false);
@@ -101,6 +74,21 @@ const Lobby = () => {
 
     executeJoin(code);
   }, [code, fetchWithAuth]);
+
+  const createMatch = async () => {
+    const response = await fetchWithAuth(`/lobbies/${code}/match`, "POST");
+    if (!response || response.status !== 200) {
+      return;
+    }
+
+    const responseJson = await response.json();
+    const uuid = responseJson.matchUUID;
+    
+    setMatchUUID(uuid);
+    localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, uuid);
+    
+    navi(`/match/${uuid}`);
+  };
 
   const handleCopy = async () => {
     try {
@@ -161,16 +149,8 @@ const Lobby = () => {
             <div className="spacer-sm" aria-hidden="true" />
 
             <div className="center-row">
-              <button className="btn-wide" type="button" onClick={() => {
-                // wrong, uuid should be requested from server
-                const uuid = generateUUID();
-                
-                setMatchUUID(uuid);
-                localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, uuid);
-                
-                navi(`/match/${uuid}`);
-              }}>
-                Join Match
+              <button className="btn-wide" type="button" onClick={createMatch}>
+                Create Match
               </button>
             </div>
 
