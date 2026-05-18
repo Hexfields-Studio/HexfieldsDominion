@@ -9,6 +9,7 @@ interface DialogProps {
     errorMessage?: string;
     closedBy?: "none" | "any";
     useDefaultStyling?: boolean;
+    onClick?: () => void | undefined;
 }
 
 export interface DialogHandle {
@@ -23,6 +24,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     errorMessage,
     closedBy = "any",
     useDefaultStyling = true,
+    onClick = undefined
   } = props;
 
   const [open, setOpen] = useState<boolean>(false);
@@ -58,7 +60,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
 
   return (
     <>
-      <dialog className={`${useDefaultStyling ? "dialog" : ""} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} closedby={closedBy}>
+      <dialog className={`${useDefaultStyling ? "dialog" : "noBorderAndBackground"} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} closedby={closedBy} onClick={onClick}>
         {showHeader && (
           <div className="closeContainer">
             {headerTitle && (
