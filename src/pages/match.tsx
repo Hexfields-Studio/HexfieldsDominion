@@ -5,8 +5,8 @@ import OptionsButton from "@/components/optionsButton/optionsButton";
 import { useEffect, useState } from "react";
 import InMemoryMatchRepository from "@/repository/InMemoryMatchRepository";
 import { useMatchRepository, useAuth } from "@/contexts/contexts";
-import { useSseEventSource } from "@/hooks/useSseEventSource";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
+import { GameProvider } from "@/contexts/GameContext";
 
 const MatchPage = () => {
   const params = useParams();
@@ -14,12 +14,7 @@ const MatchPage = () => {
   const { setRepository } = useMatchRepository();
   const { fetchWithAuth } = useAuth();
   const [lobbyCode, setLobbyCode] = useState<string | undefined>();
-  const eventSource = useSseEventSource(`games/${matchUUID}/events`);
   useHeartbeat(lobbyCode);
-
-  eventSource?.addEventListener("matchUpdate", (event) => {
-    console.log(`received matchUpdate: ${event.data}`);
-  });
 
   useEffect(()=> {
     setRepository(new InMemoryMatchRepository);
@@ -41,7 +36,9 @@ const MatchPage = () => {
   return (
     <>
       <OptionsButton/>
-      <GameField boardRadius={3}/>
+      <GameProvider gameUUID={matchUUID}>
+        <GameField boardRadius={3}/>
+      </GameProvider>
     </>
   );
 };

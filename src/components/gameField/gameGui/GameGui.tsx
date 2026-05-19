@@ -7,38 +7,66 @@ import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import Dice from "@/components/gameField/gameGui/dice/dice";
 import { useEffect, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
+import { useAuth, useSseContext, useGame } from "@/contexts/contexts";
+import { ROLLING_DICES_DIALOG_TIMEOUT } from "@/constants/constants";
 
-const getRandomNumber = () => Math.floor(Math.random() * 6) + 1;
+type DiceValuePairType = {
+  value1: number,
+  value2: number
+}
 
 const GameGui: React.FC = () => {
+
+  const { fetchWithAuth } = useAuth();
+  const { uuid } = useGame();
+  const { eventSource } = useSseContext();
 
   const isThisPlayersTurn = useIsMyTurn();
   const [rolledSides, setRolledSides] = useState<number[]>([0, 0]);
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
 
-  const rollDice = () => setRolledSides([getRandomNumber(), getRandomNumber()]);
-
   const dialogRef = useRef<DialogHandle | null>(null);
 
-  useEffect(()=>{
-    rollDice();
-  }, [])
+  const rollDice = () => {
+    (async () => {
+      const response = await fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
+      if (!response || response.status !== 200) {
+        return;
+      }
+
+      const responseJson = await response.json();
+
+      showDiceAnimation(responseJson);
+    })();
+  };
+
+  const showDiceAnimation = (diceValuePair: DiceValuePairType) => {
+    dialogRef.current?.toggleDialog();
+
+    setRolledSides([diceValuePair.value1, diceValuePair.value2]);
+    
+    setTimeout(() => dialogRef.current?.toggleDialog(), ROLLING_DICES_DIALOG_TIMEOUT);
+  };
 
   useEffect(()=>{
-    console.log("Rolled:", rolledSides);
-    setAnimationTrigger(animationTrigger + 1);
-  }, [rolledSides]);
+    setAnimationTrigger(a => a + 1);
+
+    const rollDiceSseListener = (event: MessageEvent) => showDiceAnimation(JSON.parse(event.data));
+
+    eventSource?.addEventListener("rollDice", rollDiceSseListener);
+    return () => eventSource?.removeEventListener("rollDice", rollDiceSseListener);
+  }, [rolledSides, eventSource]);
 
   return (
     <Layer>
       <Html divProps={{ className: styles.gui }}>
-        <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none" onClick={()=>console.log("TestKlappt")}>
+        <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
           <div className={styles["diceContainer"]}>
-            <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger} rollDice={rollDice}/>
-            <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger} rollDice={rollDice}/>
+            <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger}/>
+            <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger}/>
           </div>
         </Dialog>
-        <button onClick={()=>dialogRef.current?.toggleDialog()} style={{pointerEvents: "all"}}>Test</button>
+        <button onClick={rollDice} style={{pointerEvents: "all"}}>Test</button>
         <div className={styles["flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
