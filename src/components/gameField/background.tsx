@@ -5,14 +5,16 @@ interface BackgroundProps {
   imagePath: string;
   tileSize?: number;
   gridSize?: number;
+  scale?: number;
 }
 
-export const Background: React.FC<BackgroundProps> = ({ imagePath, tileSize = 256, gridSize = 8 }) => {
+export const Background: React.FC<BackgroundProps> = ({ imagePath, tileSize = 256, gridSize = 1, scale = 1 }) => {
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+  const scaledTileSize = tileSize * scale;
 
   useEffect(() => {
     const img = new window.Image();
-    img.src = imagePath;
+    img.src = `${import.meta.env.BASE_URL}${imagePath}`;
     img.onload = () => setBackgroundImage(img);
   }, [imagePath]);
 
@@ -25,10 +27,10 @@ export const Background: React.FC<BackgroundProps> = ({ imagePath, tileSize = 25
           <Image
             key={`bg-${row}-${col}`}
             image={backgroundImage}
-            x={(col - gridSize / 2) * tileSize}
-            y={(row - gridSize / 2) * tileSize}
-            width={tileSize}
-            height={tileSize}
+            x={(col - gridSize / 2) * scaledTileSize}
+            y={(row - gridSize / 2) * scaledTileSize}
+            width={scaledTileSize}
+            height={scaledTileSize}
           />
         ))
       )}
