@@ -1,4 +1,5 @@
-import { Group, RegularPolygon, Text } from "react-konva";
+import { Group, RegularPolygon, Text, Image } from "react-konva";
+import { useEffect, useState } from "react";
 
 export interface hexagonProps {
     q: number,
@@ -7,21 +8,63 @@ export interface hexagonProps {
     y: number,
     fill: string,
     radius: number,
-    label: string
+    label: string,
+    resourceType?: "wheat" | "sheep" | "brick" | "stone" | "wood" | "dunes"
 }
 
-export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label }) => {
+export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resourceType }) => {
+  const [textureImage, setTextureImage] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    if (resourceType) {
+      // Randomly pick between variant 1 and 2
+      const variant = Math.random() > 0.5 ? "1" : "2";
+      const imgPath = `${import.meta.env.BASE_URL}fields/${resourceType}Field${variant}.png`;
+      
+      const img = new window.Image();
+      img.src = imgPath;
+      img.onload = () => setTextureImage(img);
+    }
+  }, [resourceType]);
 
   return (
     <Group x={x} y={y}>
+      {textureImage && (
+        <Group
+          clipFunc={(ctx) => {
+            const startAngle = -Math.PI / 2; // Start at -90° to match hexagon orientation
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+              const angle = startAngle + (Math.PI / 3) * i;
+              const px = radius * Math.cos(angle);
+              const py = radius * Math.sin(angle);
+              if (i === 0) {
+                ctx.moveTo(px, py);
+              } else {
+                ctx.lineTo(px, py);
+              }
+            }
+            ctx.closePath();
+          }}
+        >
+          <Image
+            image={textureImage}
+            x={-radius}
+            y={-radius}
+            width={radius * 2}
+            height={radius * 2}
+          />
+        </Group>
+      )}
+      
       <RegularPolygon
         x={0}
         y={0}
         sides={6}
         radius={radius}
-        fill={fill}
+        fill={textureImage ? "transparent" : fill}
         stroke="black"
-        strokeWidth={2}
+        strokeWidth={4}
       />
 
       <Text

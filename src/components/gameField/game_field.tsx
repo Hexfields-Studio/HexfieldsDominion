@@ -5,6 +5,7 @@ import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
+import { Background } from "./background";
 
 const radius: number = 100;
 
@@ -45,6 +46,8 @@ const MAX_SCALE = 2;
 const SCALE_BY = 1.1;
 
 let numberChips: number[];
+
+const resourceTypes: ("wheat" | "sheep" | "brick" | "stone" | "wood" | "dunes")[] = ["wheat", "sheep", "brick", "stone", "wood", "dunes"];
 
 function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
   const edgeMap = new Map<string, Edge>();
@@ -106,9 +109,11 @@ function generateHexagons(newHexagons: hexagonProps[], boardRadius: number) {
       const x = (q + r/2) * Math.sqrt(3) * radius;
       const y = r * (3/2) * radius;
       if (q === 0 && r === 0) { // center hex  
-        newHexagons.push({ q, r, x, y, fill: "gold", radius: radius, label: "" });
+        newHexagons.push({ q, r, x, y, fill: "gold", radius: radius, label: "7", resourceType: "dunes" });
       }else{  
-        newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: numberChips.pop()!.toString() });
+        // TODO: Assign resources with game data
+        const randomResourceType = resourceTypes[Math.floor(Math.random() * resourceTypes.length)]; // random resource, testing only
+        newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: numberChips.pop()!.toString(), resourceType: randomResourceType });
       }
     }
   }
@@ -278,8 +283,9 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
           scaleY={scale}
           imageSmoothingEnabled={false}
         >
+          <Background imagePath="fields/waterSeamless.png" gridSize={32} scale={0.5} />
           {hexagons.map((hex, i) => (
-            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label}/>
+            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resourceType={hex.resourceType}/>
           ))}
 
           {edges.map((edge, i) => (
@@ -301,10 +307,10 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
                     x: corner.x,
                     y: corner.y,
                     rotation: 0,
-                    src: "../structures/pixel_house_32x32.png",
-                    width: 32,
-                    height: 32,
-                    scale: 1.5,
+                    src: "../structures/house_small.png",
+                    width: 120,
+                    height: 120,
+                    scale: 0.5,
                   }]);
                   setDisabledCorners(new Set(disabledCorners).add(id));
                 }}/>
