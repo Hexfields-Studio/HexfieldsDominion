@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import { useAuth, useGame } from "@/contexts/contexts";
 import { ROLLING_DICES_DIALOG_TIMEOUT } from "@/constants/constants";
-import { useSseListeners } from "@/hooks/useSseListeners";
+import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 
 type DiceValuePairType = {
   value1: number,

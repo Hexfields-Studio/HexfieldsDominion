@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { SseContext } from "./contexts";
-import { useSseEventSource, type SseEventSourceProps } from "@/hooks/useSseEventSource";
+import { useSseEventSource, type SseEventSourceProps } from "@/hooks/sseHooks/useSseEventSource";
 import type { SseListener } from "@/constants/customTypes";
 
 export interface SseContextType {

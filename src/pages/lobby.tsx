@@ -7,7 +7,7 @@ import type { SingleValue } from "react-select";
 import type { SelectOption, SseListener } from "@/constants/customTypes";
 import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
-import { useSseEventSource } from "@/hooks/useSseEventSource";
+import { useSseEventSource } from "@/hooks/sseHooks/useSseEventSource";
 import { useAuth } from "@/contexts/contexts";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
 
