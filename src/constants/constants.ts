@@ -1,1 +1,2 @@
 export const ACCESS_TOKEN_REFRESH_TIME_FRAME = 5000; // 5s to make sure there is always a valid token (backend needs some time to process refresh request)
+export const HEARTBEAT_INTERVAL = 4000;

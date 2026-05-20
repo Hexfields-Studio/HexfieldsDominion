@@ -6,6 +6,6 @@ export const useMatchData = () => {
 
   return useSyncExternalStore(
     repository.subscribe,
-    repository.getMatchData
+    repository.getMatchData,
   );
 };

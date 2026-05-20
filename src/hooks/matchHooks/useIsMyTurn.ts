@@ -6,6 +6,6 @@ export const useIsMyTurn = () => {
 
   return useSyncExternalStore(
     repository.subscribe,
-    repository.isItMyTurn
+    repository.isItMyTurn,
   );
 };

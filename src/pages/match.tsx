@@ -9,13 +9,11 @@ import { useMatchRepository } from "@/contexts/contexts";
 const MatchPage = () => {
   const params = useParams();
   const navi = useNavigate();
-  const { repository, setRepository } = useMatchRepository();
+  const { setRepository } = useMatchRepository();
 
   useEffect(()=>{
-    repository.closeConnection();
     setRepository(new InMemoryMatchRepository);
-    return () => repository.closeConnection();
-  },[]);
+  }, [setRepository]);
 
   return (
     <>

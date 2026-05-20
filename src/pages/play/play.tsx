@@ -18,28 +18,16 @@ const StartMenu = () => {
   const dialogErrorInvalidLobbycodeRef = useRef<DialogHandle | null>(null);
 
   const createLobby = async () => {
-    try {
-      // create lobby
-      const responseCode = await fetchWithAuth("/lobbies", "PATCH");
-      if (responseCode === undefined) {
-        return;
-      }
-      const responseCodeJson = await responseCode.json();
-      const fetchedLobbyCode = responseCodeJson.lobbyCode;
-
-      setLobbyCode(fetchedLobbyCode);
-      localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, fetchedLobbyCode);
-
-      // go to lobby
-      const responseData = await fetchWithAuth(`/lobbies/${fetchedLobbyCode}`, "GET");
-      if (responseData === undefined) {
-        return;
-      }
-      const reponseDataJson = await responseData.json();
-      navi(`/lobby/${fetchedLobbyCode}`, { state: { reponseDataJson } });
-    } catch (error) {
-      console.error("Error", error);
+    // create lobby
+    const responseCode = await fetchWithAuth("/lobbies", "PATCH");
+    if (!responseCode || responseCode?.status !== 200) {
+      return;
     }
+    const responseCodeJson = await responseCode.json();
+    const fetchedLobbyCode = responseCodeJson.lobbyCode;
+
+    // join created lobby
+    executeJoin(fetchedLobbyCode);
   };
 
   const joinLobby = async (formData: FormData) => {
@@ -47,18 +35,24 @@ const StartMenu = () => {
       return;
     }
 
-    const responseData = await fetchWithAuth(`/lobbies/${lobbyCode}`, "GET");
-    if (responseData === undefined) {
-      return;
-    }
-    if (responseData.status === 400) {
-      dialogErrorInvalidLobbycodeRef.current?.toggleDialog();
-      return;
-    }
-    const reponseDataJson = await responseData.json();
+    executeJoin(lobbyCode, () => dialogErrorInvalidLobbycodeRef.current?.toggleDialog());
+  };
 
-    localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, lobbyCode);
-    navi(`/lobby/${lobbyCode}`, { state: { reponseDataJson } });
+  const executeJoin = async (lobbyCode: string, notFoundAction?: (() => void)) => {
+    const responseLobbyExists = await fetchWithAuth(`/lobbies/${lobbyCode}/exists`, "GET");
+    if (!responseLobbyExists || responseLobbyExists.status !== 200) {
+      return;
+    }
+
+    const responseText = await responseLobbyExists.text();
+    if (responseText !== "true") {
+      if (notFoundAction) {
+        notFoundAction();
+      }
+      return;
+    }
+    
+    navi(`/lobby/${lobbyCode}`);
   };
 
   const isLobbycodeValid = (codeToCheck: string) => codeToCheck && codeToCheck.match("^([a-zA-Z0-9])+$");

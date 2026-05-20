@@ -6,6 +6,6 @@ export const useMyRessources = () => {
 
   return useSyncExternalStore(
     repository.subscribe,
-    repository.getMyRessources
+    repository.getMyRessources,
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import "@/index.css";
 import { useNavigate, useParams } from "react-router";
 import OptionsButton from "@/components/optionsButton/optionsButton";
@@ -7,6 +7,7 @@ import type { SingleValue } from "react-select";
 import type { SelectOption } from "@/constants/customTypes";
 import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
+import { useSseEventSource } from "@/hooks/useSseEventSource";
 import { useAuth } from "@/contexts/contexts";
 
 interface Player {
@@ -65,6 +66,7 @@ const Lobby = () => {
   const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
   const code = params.code ?? "";
+  const eventSource = useSseEventSource(`lobbies/${code}/events`, code);
 
   const [matchUUID, setMatchUUID] = useState<string>(() => localStorage.getItem(STORAGE_KEYS.LAST_MATCH_UUID) ?? "");
   const [copied, setCopied] = useState<boolean>(false);
@@ -77,40 +79,27 @@ const Lobby = () => {
   const onSelectTurnTimeout = (selectedOption: SingleValue<SelectOption>) => setSelectedTurnTimeout(selectedOption);
   const onSelectMods = (selectedOption: SingleValue<SelectOption>) => setSelectedMods(selectedOption);
 
+  eventSource?.addEventListener("lobbyUpdate", (event) => {
+    const data = JSON.parse(event.data);
+    setPlayers(data);
+  });
+
   useEffect(() => {
-    let eventSource: EventSource;
-
-    // Fetch initial players
-    const fetchPlayers = async () => {
-      const response = await fetchWithAuth(`/lobbies/${code}`, "GET");
-      if (response) {
-        const data = await response.json();
-        setPlayers(data.players || []);
-      }
-
-      // Set up SSE for real-time updates
-      const responseSseToken = await fetchWithAuth("/auth/ssetoken", "GET");
-      if (!responseSseToken) {
+    const executeJoin = async (lobbyCode: string) => {
+      const response = await fetchWithAuth(`/lobbies/${lobbyCode}`, "POST");
+      if (!response || response.status !== 200) {
         return;
       }
-      const sseToken = await responseSseToken.text();
 
-      eventSource = new EventSource(`${import.meta.env.VITE_API_URL}/lobbies/${code}/events?sseToken=${sseToken}`);
-      eventSource.addEventListener("lobbyUpdate", (event) => {
-        const data = JSON.parse(event.data);
-        setPlayers(data);
-      });
+      const responseJson = await response.json();
 
-      eventSource.onerror = (err) => {
-        console.error("SSE error:", err);
-      };
+      //TODO: replace with LobbyContext
+      localStorage.setItem("playerId", responseJson.id);
+
+      localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, lobbyCode);
     };
 
-    fetchPlayers();
-
-    return () => {
-      eventSource.close();
-    };
+    executeJoin(code);
   }, [code, fetchWithAuth]);
 
   const handleCopy = async () => {

@@ -10,7 +10,7 @@ export type AuthContextType = {
     register: (credentials: Credentials) => void;
     login: (credentials: Credentials) => void;
     logout: () => void;
-    fetchWithAuth: (input: RequestInfo | URL, method: string) => Promise<Response | undefined>;
+    fetchWithAuth: (input: RequestInfo | URL, method: string, body?: BodyInit) => Promise<Response | undefined>;
     isAuthValid: () => Promise<boolean>;
 }
 
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
     navigate("/");
   };
 
-  const fetchWithAuth = async (input: RequestInfo | URL, method: string) => {
+  const fetchWithAuth = async (input: RequestInfo | URL, method: string, body?: BodyInit) => {
     const isValid = await isAuthValid();
     if (!isValid) {
       return;
@@ -74,6 +74,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": "application/json",
       },
+      body: body ?? null,
     });
   };
 
