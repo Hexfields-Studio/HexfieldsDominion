@@ -1,8 +1,15 @@
+import type { SseListener } from "@/constants/customTypes";
 import { useAuth } from "@/contexts/contexts";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-export const useSseEventSource = (path: string) => {
-  const [eventSource, setEventSource] = useState<undefined | EventSource>();
+export interface SseEventSourceProps {
+  path: string;
+  listeners: SseListener[];
+}
+
+export const useSseEventSource = (props: SseEventSourceProps) => {
+  const { path, listeners } = props;
+
   const { fetchWithAuth } = useAuth();
 
   useEffect(() => {
@@ -28,19 +35,19 @@ export const useSseEventSource = (path: string) => {
 
     const setupEventSource = (sseToken: string) => {
       eventSource = new EventSource(`${import.meta.env.VITE_API_URL}/${path}?sseToken=${sseToken}`);
-      setEventSource(eventSource);
 
       eventSource.onerror = (err) => {
         console.error("SSE error:", err);
       };
+
+      listeners.forEach(listener => eventSource?.addEventListener(listener.type, listener.action));
     };
 
     connect();
 
     return () => {
       eventSource.close();
+      listeners.forEach(listener => eventSource?.removeEventListener(listener.type, listener.action));
     };
-  }, [fetchWithAuth, path, setEventSource]);
-
-  return eventSource;
+  }, [fetchWithAuth, path, listeners]);
 };

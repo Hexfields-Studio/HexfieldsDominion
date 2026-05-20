@@ -1,9 +1,10 @@
-import { type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { SseContext } from "./contexts";
-import { useSseEventSource } from "@/hooks/useSseEventSource";
+import { useSseEventSource, type SseEventSourceProps } from "@/hooks/useSseEventSource";
+import type { SseListener } from "@/constants/customTypes";
 
 export interface SseContextType {
-  eventSource: EventSource | undefined;
+  registerListeners: (listeners: SseListener[]) => void;
 }
 
 export interface SseContextProps {
@@ -14,10 +15,20 @@ export interface SseContextProps {
 export const SseProvider = (props: SseContextProps) => {
   const { path, children } = props;
 
-  const eventSource = useSseEventSource(path);
+  const listenersRef = useRef<SseListener[]>([]);
+
+  const registerListeners = (listeners: SseListener[]) => {
+    listeners.forEach(listener => listenersRef.current.push(listener));
+  };
+
+  const eventSourceProps: SseEventSourceProps = {
+    path,
+    listeners: listenersRef.current,
+  };
+  useSseEventSource(eventSourceProps);
   
   return (
-    <SseContext.Provider value={{ eventSource }}>
+    <SseContext.Provider value={{ registerListeners }}>
       {children}
     </SseContext.Provider>
   );

@@ -5,10 +5,11 @@ import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import Dice from "@/components/gameField/gameGui/dice/dice";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
-import { useAuth, useSseContext, useGame } from "@/contexts/contexts";
+import { useAuth, useGame } from "@/contexts/contexts";
 import { ROLLING_DICES_DIALOG_TIMEOUT } from "@/constants/constants";
+import { useSseListeners } from "@/hooks/useSseListeners";
 
 type DiceValuePairType = {
   value1: number,
@@ -19,13 +20,21 @@ const GameGui: React.FC = () => {
 
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
-  const { eventSource } = useSseContext();
 
   const isThisPlayersTurn = useIsMyTurn();
   const [rolledSides, setRolledSides] = useState<number[]>([0, 0]);
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
 
   const dialogRef = useRef<DialogHandle | null>(null);
+
+  useSseListeners(useMemo(() => [
+    {
+      type: "rollDice",
+      action: (event: MessageEvent) => {
+        showDiceAnimation(JSON.parse(event.data));
+      },
+    },
+  ], []));
 
   const rollDice = () => {
     (async () => {
@@ -50,12 +59,7 @@ const GameGui: React.FC = () => {
 
   useEffect(()=>{
     setAnimationTrigger(a => a + 1);
-
-    const rollDiceSseListener = (event: MessageEvent) => showDiceAnimation(JSON.parse(event.data));
-
-    eventSource?.addEventListener("rollDice", rollDiceSseListener);
-    return () => eventSource?.removeEventListener("rollDice", rollDiceSseListener);
-  }, [rolledSides, eventSource]);
+  }, [rolledSides]);
 
   return (
     <Layer>

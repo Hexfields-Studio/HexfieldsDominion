@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "@/index.css";
 import { useNavigate, useParams } from "react-router";
 import OptionsButton from "@/components/optionsButton/optionsButton";
 import Select from "react-select";
 import type { SingleValue } from "react-select";
-import type { SelectOption } from "@/constants/customTypes";
+import type { SelectOption, SseListener } from "@/constants/customTypes";
 import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { useSseEventSource } from "@/hooks/useSseEventSource";
@@ -33,15 +33,40 @@ const selectOptionsMods: SelectOption[] = [
   { value: 1, label: "..." },
 ];
 
+type MatchCreatedDataType = {
+  matchUUID: string
+}
+
 const Lobby = () => {
   const params = useParams();
   const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
   const code = params.code ?? "";
-  const eventSource = useSseEventSource(`lobbies/${code}/events`);
   useHeartbeat(code);
 
-  const [matchUUID, setMatchUUID] = useState<string>(() => localStorage.getItem(STORAGE_KEYS.LAST_MATCH_UUID) ?? "");
+  const joinMatch = useCallback((data: MatchCreatedDataType) => {
+    localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, data.matchUUID);
+    navi(`/match/${data.matchUUID}`);
+  }, [navi]);
+  
+  const sseListeners: SseListener[] = useMemo(() => [
+    {
+      type: "lobbyUpdate",
+      action: (event: MessageEvent) => {
+        const data = JSON.parse(event.data);
+        setPlayers(data);
+      },
+    },
+    {
+      type: "matchCreated",
+      action: (event: MessageEvent) => {
+        const data = JSON.parse(event.data);
+        joinMatch(data);
+      },
+    },
+  ], [joinMatch]);
+  useSseEventSource({ path: `lobbies/${code}/events`, listeners: sseListeners });
+
   const [copied, setCopied] = useState<boolean>(false);
   const [selectedMultiplayerMode, setSelectedMultiplayerMode] = useState<SelectOption | null>(null);
   const [selectedTurnTimeout, setSelectedTurnTimeout] = useState<SelectOption | null>(null);
@@ -52,10 +77,6 @@ const Lobby = () => {
   const onSelectTurnTimeout = (selectedOption: SingleValue<SelectOption>) => setSelectedTurnTimeout(selectedOption);
   const onSelectMods = (selectedOption: SingleValue<SelectOption>) => setSelectedMods(selectedOption);
 
-  eventSource?.addEventListener("lobbyUpdate", (event) => {
-    const data = JSON.parse(event.data);
-    setPlayers(data);
-  });
 
   useEffect(() => {
     const executeJoin = async (lobbyCode: string) => {
@@ -82,12 +103,7 @@ const Lobby = () => {
     }
 
     const responseJson = await response.json();
-    const uuid = responseJson.matchUUID;
-    
-    setMatchUUID(uuid);
-    localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, uuid);
-    
-    navi(`/match/${uuid}`);
+    joinMatch(responseJson);
   };
 
   const handleCopy = async () => {
