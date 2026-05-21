@@ -1,10 +1,11 @@
-$side_size: var(--size);
-$side_zOffset: $side_size * 0.5;
-$dot_size: $side_size * 0.175;
+:root{
+  --side_zOffset: calc(var(--dice_side_size) * 0.5);
+  --dot_size: calc(var(--dice_side_size) * 0.175);
+}
 
 #dice {
-    width: $side_size;
-    height: $side_size;
+    width: var(--dice_side_size);
+    height: var(--dice_side_size);
     transform-style: preserve-3d;
     transition: transform 2s ease-in-out;
 
@@ -22,8 +23,8 @@ $dot_size: $side_size * 0.175;
             .dot {
                 display: block;
                 position: absolute;
-                width: $dot_size;
-                height: $dot_size;
+                width: var(--dot_size);
+                height: var(--dot_size);
                 border-radius: 50%;
                 background-color: map.get($gameGui, dice, default, dotColor);
                 transform: translate(-50%, -50%);
@@ -43,7 +44,7 @@ $dot_size: $side_size * 0.175;
     }
 
   .side-1 {
-    transform: translateZ($side_zOffset);
+    transform: translateZ(var(--side_zOffset));
 
     .dot-1 {
       top: 50%;
@@ -52,7 +53,7 @@ $dot_size: $side_size * 0.175;
   }
 
   .side-2 {
-    transform: rotateX(-180deg) translateZ($side_zOffset);
+    transform: rotateX(-180deg) translateZ(var(--side_zOffset));
 
     .dot-1 {
       top: 25%;
@@ -66,7 +67,7 @@ $dot_size: $side_size * 0.175;
   }
 
   .side-3 {
-    transform: rotateY(90deg) translateZ($side_zOffset);
+    transform: rotateY(90deg) translateZ(var(--side_zOffset));
 
     .dot-1 {
       top: 25%;
@@ -85,7 +86,7 @@ $dot_size: $side_size * 0.175;
   }
 
   .side-4 {
-    transform: rotateY(-90deg) translateZ($side_zOffset);
+    transform: rotateY(-90deg) translateZ(var(--side_zOffset));
 
     .dot-1 {
       top: 25%;
@@ -109,7 +110,7 @@ $dot_size: $side_size * 0.175;
   }
 
   .side-5 {
-    transform: rotateX(90deg) translateZ($side_zOffset);
+    transform: rotateX(90deg) translateZ(var(--side_zOffset));
 
     .dot-1 {
       top: 25%;
@@ -138,7 +139,7 @@ $dot_size: $side_size * 0.175;
   }
 
   .side-6 {
-    transform: rotateX(-90deg) translateZ($side_zOffset);
+    transform: rotateX(-90deg) translateZ(var(--side_zOffset));
 
     .dot-1 {
       top: 25%;

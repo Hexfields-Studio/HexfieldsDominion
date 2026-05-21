@@ -1,21 +1,31 @@
+:root {
+    --gap_for_spinning_dice: calc((var(--dice_side_size) * 1.732 - var(--dice_side_size)) * 0.5)
+}
+
 .endTurnButtonDisplay{
     position: fixed;
     bottom: 0;
     right: 0;
-    height:100%;
+    margin: 5px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;   /* center vertically */
-    gap: 10px;
-
+    gap: var(--gap_for_spinning_dice);
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color: rgba($color: #000000, $alpha: 0.75);
+    padding-top: var(--gap_for_spinning_dice);
+    overflow: hidden;
     .endTurnButtonDisplay__endTurnButton{
         pointer-events: all;
         font-size:xxx-large;
         box-sizing: border-box; /* include border inside the div */
         font-family: fantasy;
+        margin: 0;
 
         border-width: map.get($gameGui, endTurnButton, borderWidth);
         border-style: map.get($gameGui, endTurnButton, borderStyle);
+        border-radius: 0;
 
         &.endTurnButtonDisplay__endTurnButton--active{
             background-color: map.get($gameGui, endTurnButton, active, backgroundColor);
@@ -30,7 +40,8 @@
 
     .endTurnButtonDisplay__diceContainer{
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
+        gap: calc(var(--gap_for_spinning_dice) * 2);
         width: 100%;
         pointer-events: all; /* make the dices clickable */ /*TODO: make only the dices clickable, exclude the diceContainer*/
     }

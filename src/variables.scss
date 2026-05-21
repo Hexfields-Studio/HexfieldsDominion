@@ -1,3 +1,5 @@
+$dice_side_size: 60px;
+
 :root{
-    --dice_size: 120px
+    --dice_side_size: #{$dice_side_size};
 }
