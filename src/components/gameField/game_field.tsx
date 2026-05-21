@@ -144,6 +144,11 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
   //For Mousewheel zoom
   const [scale, setScale] = useState(1);
 
+  // For animated background
+  const [backgroundOffsetX, setBackgroundOffsetX] = useState(0);
+  const backgroundDirectionRef = useRef(Math.random() > 0.5 ? 1 : -1); // 1 for east, -1 for west
+  const backgroundSpeedRef = useRef(0.5); // animation speed inpixels per frame
+
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
   }, [cameraOffset]);
@@ -188,7 +193,22 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
     setHexagons(newHexagons);
 
     window.addEventListener("resize", ()=>handleResize(container));
-    return () => window.removeEventListener("resize", ()=>handleResize(container));
+    
+    // Animation loop for background
+    let animationFrameId: number;
+    const animate = () => {
+      setBackgroundOffsetX(prev => {
+        const newOffset = prev + backgroundSpeedRef.current * backgroundDirectionRef.current;
+        return newOffset % 1000000; // prevent overflow of offset number with modulo
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+    animationFrameId = requestAnimationFrame(animate);
+    
+    return () => {
+      window.removeEventListener("resize", ()=>handleResize(container));
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   function moveCamera(e: Konva.KonvaEventObject<MouseEvent>) {
@@ -283,7 +303,7 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
           scaleY={scale}
           imageSmoothingEnabled={false}
         >
-          <Background imagePath="fields/waterSeamless.png" gridSize={32} scale={0.5} />
+          <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
           {hexagons.map((hex, i) => (
             <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resourceType={hex.resourceType}/>
           ))}

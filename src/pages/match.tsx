@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import "@/index.css";
+import styles from "@/pages/match.module.scss";
 import GameField from "@/components/gameField/game_field";
 import OptionsButton from "@/components/optionsButton/optionsButton";
 import { useEffect, useState } from "react";
@@ -34,12 +35,12 @@ const MatchPage = () => {
   }, [setRepository, fetchWithAuth, matchUUID]);
 
   return (
-    <>
+    <div className={styles.matchPageContainer}>
       <OptionsButton/>
       <GameProvider gameUUID={matchUUID}>
         <GameField boardRadius={3}/>
       </GameProvider>
-    </>
+    </div>
   );
 };
 
