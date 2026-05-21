@@ -1,6 +1,7 @@
 import { Layer } from "react-konva";
-import PlayerLineupDisplay from "./playerLineupDisplay/PlayerLineupDisplay";
-import RessourceDisplay from "./ressourceDisplay/RessourceDisplay";
+import PlayerLineupDisplay from "@/components/gameField/gameGui/playerLineupDisplay/PlayerLineupDisplay";
+import RessourceDisplay from "@/components/gameField/gameGui/ressourceDisplay/RessourceDisplay";
+import EndTurnButtonDisplay from "@/components/gameField/gameGui/endTurnButtonDisplay/EndTurnButtonDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
@@ -74,8 +75,8 @@ const GameGui: React.FC = () => {
         <div className={styles["flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
+          <EndTurnButtonDisplay/>
         </div>
-        <button className={`${styles["gui__endTurnButton"]} ${isThisPlayersTurn ? styles["gui__endTurnButton--active"] : styles["gui__endTurnButton--inctive"]}`}>End Turn</button>
       </Html>
     </Layer>
   );

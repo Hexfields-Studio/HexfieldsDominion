@@ -1,0 +1,30 @@
+.endTurnButtonDisplay{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;   /* center vertically */
+    gap: 10px;
+
+    .endTurnButtonDisplay__endTurnButton{
+        pointer-events: all;
+        font-size:xxx-large;
+        box-sizing: border-box; /* include border inside the div */
+        font-family: fantasy;
+
+        border-width: map.get($gameGui, endTurnButton, borderWidth);
+        border-style: map.get($gameGui, endTurnButton, borderStyle);
+
+        &.endTurnButtonDisplay__endTurnButton--active{
+            background-color: map.get($gameGui, endTurnButton, active, backgroundColor);
+            border-color: map.get($gameGui, endTurnButton, active, borderColor);
+        }
+
+        &.endTurnButtonDisplay__endTurnButton--inactive{
+            background-color: map.get($gameGui, endTurnButton, inactive, backgroundColor);
+            border-color: map.get($gameGui, endTurnButton, inactive, borderColor);
+        }
+    }
+}
