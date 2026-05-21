@@ -24,14 +24,16 @@ const sideChaotic = {
   6: "rotateX(450deg) rotateY(360deg) rotateZ(720deg)",
 };
 
+type DiceSize = "highlighted" | "boxed";
+
 type DiceProps = {
     theme: string;
     rolledSide: number;
     animationTrigger: number;
+    currentDiceSide: DiceSize
 }
 
-// 37:30 für Zwei dice und fix rfandom number immer animation
-const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger }) => {
+const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger, currentDiceSide }) => {
   const [style, setStyle] = useState<React.CSSProperties>();
   const [useDefaultSide, setUseDefaultSide] = useState<boolean>(false);
 
@@ -44,13 +46,13 @@ const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger }) => {
       transform: useDefaultSide ? 
         sideDefault[rolledSide as keyof typeof sideDefault] :
         sideChaotic[rolledSide as keyof typeof sideChaotic],
-    });
+        "--current_dice_size": `var(--dice_size_${currentDiceSide})`
+    } as React.CSSProperties);
   }, [useDefaultSide]);
 
   const range = (i: number) => Array.from({ length: i }, (_, j) => j + 1);
 
-  //<div id="dice" data-side={diceSide} onClick={rollDice}>
-  return (//className={reRoll ? "reRoll" : ""}
+  return (
     <div id={styles.dice} data-theme={theme} style={style} >
       {
         [1,2,3,4,5,6].map((i) => (

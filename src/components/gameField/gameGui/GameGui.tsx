@@ -10,6 +10,7 @@ import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import { useAuth, useGame } from "@/contexts/contexts";
 import { ROLLING_DICES_DIALOG_TIMEOUT } from "@/constants/constants";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
+import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 
 type DiceValuePairType = {
   value1: number,
@@ -20,6 +21,7 @@ const GameGui: React.FC = () => {
 
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
+  const isMyTurn = useIsMyTurn();
 
   const [rolledSides, setRolledSides] = useState<number[]>([0, 0]);
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
@@ -65,8 +67,8 @@ const GameGui: React.FC = () => {
       <Html divProps={{ className: styles.gui }}>
         <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
           <div className={styles["diceContainer"]}>
-            <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger}/>
-            <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger}/>
+            <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger} currentDiceSide={"highlighted"}/>
+            <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger} currentDiceSide={"highlighted"}/>
           </div>
         </Dialog>
         <button onClick={rollDice} style={{pointerEvents: "all"}}>Test</button>

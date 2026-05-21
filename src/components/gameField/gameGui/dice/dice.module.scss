@@ -1,11 +1,9 @@
-:root{
-  --side_zOffset: calc(var(--dice_side_size) * 0.5);
-  --dot_size: calc(var(--dice_side_size) * 0.175);
-}
-
 #dice {
-    width: var(--dice_side_size);
-    height: var(--dice_side_size);
+    --side_zOffset: calc(var(--current_dice_size) * 0.5);
+    --dot_size: calc(var(--current_dice_size) * 0.175);
+
+    width: var(--current_dice_size);
+    height: var(--current_dice_size);
     transform-style: preserve-3d;
     transition: transform 2s ease-in-out;
 
@@ -18,7 +16,6 @@
             box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.25);
             backdrop-filter: blur(100px);
             -webkit-backdrop-filter: blur(100px);
-
 
             .dot {
                 display: block;

@@ -1,5 +1,7 @@
-$dice_side_size: 60px;
+$dice_size_highlighted: 120px;
+$dice_size_boxed: 60px;
 
 :root{
-    --dice_side_size: #{$dice_side_size};
+    --dice_size_highlighted: #{$dice_size_highlighted};
+    --dice_size_boxed: #{$dice_size_boxed};
 }
