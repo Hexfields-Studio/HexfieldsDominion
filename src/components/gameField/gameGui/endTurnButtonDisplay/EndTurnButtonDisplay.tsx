@@ -23,8 +23,8 @@ const EndTurnButtonDisplay: React.FC = () => {
     return (
         <div className={styles["endTurnButtonDisplay"]}>
             <div className={styles["endTurnButtonDisplay__diceContainer"]} onClick={()=>rollDice()}>
-                <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger} currentDiceSide={"boxed"}/>
-                <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger} currentDiceSide={"boxed"}/>
+                <Dice diceTheme={1} rolledSide={rolledSides[0]} animationTrigger={animationTrigger} currentDiceSide={"boxed"}/>
+                <Dice diceTheme={2} rolledSide={rolledSides[1]} animationTrigger={animationTrigger} currentDiceSide={"boxed"}/>
             </div>
             <button className={`${styles["endTurnButtonDisplay__endTurnButton"]} ${isThisPlayersTurn ? styles["endTurnButtonDisplay__endTurnButton--active"] : styles["endTurnButtonDisplay__endTurnButton--inactive"]}`}>End Turn</button>
         </div>

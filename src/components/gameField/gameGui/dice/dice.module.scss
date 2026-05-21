@@ -218,23 +218,23 @@
   }
 
     /* ===== Theme overrides ===== */
-    &[data-theme="blue"] {
+    &[data-theme="1"] {
         .side {
-            background-color: map.get($gameGui, dice, blue, sideColor);
+            background-color: map.get($gameGui, dice, 1, sideColor);
         }
 
         .dot {
-            background-color: map.get($gameGui, dice, blue, dotColor);
+            background-color: map.get($gameGui, dice, 1, dotColor);
         }
     }
 
-    &[data-theme="red"] {
+    &[data-theme="2"] {
         .side {
-            background-color: map.get($gameGui, dice, red, sideColor);
+            background-color: map.get($gameGui, dice, 2, sideColor);
         }
 
         .dot {
-            background-color: map.get($gameGui, dice, red, dotColor);
+            background-color: map.get($gameGui, dice, 2, dotColor);
         }
     }
 }

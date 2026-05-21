@@ -27,13 +27,13 @@ const sideChaotic = {
 type DiceSize = "highlighted" | "boxed";
 
 type DiceProps = {
-    theme: string;
+    diceTheme: number;
     rolledSide: number;
     animationTrigger: number;
     currentDiceSide: DiceSize
 }
 
-const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger, currentDiceSide }) => {
+const Dice: React.FC<DiceProps> = ({ diceTheme, rolledSide, animationTrigger, currentDiceSide }) => {
   const [style, setStyle] = useState<React.CSSProperties>();
   const [useDefaultSide, setUseDefaultSide] = useState<boolean>(false);
 
@@ -53,7 +53,7 @@ const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger, curren
   const range = (i: number) => Array.from({ length: i }, (_, j) => j + 1);
 
   return (
-    <div id={styles.dice} data-theme={theme} style={style} >
+    <div id={styles.dice} data-theme={diceTheme} style={style} >
       {
         [1,2,3,4,5,6].map((i) => (
           <div className={`${styles.side} ${styles[`side-${i}`]}`} key={`side-${i}`}>
