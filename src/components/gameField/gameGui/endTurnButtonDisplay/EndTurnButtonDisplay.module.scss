@@ -27,4 +27,11 @@
             border-color: map.get($gameGui, endTurnButton, inactive, borderColor);
         }
     }
+
+    .endTurnButtonDisplay__diceContainer{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        pointer-events: all; /* make the dices clickable */ /*TODO: make only the dices clickable, exclude the diceContainer*/
+    }
 }

@@ -4,7 +4,6 @@ import RessourceDisplay from "@/components/gameField/gameGui/ressourceDisplay/Re
 import EndTurnButtonDisplay from "@/components/gameField/gameGui/endTurnButtonDisplay/EndTurnButtonDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
-import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import Dice from "@/components/gameField/gameGui/dice/dice";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
@@ -22,7 +21,6 @@ const GameGui: React.FC = () => {
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
 
-  const isThisPlayersTurn = useIsMyTurn();
   const [rolledSides, setRolledSides] = useState<number[]>([0, 0]);
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
 

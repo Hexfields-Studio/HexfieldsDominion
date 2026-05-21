@@ -51,7 +51,7 @@ const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger }) => {
 
   //<div id="dice" data-side={diceSide} onClick={rollDice}>
   return (//className={reRoll ? "reRoll" : ""}
-    <div id={styles.dice} data-theme={theme} style={style}>
+    <div id={styles.dice} data-theme={theme} style={style} >
       {
         [1,2,3,4,5,6].map((i) => (
           <div className={`${styles.side} ${styles[`side-${i}`]}`} key={`side-${i}`}>

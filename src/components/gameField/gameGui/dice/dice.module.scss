@@ -1,6 +1,10 @@
+$side_size: var(--size);
+$side_zOffset: $side_size * 0.5;
+$dot_size: $side_size * 0.175;
+
 #dice {
-    width: 120px;
-    height: 120px;
+    width: $side_size;
+    height: $side_size;
     transform-style: preserve-3d;
     transition: transform 2s ease-in-out;
 
@@ -18,8 +22,8 @@
             .dot {
                 display: block;
                 position: absolute;
-                width: 21px;
-                height: 21px;
+                width: $dot_size;
+                height: $dot_size;
                 border-radius: 50%;
                 background-color: map.get($gameGui, dice, default, dotColor);
                 transform: translate(-50%, -50%);
@@ -39,7 +43,7 @@
     }
 
   .side-1 {
-    transform: translateZ(60px);
+    transform: translateZ($side_zOffset);
 
     .dot-1 {
       top: 50%;
@@ -48,7 +52,7 @@
   }
 
   .side-2 {
-    transform: rotateX(-180deg) translateZ(60px);
+    transform: rotateX(-180deg) translateZ($side_zOffset);
 
     .dot-1 {
       top: 25%;
@@ -62,7 +66,7 @@
   }
 
   .side-3 {
-    transform: rotateY(90deg) translateZ(60px);
+    transform: rotateY(90deg) translateZ($side_zOffset);
 
     .dot-1 {
       top: 25%;
@@ -81,7 +85,7 @@
   }
 
   .side-4 {
-    transform: rotateY(-90deg) translateZ(60px);
+    transform: rotateY(-90deg) translateZ($side_zOffset);
 
     .dot-1 {
       top: 25%;
@@ -105,7 +109,7 @@
   }
 
   .side-5 {
-    transform: rotateX(90deg) translateZ(60px);
+    transform: rotateX(90deg) translateZ($side_zOffset);
 
     .dot-1 {
       top: 25%;
@@ -134,7 +138,7 @@
   }
 
   .side-6 {
-    transform: rotateX(-90deg) translateZ(60px);
+    transform: rotateX(-90deg) translateZ($side_zOffset);
 
     .dot-1 {
       top: 25%;
