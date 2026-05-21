@@ -1,24 +1,44 @@
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import "@/index.css";
 import GameField from "@/components/gameField/game_field";
 import OptionsButton from "@/components/optionsButton/optionsButton";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import InMemoryMatchRepository from "@/repository/InMemoryMatchRepository";
-import { useMatchRepository } from "@/contexts/contexts";
+import { useMatchRepository, useAuth } from "@/contexts/contexts";
+import { useHeartbeat } from "@/hooks/useHeartbeat";
+import { GameProvider } from "@/contexts/GameContext";
 
 const MatchPage = () => {
   const params = useParams();
-  const navi = useNavigate();
+  const matchUUID = params.uuid ?? "";
   const { setRepository } = useMatchRepository();
+  const { fetchWithAuth } = useAuth();
+  const [lobbyCode, setLobbyCode] = useState<string | undefined>();
+  useHeartbeat(lobbyCode);
 
-  useEffect(()=>{
+  useEffect(()=> {
     setRepository(new InMemoryMatchRepository);
-  }, [setRepository]);
+
+    const fetchLobbyCode = async () => {
+      const response = await fetchWithAuth(`/games/${matchUUID}/lobby`, "GET");
+      if (!response || response.status !== 200) {
+        return;
+      }
+
+      const responseJson = await response.json();
+
+      setLobbyCode(responseJson.lobbyCode);
+    };
+
+    fetchLobbyCode();
+  }, [setRepository, fetchWithAuth, matchUUID]);
 
   return (
     <>
       <OptionsButton/>
-      <GameField boardRadius={3}/>
+      <GameProvider gameUUID={matchUUID}>
+        <GameField boardRadius={3}/>
+      </GameProvider>
     </>
   );
 };
