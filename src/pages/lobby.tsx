@@ -72,6 +72,7 @@ const Lobby = () => {
   const [selectedTurnTimeout, setSelectedTurnTimeout] = useState<SelectOption | null>(null);
   const [selectedMods, setSelectedMods] = useState<SelectOption | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
 
   const onSelectMultiplayerMode = (selectedOption: SingleValue<SelectOption>) => setSelectedMultiplayerMode(selectedOption);
   const onSelectTurnTimeout = (selectedOption: SingleValue<SelectOption>) => setSelectedTurnTimeout(selectedOption);
@@ -88,7 +89,9 @@ const Lobby = () => {
       const responseJson = await response.json();
 
       //TODO: replace with LobbyContext
-      localStorage.setItem("playerId", responseJson.id);
+      localStorage.setItem("playerId", responseJson.createdPlayer.id);
+      
+      setIsOwner(responseJson.isLobbyOwner);
 
       localStorage.setItem(STORAGE_KEYS.LAST_LOBBY_CODE, lobbyCode);
     };
@@ -116,6 +119,8 @@ const Lobby = () => {
       alert("Copy failed");
     }
   };
+
+  const placeholder = isOwner ? "Auswählen" : "-";
 
   return (
     <>
@@ -164,11 +169,13 @@ const Lobby = () => {
 
             <div className="spacer-sm" aria-hidden="true" />
 
-            <div className="center-row">
-              <button className="btn-wide" type="button" onClick={createMatch}>
-                Create Match
-              </button>
-            </div>
+            { isOwner &&
+              <div className="center-row">
+                <button className="btn-wide" type="button" onClick={createMatch}>
+                  Create Match
+                </button>
+              </div>
+            }
 
             <div className="center-row">
               <button className="btn-wide" type="button" onClick={() => navi("/play")}>
@@ -184,11 +191,11 @@ const Lobby = () => {
             <h3>Konfiguration</h3>
             <div className="selectContainer">
               <p>Multiplayer-Modus</p>
-              <Select defaultValue={selectedMultiplayerMode} options={selectOptionsMultiplayerMode} onChange={onSelectMultiplayerMode} placeholder="Auswählen" styles={DefaultSelectStyle} isSearchable={false}/>
+              <Select isDisabled={!isOwner} defaultValue={selectedMultiplayerMode} options={selectOptionsMultiplayerMode} onChange={onSelectMultiplayerMode} placeholder={placeholder} styles={DefaultSelectStyle} isSearchable={false}/>
               <p>Spielzug-Timeout</p>
-              <Select defaultValue={selectedTurnTimeout} options={selectOptionsTurnTimeout} onChange={onSelectTurnTimeout} placeholder="Auswählen" styles={DefaultSelectStyle} isSearchable={false}/>
+              <Select isDisabled={!isOwner} defaultValue={selectedTurnTimeout} options={selectOptionsTurnTimeout} onChange={onSelectTurnTimeout} placeholder={placeholder} styles={DefaultSelectStyle} isSearchable={false}/>
               <p>Mods</p>
-              <Select defaultValue={selectedMods} options={selectOptionsMods} onChange={onSelectMods} placeholder="Auswählen" styles={DefaultSelectStyle} isSearchable={false}/>
+              <Select isDisabled={!isOwner} defaultValue={selectedMods} options={selectOptionsMods} onChange={onSelectMods} placeholder={placeholder} styles={DefaultSelectStyle} isSearchable={false}/>
             </div>
           </div>
         </aside>
