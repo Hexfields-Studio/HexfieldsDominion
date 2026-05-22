@@ -27,6 +27,13 @@ export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, res
     }
   }, [resourceType]);
 
+  // 8-direction offsets for number aura
+  const shadowOffsets = [
+    [-2, -2], [-2, 0], [-2, 2],
+    [0, -2],           [0, 2],
+    [2, -2],  [2, 0],  [2, 2]
+  ];
+
   return (
     <Group x={x} y={y}>
       {textureImage && (
@@ -66,6 +73,21 @@ export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, res
         stroke="black"
         strokeWidth={4}
       />
+
+      {shadowOffsets.map(([dx, dy], i) => (
+        <Text
+          key={`shadow-${i}`}
+          x={dx}
+          y={dy}
+          text={label}
+          fontSize={30}
+          fontStyle="bold"
+          fill="#ffffff"
+          align="center"
+          offsetX={15}
+          offsetY={15}
+        />
+      ))}
 
       <Text
         x={0}
