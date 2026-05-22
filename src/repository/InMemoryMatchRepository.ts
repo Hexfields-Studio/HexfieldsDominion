@@ -1,3 +1,4 @@
+import { getStorageItem } from "@/constants/storage";
 import type { MatchRepository, PlayerRepresentation, PlayerRessources, Ressource } from "./MatchRepository";
 
 class InMemoryMatchRepository implements MatchRepository{
@@ -7,7 +8,7 @@ class InMemoryMatchRepository implements MatchRepository{
     {
       username: "Faker",
       isThisPlayersTurn: true,
-      publicId: 1,
+      publicId: 0,
       ressources: new Map<Ressource, number>([
         ["wood", 9],
         ["brick", 9],
@@ -19,7 +20,7 @@ class InMemoryMatchRepository implements MatchRepository{
     {
       username: "BackStraightenReminder",
       isThisPlayersTurn: false,
-      publicId: 2,
+      publicId: 1,
       ressources: new Map<Ressource, number>([
         ["wood", 1],
         ["brick", 2],
@@ -64,7 +65,7 @@ class InMemoryMatchRepository implements MatchRepository{
   /*############################*/
 
   getMyPublicId = (): number => {
-    return 1;
+    return getStorageItem("playerId", 0);
   };
 
   getMyRessources = (): PlayerRessources | undefined => this.matchData.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.ressources;
