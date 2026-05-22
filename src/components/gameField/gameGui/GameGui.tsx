@@ -4,13 +4,13 @@ import RessourceDisplay from "@/components/gameField/gameGui/ressourceDisplay/Re
 import EndTurnButtonDisplay from "@/components/gameField/gameGui/endTurnButtonDisplay/EndTurnButtonDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
-import Dice from "@/components/gameField/gameGui/dice/dice";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import { useAuth, useGame } from "@/contexts/contexts";
 import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT } from "@/constants/constants";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
+import DiceContainer from "./dice/DiceContainer";
 
 type DiceValuePairType = {
   value1: number,
@@ -54,9 +54,9 @@ const GameGui: React.FC = () => {
   const highlightDiceAnimation = (diceValuePair: DiceValuePairType) => {
     if(isMyTurn){
       dialogRef.current?.toggleDialog();
-      setRolledSides([diceValuePair.value1, diceValuePair.value2]);
       setTimeout(() => dialogRef.current?.toggleDialog(), HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
     }
+    setRolledSides([diceValuePair.value1, diceValuePair.value2]);
   };
 
   useEffect(()=>{
@@ -67,16 +67,13 @@ const GameGui: React.FC = () => {
     <Layer>
       <Html divProps={{ className: styles.gui }}>
         <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
-          <div className={styles["diceContainer"]}>
-            <Dice diceTheme={1} rolledSide={rolledSides[0]} animationTrigger={animationTrigger} currentDiceSide={"highlighted"}/>
-            <Dice diceTheme={2} rolledSide={rolledSides[1]} animationTrigger={animationTrigger} currentDiceSide={"highlighted"}/>
-          </div>
+          <DiceContainer className={styles["gui__diceContainer"]} rolledSides={rolledSides} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
         </Dialog>
         <button onClick={rollDice} style={{pointerEvents: "all"}}>Test</button>
-        <div className={styles["flexboxes"]}>
+        <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
-          <EndTurnButtonDisplay/>
+          <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger}/>
         </div>
       </Html>
     </Layer>

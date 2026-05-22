@@ -24,13 +24,13 @@ const sideChaotic = {
   6: "rotateX(450deg) rotateY(360deg) rotateZ(720deg)",
 };
 
-type DiceSize = "highlighted" | "boxed";
+export type DiceSide = "highlighted" | "boxed";
 
 type DiceProps = {
     diceTheme: number;
     rolledSide: number;
     animationTrigger: number;
-    currentDiceSide: DiceSize
+    currentDiceSide: DiceSide
 }
 
 const Dice: React.FC<DiceProps> = ({ diceTheme, rolledSide, animationTrigger, currentDiceSide }) => {
