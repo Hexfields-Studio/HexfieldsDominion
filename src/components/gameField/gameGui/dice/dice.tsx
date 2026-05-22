@@ -1,6 +1,6 @@
 // This component is inspired by: https://codepen.io/abirana/pen/rNMLrPB
 import { useEffect, useState } from "react";
-import styles from "./dice.module.scss";
+import styles from "./Dice.module.scss";
 
 //TODO: Refactor this so it doesnt store big strings
 

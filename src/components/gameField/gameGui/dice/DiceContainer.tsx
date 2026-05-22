@@ -1,4 +1,5 @@
-import Dice, { type DiceSide } from "./dice"
+import Dice, { type DiceSide } from "./dice";
+
 
 type DiceContainerProps = {
     className: string;

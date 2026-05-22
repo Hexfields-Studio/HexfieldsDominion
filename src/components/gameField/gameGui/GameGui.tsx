@@ -10,7 +10,7 @@ import { useAuth, useGame } from "@/contexts/contexts";
 import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT } from "@/constants/constants";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
-import DiceContainer from "./dice/DiceContainer";
+import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
 
 type DiceValuePairType = {
   value1: number,
@@ -54,7 +54,11 @@ const GameGui: React.FC = () => {
   const highlightDiceAnimation = (diceValuePair: DiceValuePairType) => {
     if(isMyTurn){
       dialogRef.current?.toggleDialog();
-      setTimeout(() => dialogRef.current?.toggleDialog(), HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
+      setHideBoxedDices(true);
+      setTimeout(() => {
+        dialogRef.current?.toggleDialog();
+        setHideBoxedDices(false);
+      }, HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
     }
     setRolledSides([diceValuePair.value1, diceValuePair.value2]);
   };
@@ -73,7 +77,7 @@ const GameGui: React.FC = () => {
         <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
-          <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger}/>
+          <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
         </div>
       </Html>
     </Layer>
