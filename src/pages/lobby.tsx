@@ -55,14 +55,12 @@ const Lobby = () => {
       action: (event: MessageEvent) => {
         const data = JSON.parse(event.data);
         setPlayers(data);
-        console.log("lobbyUpdate", data);
       },
     },
     {
       type: "matchCreated",
       action: (event: MessageEvent) => {
         const data = JSON.parse(event.data);
-        console.log("matchCreated", data);
         joinMatch(data);
       },
     },

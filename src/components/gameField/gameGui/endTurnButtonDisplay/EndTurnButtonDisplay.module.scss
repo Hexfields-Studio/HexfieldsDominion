@@ -46,6 +46,6 @@
         gap: var(--gap_for_rotated_dice);
         width: calc(var(--dice_size_boxed) * 2 + var(--gap_for_rotated_dice) * 2);
         height: calc(var(--dice_size_boxed) + var(--gap_for_rotated_dice));
-        pointer-events: all; /* make the dices clickable */ /*TODO: make only the dices clickable, exclude the diceContainer*/
+        pointer-events: none;
     }
 }
