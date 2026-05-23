@@ -4,6 +4,7 @@ import type { MatchRepositoryContextType } from "./MatchRepositoryContext";
 import type { ThemeContextType } from "./ThemeContext";
 import type { SseContextType } from "./SseContext";
 import type { GameContextType } from "./GameContext";
+import type { FetchWithTimeoutContextType } from "./FetchWithTimeoutContext";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -50,5 +51,14 @@ export const GameContext = createContext<GameContextType | undefined>(undefined)
 export const useGame = () => {
   const context = useContext(GameContext);
   if (!context) throw new Error("useGame must be used within GameContextProvider");
+  return context;
+};
+
+
+export const FetchWithTimeoutContext = createContext<FetchWithTimeoutContextType | undefined>(undefined);
+
+export const useFetchWithTimeout = () => {
+  const context = useContext(FetchWithTimeoutContext);
+  if (!context) throw new Error("useFetchWithTimeout must be used within FetchWithTimeoutContextProvider");
   return context;
 };

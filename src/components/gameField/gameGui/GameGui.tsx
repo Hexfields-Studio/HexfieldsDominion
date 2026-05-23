@@ -64,7 +64,10 @@ const GameGui: React.FC = () => {
   };
 
   useEffect(()=>{
-    setAnimationTrigger(a => a + 1);
+    const triggerAnimation = async () => {
+      setAnimationTrigger(a => a + 1);
+    };
+    triggerAnimation();
   }, [rolledSides]);
 
   return (
@@ -73,7 +76,7 @@ const GameGui: React.FC = () => {
         <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
           <DiceContainer className={styles["gui__diceContainer"]} rolledSides={rolledSides} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
         </Dialog>
-        <button onClick={rollDice} style={{pointerEvents: "all"}}>Test</button>
+        <button onClick={rollDice} style={{ pointerEvents: "all" }}>Test</button>
         <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>

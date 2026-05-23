@@ -3,19 +3,27 @@ import "@/index.css";
 import "./home.css";
 import OptionsButton from "@/components/optionsButton/optionsButton";
 import { useAuth } from "@/contexts/contexts";
+import { useError } from "@/hooks/useError";
 
 const HomePage = () => {
   const { register, login, guest } = useAuth();
+  const { errorDialog, isError, openErrorDialogIfMessage } = useError();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = () => {
-    register({ username, password });
+  const handleRegister = async () => {
+    const response = await register({ username, password });
+    if (isError(response)) {
+      openErrorDialogIfMessage(response);
+    }
   };
 
-  const handleLogin = () => {
-    login({ username, password });
+  const handleLogin = async () => {
+    const response = await login({ username, password });
+    if (isError(response)) {
+      openErrorDialogIfMessage(response);
+    }
   };
 
   const handlePlayAsGuest = () => {
@@ -26,6 +34,8 @@ const HomePage = () => {
 
   return (
     <>
+      { errorDialog }
+      
       <OptionsButton showLogOut={false}/>
 
       <h1>Home Page</h1>
