@@ -133,7 +133,7 @@ const GameField: React.FC<GameFieldProps> = () => {
 
   // For animated background
   const [backgroundOffsetX, setBackgroundOffsetX] = useState(0);
-  const backgroundDirectionRef = useRef(Math.random() > 0.5 ? 1 : -1); // 1 for east, -1 for west
+  const backgroundDirectionRef = useRef(1); // 1 for east, -1 for west
   const backgroundSpeedRef = useRef(0.5); // animation speed inpixels per frame
 
   useSseListeners(useMemo(() => [
@@ -147,6 +147,7 @@ const GameField: React.FC<GameFieldProps> = () => {
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
+    backgroundDirectionRef.current = Math.random() > 0.5 ? 1 : -1;
   }, [cameraOffset]);
 
   const handleResize = (container: HTMLDivElement | null) => {
@@ -196,7 +197,7 @@ const GameField: React.FC<GameFieldProps> = () => {
       window.removeEventListener("resize", ()=>handleResize(container));
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [boardRadius]);
 
   const generateHexagons = useCallback((newHexagons: hexagonProps[]) => {
     fields.forEach(field => {
