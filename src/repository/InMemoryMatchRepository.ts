@@ -59,8 +59,10 @@ class InMemoryMatchRepository implements MatchRepository{
   subscribe = (listener: any) => {
     this.subscribers.push(listener);
     return () => {
-      this.subscribers.filter(l => l !== listener);
-    }
+      this.subscribers = this.subscribers.filter(
+        l => l !== listener
+      );
+    };
   };
 
   getMatchData = () => this.matchData;

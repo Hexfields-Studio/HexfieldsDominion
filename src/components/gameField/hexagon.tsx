@@ -1,5 +1,6 @@
 import { Group, RegularPolygon, Text, Image } from "react-konva";
 import { useEffect, useState } from "react";
+import type { ResourceType } from "@/repository/MatchRepository";
 
 export interface hexagonProps {
     q: number,
@@ -9,23 +10,23 @@ export interface hexagonProps {
     fill: string,
     radius: number,
     label: string,
-    resourceType?: "wheat" | "sheep" | "brick" | "stone" | "wood" | "dunes"
+    resource: ResourceType
 }
 
-export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resourceType }) => {
+export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resource }) => {
   const [textureImage, setTextureImage] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    if (resourceType) {
+    if (resource) {
       // Randomly pick between variant 1 and 2
       const variant = Math.random() > 0.5 ? "1" : "2";
-      const imgPath = `${import.meta.env.BASE_URL}fields/${resourceType}Field${variant}.png`;
+      const imgPath = `${import.meta.env.BASE_URL}fields/${resource.toLowerCase()}Field${variant}.png`;
       
       const img = new window.Image();
       img.src = imgPath;
       img.onload = () => setTextureImage(img);
     }
-  }, [resourceType]);
+  }, [resource]);
 
   // 8-direction offsets for number aura
   const shadowOffsets = [

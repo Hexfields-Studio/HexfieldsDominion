@@ -47,10 +47,6 @@ const MIN_SCALE = 0.75;
 const MAX_SCALE = 2;
 const SCALE_BY = 1.1;
 
-let numberChips: number[];
-
-const resourceTypes: ("wheat" | "sheep" | "brick" | "stone" | "wood" | "dunes")[] = ["wheat", "sheep", "brick", "stone", "wood", "dunes"];
-
 function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
   const edgeMap = new Map<string, Edge>();
     
@@ -103,29 +99,11 @@ function computeUniqueCorners(hexagons: hexagonProps[]): Corner[] {
   return [...cornerMap.values()];
 }
 
-function generateHexagons(newHexagons: hexagonProps[], boardRadius: number) {
-  for (let q = -boardRadius + 1; q <= boardRadius - 1; q++) {
-    const r1 = Math.max(-boardRadius + 1, -q - boardRadius + 1);
-    const r2 = Math.min(boardRadius - 1, -q + boardRadius - 1);
-    for (let r = r1; r <= r2; r++) {
-      const x = (q + r/2) * Math.sqrt(3) * radius;
-      const y = r * (3/2) * radius;
-      if (q === 0 && r === 0) { // center hex  
-        newHexagons.push({ q, r, x, y, fill: "gold", radius: radius, label: "7", resourceType: "dunes" });
-      }else{  
-        // TODO: Assign resources with game data
-        const randomResourceType = resourceTypes[Math.floor(Math.random() * resourceTypes.length)]; // random resource, testing only
-        newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: numberChips.pop()!.toString(), resourceType: randomResourceType });
-      }
-    }
-  }
-}
-
 interface GameFieldProps {
     boardRadius: number
 }
 
-const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
+const GameField: React.FC<GameFieldProps> = () => {
 
   // subscriptions
   const fields: Field[] = useFields();
@@ -188,15 +166,6 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
       });
     }
 
-    numberChips = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
-    numberChips.sort(() => Math.random() - 0.5); // Shuffle
-
-    const newHexagons: hexagonProps[] = [];
-    generateHexagons(newHexagons, boardRadius);
-    setCorners(computeUniqueCorners(newHexagons));
-    setEdges(computeUniqueEdges(newHexagons));
-    setHexagons(newHexagons);
-
     window.addEventListener("resize", ()=>handleResize(container));
     
     // Animation loop for background
@@ -217,8 +186,23 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
   }, []);
 
   useEffect(()=>{
-    
+    if(fields.length === 0) return;
+    const newHexagons: hexagonProps[] = [];
+    generateHexagons(newHexagons);
+    setCorners(computeUniqueCorners(newHexagons));
+    setEdges(computeUniqueEdges(newHexagons));
+    setHexagons(newHexagons);
   }, [fields]);
+
+  function generateHexagons(newHexagons: hexagonProps[]) {
+    fields.forEach(field => {
+      const q = field.pos.q;
+      const r = field.pos.r;
+      const x = (q + r/2) * Math.sqrt(3) * radius;
+      const y = r * (3/2) * radius;
+      newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip.toString(), resource: field.resource });
+    });
+}
 
   function moveCamera(e: Konva.KonvaEventObject<MouseEvent>) {
     const halfWidth = containerClientSize.width / 2;
@@ -314,7 +298,7 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
         >
           <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
           {hexagons.map((hex, i) => (
-            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resourceType={hex.resourceType}/>
+            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
           ))}
 
           {edges.map((edge, i) => (

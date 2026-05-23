@@ -36,7 +36,6 @@ const selectOptionsMods: SelectOption[] = [
 
 type MatchCreatedDataType = {
   matchUUID: string,
-  fields: Field[]
 }
 
 const Lobby = () => {
@@ -45,11 +44,9 @@ const Lobby = () => {
   const { fetchWithAuth } = useAuth();
   const code = params.code ?? "";
   useHeartbeat(code);
-  const {repository} = useMatchRepository();
 
   const joinMatch = useCallback((data: MatchCreatedDataType) => {
     console.log("joinMatch", data);
-    repository.setFields(data.fields);
     localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, data.matchUUID);
     navi(`/match/${data.matchUUID}`);
   }, [navi]);
