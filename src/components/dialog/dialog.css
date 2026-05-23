@@ -3,7 +3,7 @@
     border: 1px solid var(--input-border);
     padding: 10px;
     max-height: 90vh;
-    background-color: var(--panel-bg);
+    background-color: var(--panel-bg-solid);
     color: var(--foreground);
 }
 

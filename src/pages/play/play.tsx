@@ -7,15 +7,16 @@ import Dialog from "@/components/dialog/dialog";
 import OptionsButton from "@/components/optionsButton/optionsButton";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { useAuth } from "@/contexts/contexts";
+import { useError } from "@/hooks/useError";
 
 const StartMenu = () => {
   const { fetchWithAuth } = useAuth();
+  const { errorDialog, isError, openErrorDialogIfMessage } = useError();
 
   const [lobbyCode, setLobbyCode] = useState<string>(localStorage.getItem(STORAGE_KEYS.LAST_LOBBY_CODE) ?? "");
 
   const navi = useNavigate();
   const dialogEnterLobbycodeRef = useRef<DialogHandle | null>(null);
-  const dialogErrorInvalidLobbycodeRef = useRef<DialogHandle | null>(null);
 
   const createLobby = async () => {
     // create lobby
@@ -35,20 +36,13 @@ const StartMenu = () => {
       return;
     }
 
-    executeJoin(lobbyCode, () => dialogErrorInvalidLobbycodeRef.current?.toggleDialog());
+    executeJoin(lobbyCode);
   };
 
-  const executeJoin = async (lobbyCode: string, notFoundAction?: (() => void)) => {
+  const executeJoin = async (lobbyCode: string) => {
     const responseLobbyExists = await fetchWithAuth(`/lobbies/${lobbyCode}/exists`, "GET");
-    if (!responseLobbyExists || responseLobbyExists.status !== 200) {
-      return;
-    }
-
-    const responseText = await responseLobbyExists.text();
-    if (responseText !== "true") {
-      if (notFoundAction) {
-        notFoundAction();
-      }
+    if (isError(responseLobbyExists)) {
+      openErrorDialogIfMessage(responseLobbyExists);
       return;
     }
     
@@ -70,7 +64,7 @@ const StartMenu = () => {
         </form>
       </Dialog>
 
-      <Dialog errorMessage="Es wurde keine Lobby mit diesem Code gefunden." ref={dialogErrorInvalidLobbycodeRef}/>
+      { errorDialog }
       
       <OptionsButton/>
 

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "./dialog.css";
 import "@/index.css";
 
@@ -14,6 +14,7 @@ interface DialogProps {
 
 export interface DialogHandle {
   toggleDialog: () => void;
+  openDialog: () => void;
 }
 
 const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
@@ -24,7 +25,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     errorMessage,
     closedBy = "any",
     useDefaultStyling = true,
-    onClick = undefined
+    onClick = undefined,
   } = props;
 
   const [open, setOpen] = useState<boolean>(false);
@@ -32,26 +33,26 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     toggleDialog,
+    openDialog,
   }));
 
-  const toggleDialog = () => {
-    open ? closeDialog() : openDialog();
-  };
+  const toggleDialog = () => (open ? closeDialog() : openDialog());
 
   const openDialog = () => {
     dialogRef.current?.showModal();
     setOpen(true);
   };
 
-  const closeDialog = () => {
+  const closeDialog = useCallback(() => {
     dialogRef.current?.close();
     setOpen(false);
-  };
+  }, []);
 
   useEffect(() => {
-    dialogRef.current?.addEventListener("close", closeDialog);
+    const currentRef = dialogRef.current;
+    currentRef?.addEventListener("close", closeDialog);
     return () => {
-      dialogRef.current?.removeEventListener("close", closeDialog);
+      currentRef?.removeEventListener("close", closeDialog);
     };
   }, [closeDialog]);
 
@@ -60,7 +61,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
 
   return (
     <>
-      <dialog className={`${useDefaultStyling ? "dialog" : "noBorderAndBackground"} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} closedby={closedBy} onClick={onClick}>
+      <dialog className={`${useDefaultStyling ? "dialog" : "noBorderAndBackground"} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} onClick={onClick}>
         {showHeader && (
           <div className="closeContainer">
             {headerTitle && (
@@ -88,5 +89,6 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     </>
   );
 });
+Dialog.displayName = "Dialog";
 
 export default Dialog;

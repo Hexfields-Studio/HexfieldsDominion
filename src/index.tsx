@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/protectedRoute";
 import { RepositoryContextProvider } from "./contexts/MatchRepositoryContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { FetchWithTimeoutProvider } from "./contexts/FetchWithTimeoutContext";
 
 // https://reactrouter.com/start/declarative/routing
 
@@ -18,30 +19,32 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <RepositoryContextProvider>
     <ThemeProvider>
       <BrowserRouter basename={BASE_URL}>
-        <AuthProvider>
-          <Routes>
+        <FetchWithTimeoutProvider>
+          <AuthProvider>
+            <Routes>
 
-            {/*
-                        / or /home = Home Page
-                        /play = Start menu
-                        /lobby = Lobby
-                        /match = Match Page
-                    */}
-            <Route path={"/"} element={<HomePage />} />
-            <Route path={"home"} element={<HomePage />} />
+              {/*
+                          / or /home = Home Page
+                          /play = Start menu
+                          /lobby = Lobby
+                          /match = Match Page
+                      */}
+              <Route path={"/"} element={<HomePage />} />
+              <Route path={"home"} element={<HomePage />} />
 
-            <Route element={<ProtectedRoute redirectTo={"home"}/>}>
-              <Route path={"play"} element={<StartMenu />} />
-              <Route path={"lobby/:code"} element={<Lobby />} />
-              <Route path={"match/:uuid"} element={<MatchPage />} />
+              <Route element={<ProtectedRoute redirectTo={"home"}/>}>
+                <Route path={"play"} element={<StartMenu />} />
+                <Route path={"lobby/:code"} element={<Lobby />} />
+                <Route path={"match/:uuid"} element={<MatchPage />} />
 
-              <Route path={"lobby"} element={<Navigate to="/play" />} />
-              <Route path={"match"} element={<Navigate to="/play" />} />
-              {//Ohne code auf Start Page zurückweisen oder so
-              }
-            </Route>
-          </Routes>
-        </AuthProvider>
+                <Route path={"lobby"} element={<Navigate to="/play" />} />
+                <Route path={"match"} element={<Navigate to="/play" />} />
+                {//Ohne code auf Start Page zurückweisen oder so
+                }
+              </Route>
+            </Routes>
+          </AuthProvider>
+        </FetchWithTimeoutProvider>
       </BrowserRouter>
     </ThemeProvider>
   </RepositoryContextProvider>,

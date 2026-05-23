@@ -17,7 +17,10 @@ export const GameProvider = (props: GameContextProps) => {
   const [uuid, setUUID] = useState<string | undefined>();
 
   useEffect(() => {
-    setUUID(gameUUID);
+    const updateUUID = async () => {
+      setUUID(gameUUID);
+    };
+    updateUUID();
   }, [gameUUID]);
 
   return (
