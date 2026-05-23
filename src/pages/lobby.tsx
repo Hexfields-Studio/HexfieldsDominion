@@ -8,8 +8,9 @@ import type { SelectOption, SseListener } from "@/constants/customTypes";
 import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { useSseEventSource } from "@/hooks/sseHooks/useSseEventSource";
-import { useAuth } from "@/contexts/contexts";
+import { useAuth, useMatchRepository } from "@/contexts/contexts";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
+import type { Field } from "@/repository/MatchRepository";
 
 interface Player {
   id: number;
@@ -34,7 +35,8 @@ const selectOptionsMods: SelectOption[] = [
 ];
 
 type MatchCreatedDataType = {
-  matchUUID: string
+  matchUUID: string,
+  fields: Field[]
 }
 
 const Lobby = () => {
@@ -43,8 +45,11 @@ const Lobby = () => {
   const { fetchWithAuth } = useAuth();
   const code = params.code ?? "";
   useHeartbeat(code);
+  const {repository} = useMatchRepository();
 
   const joinMatch = useCallback((data: MatchCreatedDataType) => {
+    console.log("joinMatch", data);
+    repository.setFields(data.fields);
     localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, data.matchUUID);
     navi(`/match/${data.matchUUID}`);
   }, [navi]);

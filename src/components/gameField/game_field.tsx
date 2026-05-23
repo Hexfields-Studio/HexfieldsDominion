@@ -6,6 +6,8 @@ import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
 import { Background } from "./background";
+import { useFields } from "@/hooks/matchHooks/useFields";
+import type { Field } from "@/repository/MatchRepository";
 
 const radius: number = 100;
 
@@ -125,6 +127,9 @@ interface GameFieldProps {
 
 const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
 
+  // subscriptions
+  const fields: Field[] = useFields();
+
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [corners, setCorners] = useState<Corner[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -210,6 +215,10 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
+
+  useEffect(()=>{
+    
+  }, [fields]);
 
   function moveCamera(e: Konva.KonvaEventObject<MouseEvent>) {
     const halfWidth = containerClientSize.width / 2;

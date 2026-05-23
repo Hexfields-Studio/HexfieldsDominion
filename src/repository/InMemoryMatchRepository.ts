@@ -1,4 +1,4 @@
-import type { MatchRepository, PlayerRepresentation, PlayerRessources, Ressource } from "./MatchRepository";
+import type { Field, MatchRepository, PlayerRepresentation, PlayerRessources, ResourceType } from "./MatchRepository";
 
 class InMemoryMatchRepository implements MatchRepository{
   eventSource: EventSource | undefined;
@@ -8,11 +8,11 @@ class InMemoryMatchRepository implements MatchRepository{
       username: "Faker",
       isThisPlayersTurn: true,
       publicId: 1,
-      ressources: new Map<Ressource, number>([
-        ["wood", 9],
-        ["brick", 9],
-        ["wheat", 6],
-        ["sheep", 6],
+      ressources: new Map<ResourceType, number>([
+        ["WOOD", 9],
+        ["BRICK", 9],
+        ["WHEAT", 6],
+        ["SHEEP", 6],
       ]),
       chosenPortrait: "KingMale",
     },
@@ -20,15 +20,16 @@ class InMemoryMatchRepository implements MatchRepository{
       username: "BackStraightenReminder",
       isThisPlayersTurn: false,
       publicId: 2,
-      ressources: new Map<Ressource, number>([
-        ["wood", 1],
-        ["brick", 2],
-        ["wheat", 3],
-        ["sheep", 4],
+      ressources: new Map<ResourceType, number>([
+        ["WOOD", 1],
+        ["BRICK", 2],
+        ["WHEAT", 3],
+        ["SHEEP", 4],
       ]),
       chosenPortrait: "ArcherFemale",
     },
   ];
+  fields: Field[] = [];
 
   constructor(){
     /* Connect to backends SSE endpoint. Example code:
@@ -47,6 +48,12 @@ class InMemoryMatchRepository implements MatchRepository{
         */
         
   }
+
+  setFields = (fields: Field[]) => {
+    this.fields = fields
+  };
+
+  getFields = () => this.fields;
 
   /* useSyncExternalStore setup */
   subscribe = (listener: any) => {

@@ -1,7 +1,16 @@
 // Keep in mind: all existing ressources are actually sent from the backend
-export type Ressource = "wood" | "brick" | "wheat" | "sheep";
+export type ResourceType = "WHEAT" | "WOOD" | "BRICK" | "SHEEP" | "DUNES";
 
-export type PlayerRessources = Map<Ressource, number>;
+export type Field = {
+  numberChip: number;
+  pos: {
+    q: number;
+    r: number;
+  }
+  resource: ResourceType;
+}
+
+export type PlayerRessources = Map<ResourceType, number>;
 
 // Keep in mind: This PlayerRepresentation is a simplified/untrue version of what the backend would actually send
 export type PlayerRepresentation = {
@@ -17,6 +26,8 @@ export interface MatchRepository{
     getMatchData: ()=>PlayerRepresentation[]
     emitChange: ()=>void
     
+    setFields: (fields: Field[]) => void
+    getFields: () => Field[]
     getMyPublicId: ()=>number
     getMyRessources: ()=>PlayerRessources | undefined
     isItMyTurn: ()=>boolean
