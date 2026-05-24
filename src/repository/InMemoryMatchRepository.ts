@@ -54,7 +54,7 @@ class InMemoryMatchRepository implements MatchRepository{
     this.subscribers.push(listener);
     return () => {
       this.subscribers.filter(l => l !== listener);
-    }
+    };
   };
 
   getMatchData = () => this.matchData;
@@ -64,8 +64,8 @@ class InMemoryMatchRepository implements MatchRepository{
   };
   /*############################*/
 
-  getMyPublicId = (): number => {
-    return getStorageItem("playerId", 0);
+  getMyPublicId = (): number | undefined => {
+    return getStorageItem("playerId", undefined);
   };
 
   getMyRessources = (): PlayerRessources | undefined => this.matchData.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.ressources;
