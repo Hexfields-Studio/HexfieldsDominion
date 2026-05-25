@@ -196,7 +196,7 @@ const GameField: React.FC<GameFieldProps> = () => {
       window.removeEventListener("resize", ()=>handleResize(container));
       cancelAnimationFrame(animationFrameId);
     };
-  }, [boardRadius]);
+  }, []);
 
   const generateHexagons = useCallback((newHexagons: hexagonProps[]) => {
     fields.forEach(field => {
