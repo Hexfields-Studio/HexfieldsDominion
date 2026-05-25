@@ -209,7 +209,7 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
       window.removeEventListener("resize", ()=>handleResize(container));
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [boardRadius]);
 
   function moveCamera(e: Konva.KonvaEventObject<MouseEvent>) {
     const halfWidth = containerClientSize.width / 2;

@@ -4,11 +4,14 @@
   --fg-dark: rgba(255,255,255,.87); --fg-light: #111;
   --accent-green: #2ecc71;
   --panel-bg-dark: rgba(0,0,0,.32);
+  --panel-bg-dark-solid: rgba(0,0,0);
   --panel-bg-light: rgba(255,255,255,.72);
+  --panel-bg-light-solid: rgba(255,255,255);
 
   --background: var(--bg-dark);
   --foreground: var(--fg-dark);
   --panel-bg: var(--panel-bg-dark);
+  --panel-bg-solid: var(--panel-bg-dark-solid);
 
   --input-background: color-mix(in srgb, var(--background) 92%, var(--foreground) 8%);
   --input-border: color-mix(in srgb, var(--foreground) 20%, transparent 80%);
@@ -30,6 +33,7 @@
   --background: var(--bg-light);
   --foreground: var(--fg-light);
   --panel-bg: var(--panel-bg-light);
+  --panel-bg-solid: var(--panel-bg-light-solid);
 }
 
 /* page layout */
