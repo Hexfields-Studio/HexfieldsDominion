@@ -32,7 +32,7 @@ export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, res
   const shadowOffsets = [
     [-2, -2], [-2, 0], [-2, 2],
     [0, -2],           [0, 2],
-    [2, -2],  [2, 0],  [2, 2]
+    [2, -2],  [2, 0],  [2, 2],
   ];
 
   return (

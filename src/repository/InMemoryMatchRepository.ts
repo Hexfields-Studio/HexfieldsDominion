@@ -1,4 +1,4 @@
-import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerResources } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
@@ -26,7 +26,7 @@ class InMemoryMatchRepository implements MatchRepository{
   }
 
   setFields = (fields: Field[]) => {
-    this.fields = fields
+    this.fields = fields;
   };
 
   getFields = () => this.fields;
@@ -36,7 +36,7 @@ class InMemoryMatchRepository implements MatchRepository{
     this.subscribers.push(listener);
     return () => {
       this.subscribers = this.subscribers.filter(
-        l => l !== listener
+        l => l !== listener,
       );
     };
   };

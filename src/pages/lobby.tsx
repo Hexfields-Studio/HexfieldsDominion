@@ -8,9 +8,8 @@ import type { SelectOption, SseListener } from "@/constants/customTypes";
 import { DefaultSelectStyle } from "@/constants/selectStyles";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { useSseEventSource } from "@/hooks/sseHooks/useSseEventSource";
-import { useAuth, useMatchRepository } from "@/contexts/contexts";
+import { useAuth } from "@/contexts/contexts";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
-import type { Field } from "@/repository/MatchRepository";
 import { useError } from "@/hooks/useError";
 
 interface Player {

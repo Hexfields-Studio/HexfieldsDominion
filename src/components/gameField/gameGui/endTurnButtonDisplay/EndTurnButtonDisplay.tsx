@@ -9,7 +9,7 @@ type EndTurnButtonDisplayProps = {
     hideBoxedDices: boolean;
 }
 
-const EndTurnButtonDisplay: React.FC<EndTurnButtonDisplayProps> = ({rolledSides, animationTrigger, hideBoxedDices}) => {
+const EndTurnButtonDisplay: React.FC<EndTurnButtonDisplayProps> = ({ rolledSides, animationTrigger, hideBoxedDices }) => {
   const isMyTurn = useIsMyTurn();
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
@@ -18,7 +18,7 @@ const EndTurnButtonDisplay: React.FC<EndTurnButtonDisplayProps> = ({rolledSides,
 
   return (
     <div className={styles["endTurnButtonDisplay"]}>
-      <div style={{visibility: hideBoxedDices ? "hidden" : "visible"}}>
+      <div style={{ visibility: hideBoxedDices ? "hidden" : "visible" }}>
         <DiceContainer className={styles["endTurnButtonDisplay__diceContainer"]} rolledSides={rolledSides} animationTrigger={animationTrigger} currentDiceSide={"boxed"} />
       </div>
             
