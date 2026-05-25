@@ -17,7 +17,7 @@ export interface MatchRepository{
     getMatchData: ()=>PlayerRepresentation[]
     emitChange: ()=>void
     
-    getMyPublicId: ()=>number
+    getMyPublicId: ()=>number | undefined
     getMyRessources: ()=>PlayerRessources | undefined
     isItMyTurn: ()=>boolean
     closeConnection: ()=>void

@@ -1,15 +1,16 @@
 import { Layer } from "react-konva";
-import PlayerLineupDisplay from "./playerLineupDisplay/PlayerLineupDisplay";
-import RessourceDisplay from "./ressourceDisplay/RessourceDisplay";
+import PlayerLineupDisplay from "@/components/gameField/gameGui/playerLineupDisplay/PlayerLineupDisplay";
+import RessourceDisplay from "@/components/gameField/gameGui/ressourceDisplay/RessourceDisplay";
+import EndTurnButtonDisplay from "@/components/gameField/gameGui/endTurnButtonDisplay/EndTurnButtonDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
-import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
-import Dice from "@/components/gameField/gameGui/dice/dice";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import { useAuth, useGame } from "@/contexts/contexts";
-import { ROLLING_DICES_DIALOG_TIMEOUT } from "@/constants/constants";
+import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT } from "@/constants/constants";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
+import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
+import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
 
 type DiceValuePairType = {
   value1: number,
@@ -20,8 +21,9 @@ const GameGui: React.FC = () => {
 
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
+  const isMyTurn = useIsMyTurn();
+  const [hideBoxedDices, setHideBoxedDices] = useState<boolean>(false);
 
-  const isThisPlayersTurn = useIsMyTurn();
   const [rolledSides, setRolledSides] = useState<number[]>([0, 0]);
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
 
@@ -31,7 +33,7 @@ const GameGui: React.FC = () => {
     {
       type: "rollDice",
       action: (event: MessageEvent) => {
-        showDiceAnimation(JSON.parse(event.data));
+        highlightDiceAnimation(JSON.parse(event.data));
       },
     },
   ], []));
@@ -45,16 +47,20 @@ const GameGui: React.FC = () => {
 
       const responseJson = await response.json();
 
-      showDiceAnimation(responseJson);
+      highlightDiceAnimation(responseJson);
     })();
   };
 
-  const showDiceAnimation = (diceValuePair: DiceValuePairType) => {
-    dialogRef.current?.toggleDialog();
-
+  const highlightDiceAnimation = (diceValuePair: DiceValuePairType) => {
+    if(isMyTurn){
+      dialogRef.current?.toggleDialog();
+      setHideBoxedDices(true);
+      setTimeout(() => {
+        dialogRef.current?.toggleDialog();
+        setHideBoxedDices(false);
+      }, HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
+    }
     setRolledSides([diceValuePair.value1, diceValuePair.value2]);
-    
-    setTimeout(() => dialogRef.current?.toggleDialog(), ROLLING_DICES_DIALOG_TIMEOUT);
   };
 
   useEffect(()=>{
@@ -65,17 +71,14 @@ const GameGui: React.FC = () => {
     <Layer>
       <Html divProps={{ className: styles.gui }}>
         <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
-          <div className={styles["diceContainer"]}>
-            <Dice theme="blue" rolledSide={rolledSides[0]} animationTrigger={animationTrigger}/>
-            <Dice theme="red" rolledSide={rolledSides[1]} animationTrigger={animationTrigger}/>
-          </div>
+          <DiceContainer className={styles["gui__diceContainer"]} rolledSides={rolledSides} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
         </Dialog>
         <button onClick={rollDice} style={{pointerEvents: "all"}}>Test</button>
-        <div className={styles["flexboxes"]}>
+        <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
+          <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
         </div>
-        <button className={`${styles["gui__endTurnButton"]} ${isThisPlayersTurn ? styles["gui__endTurnButton--active"] : styles["gui__endTurnButton--inctive"]}`}>End Turn</button>
       </Html>
     </Layer>
   );

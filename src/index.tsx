@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/protectedRoute";
 import { RepositoryContextProvider } from "./contexts/MatchRepositoryContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
-
+import "./variables.scss";
 // https://reactrouter.com/start/declarative/routing
 
 
