@@ -29,13 +29,13 @@ export type MatchData = {
 export interface MatchRepository{
     subscribe: (subscriber: any)=>void
     setMatchData: (matchData: MatchData) => void
-    getMatchData: ()=>MatchData | undefined
-    emitChange: ()=>void
+    getMatchData: () => MatchData | undefined
+    emitChange: () => void
     
     setFields: (fields: Field[]) => void
     getFields: () => Field[]
     getMyPublicId: () => number | undefined
-    getMyRessources: ()=>PlayerResources | undefined
+    getMyRessources: () => PlayerResources | undefined
     isItMyTurn: ()=>boolean
     setCurrentPlayersTurn: (publicId: number) => void
     getCurrentPlayersTurn: () => number | undefined

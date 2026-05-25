@@ -1,4 +1,4 @@
-import type { Field, MatchData, MatchRepository, PlayerResources } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerResources, PlayerRepresentation } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
