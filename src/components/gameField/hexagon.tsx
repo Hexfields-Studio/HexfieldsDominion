@@ -10,7 +10,7 @@ export interface hexagonProps {
     fill: string,
     radius: number,
     label: string,
-    resource?: typeof resourcesFields[number]
+    resource: typeof resourcesFields[number]
 }
 
 export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resource }) => {
