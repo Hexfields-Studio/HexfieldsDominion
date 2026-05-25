@@ -65,8 +65,6 @@ const GameGui: React.FC = () => {
     setRolledSides([diceValuePair.value1, diceValuePair.value2]);
   };
 
-  const nextPlayer = () => fetchWithAuth(`/games/${uuid}/endTurn`, "POST");
-
   useEffect(()=>{
     const triggerAnimation = async () => {
       setAnimationTrigger(a => a + 1);
@@ -88,7 +86,6 @@ const GameGui: React.FC = () => {
           <RessourceDisplay/>
           <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
         </div>
-        <button onClick={nextPlayer} disabled={!isMyTurn} className={`${styles["gui__endTurnButton"]} ${isMyTurn ? styles["gui__endTurnButton--active"] : styles["gui__endTurnButton--inctive"]}`}>End Turn</button>
       </Html>
     </Layer>
   );
