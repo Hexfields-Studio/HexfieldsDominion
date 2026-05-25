@@ -1,10 +1,11 @@
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
-import type { MatchData, MatchRepository, PlayerResources } from "./MatchRepository";
 
 class InMemoryMatchRepository implements MatchRepository{
   eventSource: EventSource | undefined;
   subscribers: any[] = [];
   matchData: MatchData | undefined;
+  fields: Field[] = [];
 
   constructor(){
     /* Connect to backends SSE endpoint. Example code:
@@ -24,11 +25,19 @@ class InMemoryMatchRepository implements MatchRepository{
         
   }
 
+  setFields = (fields: Field[]) => {
+    this.fields = fields
+  };
+
+  getFields = () => this.fields;
+
   /* useSyncExternalStore setup */
   subscribe = (listener: any) => {
     this.subscribers.push(listener);
     return () => {
-      this.subscribers.filter(l => l !== listener);
+      this.subscribers = this.subscribers.filter(
+        l => l !== listener
+      );
     };
   };
 

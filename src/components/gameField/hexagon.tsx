@@ -10,23 +10,23 @@ export interface hexagonProps {
     fill: string,
     radius: number,
     label: string,
-    resourceType?: typeof resourcesFields[number]
+    resource?: typeof resourcesFields[number]
 }
 
-export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resourceType }) => {
+export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resource }) => {
   const [textureImage, setTextureImage] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    if (resourceType) {
+    if (resource) {
       // Randomly pick between variant 1 and 2
       const variant = Math.random() > 0.5 ? "1" : "2";
-      const imgPath = `${import.meta.env.BASE_URL}fields/${resourceType.toLowerCase()}Field${variant}.png`;
+      const imgPath = `${import.meta.env.BASE_URL}fields/${resource.toLowerCase()}Field${variant}.png`;
       
       const img = new window.Image();
       img.src = imgPath;
       img.onload = () => setTextureImage(img);
     }
-  }, [resourceType]);
+  }, [resource]);
 
   // 8-direction offsets for number aura
   const shadowOffsets = [

@@ -2,6 +2,15 @@
 export const resources = ["WOOD", "BRICK", "WHEAT", "SHEEP"] as const;
 export const resourcesFields = [...resources, "DUNES"] as const;
 
+export type Field = {
+  numberChip: number;
+  pos: {
+    q: number;
+    r: number;
+  }
+  resource: typeof resourcesFields[number];
+}
+
 export type PlayerResources = Record<typeof resources[number], number>;
 
 // Keep in mind: This PlayerRepresentation is a simplified/untrue version of what the backend would actually send
@@ -23,7 +32,9 @@ export interface MatchRepository{
     getMatchData: ()=>MatchData | undefined
     emitChange: ()=>void
     
-    getMyPublicId: ()=>number | undefined
+    setFields: (fields: Field[]) => void
+    getFields: () => Field[]
+    getMyPublicId: () => number | undefined
     getMyRessources: ()=>PlayerResources | undefined
     isItMyTurn: ()=>boolean
     setCurrentPlayersTurn: (publicId: number) => void
