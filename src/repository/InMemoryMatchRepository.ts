@@ -1,35 +1,10 @@
 import { getStorageItem } from "@/constants/storage";
-import type { MatchRepository, PlayerRepresentation, PlayerRessources, Ressource } from "./MatchRepository";
+import type { MatchData, MatchRepository, PlayerResources } from "./MatchRepository";
 
 class InMemoryMatchRepository implements MatchRepository{
   eventSource: EventSource | undefined;
   subscribers: any[] = [];
-  matchData: PlayerRepresentation[] = [   // This is just mock data
-    {
-      username: "Faker",
-      isThisPlayersTurn: true,
-      publicId: 0,
-      ressources: new Map<Ressource, number>([
-        ["wood", 9],
-        ["brick", 9],
-        ["wheat", 6],
-        ["sheep", 6],
-      ]),
-      chosenPortrait: "KingMale",
-    },
-    {
-      username: "BackStraightenReminder",
-      isThisPlayersTurn: false,
-      publicId: 1,
-      ressources: new Map<Ressource, number>([
-        ["wood", 1],
-        ["brick", 2],
-        ["wheat", 3],
-        ["sheep", 4],
-      ]),
-      chosenPortrait: "ArcherFemale",
-    },
-  ];
+  matchData: MatchData | undefined;
 
   constructor(){
     /* Connect to backends SSE endpoint. Example code:
@@ -57,6 +32,10 @@ class InMemoryMatchRepository implements MatchRepository{
     };
   };
 
+  setMatchData = (matchData: MatchData) => {
+    this.matchData = matchData;
+  };
+
   getMatchData = () => this.matchData;
 
   emitChange = (): void => {
@@ -68,9 +47,25 @@ class InMemoryMatchRepository implements MatchRepository{
     return getStorageItem("playerId", undefined);
   };
 
-  getMyRessources = (): PlayerRessources | undefined => this.matchData.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.ressources;
+  getMyRessources = (): PlayerResources | undefined => {
+    return this.matchData?.players.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.resources;
+  };
     
-  isItMyTurn = (): boolean => this.matchData.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.isThisPlayersTurn ?? false;
+  isItMyTurn = (): boolean => {
+    if (this.matchData === undefined) {
+      return false;
+    }
+    return this.matchData.playerCurrentTurn === this.getMyPublicId();
+  };
+
+  setCurrentPlayersTurn = (publicId: number) => {
+    if (this.matchData === undefined) {
+      return;
+    }
+    this.matchData.playerCurrentTurn = publicId;
+  };
+
+  getCurrentPlayersTurn = (): number | undefined => this.matchData?.playerCurrentTurn;
 
   // Always invoke this when unmounting from Match Page
   closeConnection = (): void => this.eventSource?.close();

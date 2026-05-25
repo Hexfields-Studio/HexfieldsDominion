@@ -1,5 +1,6 @@
 import { Group, RegularPolygon, Text, Image } from "react-konva";
 import { useEffect, useState } from "react";
+import { resourcesFields } from "@/repository/MatchRepository";
 
 export interface hexagonProps {
     q: number,
@@ -9,7 +10,7 @@ export interface hexagonProps {
     fill: string,
     radius: number,
     label: string,
-    resourceType?: "wheat" | "sheep" | "brick" | "stone" | "wood" | "dunes"
+    resourceType?: typeof resourcesFields[number]
 }
 
 export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resourceType }) => {
@@ -19,7 +20,7 @@ export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, res
     if (resourceType) {
       // Randomly pick between variant 1 and 2
       const variant = Math.random() > 0.5 ? "1" : "2";
-      const imgPath = `${import.meta.env.BASE_URL}fields/${resourceType}Field${variant}.png`;
+      const imgPath = `${import.meta.env.BASE_URL}fields/${resourceType.toLowerCase()}Field${variant}.png`;
       
       const img = new window.Image();
       img.src = imgPath;

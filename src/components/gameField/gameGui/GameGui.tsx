@@ -9,6 +9,7 @@ import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import { useAuth, useGame } from "@/contexts/contexts";
 import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT } from "@/constants/constants";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
+import { useError } from "@/hooks/useError";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
 
@@ -21,6 +22,7 @@ const GameGui: React.FC = () => {
 
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
+  const { isError } = useError();
   const isMyTurn = useIsMyTurn();
   const [hideBoxedDices, setHideBoxedDices] = useState<boolean>(false);
 
@@ -41,11 +43,11 @@ const GameGui: React.FC = () => {
   const rollDice = () => {
     (async () => {
       const response = await fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
-      if (!response || response.status !== 200) {
+      if (isError(response)) {
         return;
       }
 
-      const responseJson = await response.json();
+      const responseJson = await response?.json();
 
       highlightDiceAnimation(responseJson);
     })();
@@ -63,6 +65,8 @@ const GameGui: React.FC = () => {
     setRolledSides([diceValuePair.value1, diceValuePair.value2]);
   };
 
+  const nextPlayer = () => fetchWithAuth(`/games/${uuid}/endTurn`, "POST");
+
   useEffect(()=>{
     const triggerAnimation = async () => {
       setAnimationTrigger(a => a + 1);
@@ -76,12 +80,15 @@ const GameGui: React.FC = () => {
         <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
           <DiceContainer className={styles["gui__diceContainer"]} rolledSides={rolledSides} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
         </Dialog>
-        <button onClick={rollDice} style={{ pointerEvents: "all" }}>Test</button>
+        { isMyTurn &&
+          <button onClick={rollDice} style={{ pointerEvents: "all" }}>Test</button>
+        }
         <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
           <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
         </div>
+        <button onClick={nextPlayer} disabled={!isMyTurn} className={`${styles["gui__endTurnButton"]} ${isMyTurn ? styles["gui__endTurnButton--active"] : styles["gui__endTurnButton--inctive"]}`}>End Turn</button>
       </Html>
     </Layer>
   );
