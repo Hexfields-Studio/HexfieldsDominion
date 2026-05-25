@@ -1,6 +1,6 @@
 // This component is inspired by: https://codepen.io/abirana/pen/rNMLrPB
 import { useEffect, useState } from "react";
-import styles from "./dice.module.scss";
+import styles from "./Dice.module.scss";
 
 //TODO: Refactor this so it doesnt store big strings
 
@@ -24,14 +24,16 @@ const sideChaotic = {
   6: "rotateX(450deg) rotateY(360deg) rotateZ(720deg)",
 };
 
+export type DiceSide = "highlighted" | "boxed";
+
 type DiceProps = {
-    theme: string;
+    diceTheme: number;
     rolledSide: number;
     animationTrigger: number;
+    currentDiceSide: DiceSide
 }
 
-// 37:30 für Zwei dice und fix rfandom number immer animation
-const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger }) => {
+const Dice: React.FC<DiceProps> = ({ diceTheme, rolledSide, animationTrigger, currentDiceSide }) => {
   const [style, setStyle] = useState<React.CSSProperties>();
   const [useDefaultSide, setUseDefaultSide] = useState<boolean>(false);
 
@@ -44,14 +46,14 @@ const Dice: React.FC<DiceProps> = ({ theme, rolledSide, animationTrigger }) => {
       transform: useDefaultSide ? 
         sideDefault[rolledSide as keyof typeof sideDefault] :
         sideChaotic[rolledSide as keyof typeof sideChaotic],
-    });
+        "--current_dice_size": `var(--dice_size_${currentDiceSide})`
+    } as React.CSSProperties);
   }, [useDefaultSide]);
 
   const range = (i: number) => Array.from({ length: i }, (_, j) => j + 1);
 
-  //<div id="dice" data-side={diceSide} onClick={rollDice}>
-  return (//className={reRoll ? "reRoll" : ""}
-    <div id={styles.dice} data-theme={theme} style={style}>
+  return (
+    <div id={styles.dice} data-theme={diceTheme} style={style} >
       {
         [1,2,3,4,5,6].map((i) => (
           <div className={`${styles.side} ${styles[`side-${i}`]}`} key={`side-${i}`}>

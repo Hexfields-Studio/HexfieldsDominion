@@ -183,7 +183,7 @@ const GameField: React.FC<GameFieldProps> = () => {
       window.removeEventListener("resize", ()=>handleResize(container));
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [boardRadius]);
 
   useEffect(()=>{
     if(fields.length === 0) return;

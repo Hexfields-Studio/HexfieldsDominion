@@ -1,4 +1,5 @@
 import type { Field, MatchRepository, PlayerRepresentation, PlayerRessources, ResourceType } from "./MatchRepository";
+import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
   eventSource: EventSource | undefined;
@@ -72,8 +73,8 @@ class InMemoryMatchRepository implements MatchRepository{
   };
   /*############################*/
 
-  getMyPublicId = (): number => {
-    return 1;
+  getMyPublicId = (): number | undefined => {
+    return getStorageItem("playerId", undefined);
   };
 
   getMyRessources = (): PlayerRessources | undefined => this.matchData.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.ressources;

@@ -11,6 +11,7 @@ import { useSseEventSource } from "@/hooks/sseHooks/useSseEventSource";
 import { useAuth, useMatchRepository } from "@/contexts/contexts";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
 import type { Field } from "@/repository/MatchRepository";
+import { useError } from "@/hooks/useError";
 
 interface Player {
   id: number;
@@ -42,6 +43,7 @@ const Lobby = () => {
   const params = useParams();
   const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
+  const { errorDialog, isError, openErrorDialogIfMessage } = useError();
   const code = params.code ?? "";
   useHeartbeat(code);
 
@@ -51,6 +53,7 @@ const Lobby = () => {
     navi(`/match/${data.matchUUID}`);
   }, [navi]);
   
+  //TODO: statt useMemo außerhalb von const Lobby schieben
   const sseListeners: SseListener[] = useMemo(() => [
     {
       type: "lobbyUpdate",
@@ -67,7 +70,7 @@ const Lobby = () => {
       },
     },
   ], [joinMatch]);
-  useSseEventSource({ path: `lobbies/${code}/events`, listeners: sseListeners });
+  const { connectSse } = useSseEventSource({ path: `lobbies/${code}/events`, listeners: sseListeners });
 
   const [copied, setCopied] = useState<boolean>(false);
   const [selectedMultiplayerMode, setSelectedMultiplayerMode] = useState<SelectOption | null>(null);
@@ -80,6 +83,9 @@ const Lobby = () => {
   const onSelectTurnTimeout = (selectedOption: SingleValue<SelectOption>) => setSelectedTurnTimeout(selectedOption);
   const onSelectMods = (selectedOption: SingleValue<SelectOption>) => setSelectedMods(selectedOption);
 
+  useEffect(() => {
+    connectSse();
+  });
 
   useEffect(() => {
     const executeJoin = async (lobbyCode: string) => {
@@ -103,11 +109,12 @@ const Lobby = () => {
 
   const createMatch = async () => {
     const response = await fetchWithAuth(`/lobbies/${code}/match`, "POST");
-    if (!response || response.status !== 200) {
+    if (isError(response)) {
+      openErrorDialogIfMessage(response);
       return;
     }
 
-    const responseJson = await response.json();
+    const responseJson = await response?.json();
     joinMatch(responseJson);
   };
 
@@ -126,6 +133,8 @@ const Lobby = () => {
 
   return (
     <>
+      { errorDialog }
+
       <OptionsButton/>
 
       <h1>Lobby</h1>

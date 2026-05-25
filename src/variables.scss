@@ -1,0 +1,7 @@
+$dice_size_highlighted: 120px;
+$dice_size_boxed: 60px;
+
+:root{
+    --dice_size_highlighted: #{$dice_size_highlighted};
+    --dice_size_boxed: #{$dice_size_boxed};
+}

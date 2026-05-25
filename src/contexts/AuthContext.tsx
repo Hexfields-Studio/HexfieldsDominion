@@ -3,12 +3,13 @@ import { type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { ACCESS_TOKEN_REFRESH_TIME_FRAME } from "@/constants/constants";
-import { AuthContext } from "./contexts";
+import { AuthContext, useFetchWithTimeout } from "./contexts";
+import { useError } from "@/hooks/useError";
 
 export type AuthContextType = {
-    guest: () => void;
-    register: (credentials: Credentials) => void;
-    login: (credentials: Credentials) => void;
+    guest: () => Promise<Response | undefined>;
+    register: (credentials: Credentials) => Promise<Response | undefined>;
+    login: (credentials: Credentials) => Promise<Response | undefined>;
     logout: () => void;
     fetchWithAuth: (input: RequestInfo | URL, method: string, body?: BodyInit) => Promise<Response | undefined>;
     isAuthValid: () => Promise<boolean>;
@@ -21,27 +22,33 @@ type Credentials = {
 
 export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const navigate = useNavigate();
+  const { isError } = useError();
+  const { fetchWithTimeout } = useFetchWithTimeout();
   const API_URL = import.meta.env.VITE_API_URL;
 
   const guest = async () => {
-    await doLoginRequest("/auth/guest");
+    return doLoginRequest("/auth/guest");
   };
 
   const register = async (credentials: Credentials) => {
-    await doLoginRequest("/auth/register", credentials);
+    return doLoginRequest("/auth/register", credentials);
   };
 
   const login = async (credentials: Credentials) => {
-    await doLoginRequest("/auth/login", credentials);
+    return doLoginRequest("/auth/login", credentials);
   };
 
   const doLoginRequest = async (path: string, credentials?: Credentials) => {
-    const response = await fetch(API_URL + path, {
+    const response = await fetchWithTimeout(API_URL + path, {
       method: "POST",
       body: (credentials ? JSON.stringify(credentials) : null),
       headers: { "Content-Type": "application/json" },
       credentials: "include",
     });
+    if (isError(response)) {
+      return response;
+    }
+
     const responseJson = await response.json();
       
     const token = responseJson.accessToken;
@@ -52,7 +59,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   };
 
   const logout = async () => {
-    await fetch(`${API_URL}/auth/logout`, {
+    await fetchWithTimeout(`${API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -68,7 +75,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
       return;
     }
 
-    return await fetch(API_URL + input, {
+    return await fetchWithTimeout(API_URL + input, {
       method: method,
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -94,7 +101,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
         
     if ((expiresAt.getTime() - new Date().getTime()) < ACCESS_TOKEN_REFRESH_TIME_FRAME) {
       // request new token
-      const refreshTokenResponse = await fetch(`${API_URL}/auth/refresh`, {
+      const refreshTokenResponse = await fetchWithTimeout(`${API_URL}/auth/refresh`, {
         method: "GET",
         credentials: "include",
       });

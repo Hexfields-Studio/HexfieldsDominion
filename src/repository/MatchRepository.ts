@@ -28,7 +28,7 @@ export interface MatchRepository{
     
     setFields: (fields: Field[]) => void
     getFields: () => Field[]
-    getMyPublicId: ()=>number
+    getMyPublicId: () => number | undefined
     getMyRessources: ()=>PlayerRessources | undefined
     isItMyTurn: ()=>boolean
     closeConnection: ()=>void
