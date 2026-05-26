@@ -17,8 +17,9 @@ export type PlayerResources = Record<typeof resources[number], number>;
 export type PlayerRepresentation = {
     username: string,
     publicId: number,   // Not sure if this is the correct use of the "publicId"
-    resources: PlayerResources
-    chosenPortrait: string //Invented, keep portraits or use colors?
+    resources: PlayerResources,
+    chosenPortrait: string, //Invented, keep portraits or use colors?
+    points: number
 }
 
 export type MatchData = {
@@ -27,17 +28,18 @@ export type MatchData = {
 }
 
 export interface MatchRepository{
-    subscribe: (subscriber: any)=>void
+    subscribe: (subscriber: any) => void
     setMatchData: (matchData: MatchData) => void
-    getMatchData: ()=>MatchData | undefined
-    emitChange: ()=>void
+    getMatchData: () => MatchData | undefined
+    emitChange: () => void
     
     setFields: (fields: Field[]) => void
     getFields: () => Field[]
     getMyPublicId: () => number | undefined
-    getMyRessources: ()=>PlayerResources | undefined
-    isItMyTurn: ()=>boolean
+    getMyRessources: () => PlayerResources | undefined
+    getMyPoints: () => number
+    isItMyTurn: () => boolean
     setCurrentPlayersTurn: (publicId: number) => void
     getCurrentPlayersTurn: () => number | undefined
-    closeConnection: ()=>void
+    closeConnection: () => void
 }

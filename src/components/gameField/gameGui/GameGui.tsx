@@ -12,6 +12,7 @@ import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 import { useError } from "@/hooks/useError";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
+import PointsDisplay from "./pointsDisplay/PointsDisplay";
 
 type DiceValuePairType = {
   value1: number,
@@ -85,6 +86,7 @@ const GameGui: React.FC = () => {
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
           <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
+          <PointsDisplay/>
         </div>
       </Html>
     </Layer>

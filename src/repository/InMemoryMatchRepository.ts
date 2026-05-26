@@ -59,6 +59,10 @@ class InMemoryMatchRepository implements MatchRepository{
   getMyRessources = (): PlayerResources | undefined => {
     return this.matchData?.players.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.resources;
   };
+
+  getMyPoints = (): number => {
+    return this.matchData?.players.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.points ?? 0;
+  };
     
   isItMyTurn = (): boolean => {
     if (this.matchData === undefined) {
