@@ -37,7 +37,7 @@ export interface MatchRepository{
     getFields: () => Field[]
     getMyPublicId: () => number | undefined
     getMyRessources: () => PlayerResources | undefined
-    isItMyTurn: ()=>boolean
+    isItMyTurn: () => boolean
     setCurrentPlayersTurn: (publicId: number) => void
     getCurrentPlayersTurn: () => number | undefined
     closeConnection: () => void
