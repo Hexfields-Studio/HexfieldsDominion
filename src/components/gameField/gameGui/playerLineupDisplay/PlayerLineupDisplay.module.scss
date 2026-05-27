@@ -26,18 +26,27 @@
                 filter: brightness(1);
                 opacity: 1;
             }
+
+            .pointsText{
+                font-size: 90%;
+            }
         }
 
         .portraitText {
             padding: 0;
-            margin: 0;
+            margin: 5px 0 0 0;
+            background-color: rgba($color: map.get($gameGui, lineupDisplay, yourTurnColor), $alpha: 0.75);
+            border: 2px solid rgba($color: map.get($gameGui, lineupDisplay, yourTurnColor), $alpha: 1);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 90%;
         }
 
         .pointsText{
             border: 2px solid rgba($color: #000000, $alpha: 0.8);
             border-radius: 15px;
             background-color: rgba($color: #000000, $alpha: 0.65);
-            font-size: 0.8vw;
+            font-size: 80%;
             margin: 0;
             pointer-events: all;
             text-align: center;
