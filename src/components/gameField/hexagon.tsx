@@ -1,6 +1,6 @@
 import { Group, RegularPolygon, Text, Image } from "react-konva";
 import { useEffect, useState } from "react";
-import type { ResourceType } from "@/repository/MatchRepository";
+import { resourcesFields } from "@/repository/MatchRepository";
 
 export interface hexagonProps {
     q: number,
@@ -10,7 +10,7 @@ export interface hexagonProps {
     fill: string,
     radius: number,
     label: string,
-    resource: ResourceType
+    resource: typeof resourcesFields[number]
 }
 
 export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, resource }) => {
@@ -32,7 +32,7 @@ export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, res
   const shadowOffsets = [
     [-2, -2], [-2, 0], [-2, 2],
     [0, -2],           [0, 2],
-    [2, -2],  [2, 0],  [2, 2]
+    [2, -2],  [2, 0],  [2, 2],
   ];
 
   return (

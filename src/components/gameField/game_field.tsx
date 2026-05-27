@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, Layer, Rect, Stage } from "react-konva";
 import "./game_field.scss";
 import type Konva from "konva";
@@ -6,6 +6,9 @@ import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
 import { Background } from "./background";
+import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
+import { useMatchRepository } from "@/contexts/contexts";
+import { resourcesFields } from "@/repository/MatchRepository";
 import { useFields } from "@/hooks/matchHooks/useFields";
 import type { Field } from "@/repository/MatchRepository";
 
@@ -107,6 +110,7 @@ const GameField: React.FC<GameFieldProps> = () => {
 
   // subscriptions
   const fields: Field[] = useFields();
+  const { repository } = useMatchRepository();
 
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [corners, setCorners] = useState<Corner[]>([]);
@@ -131,6 +135,15 @@ const GameField: React.FC<GameFieldProps> = () => {
   const [backgroundOffsetX, setBackgroundOffsetX] = useState(0);
   const backgroundDirectionRef = useRef(Math.random() > 0.5 ? 1 : -1); // 1 for east, -1 for west
   const backgroundSpeedRef = useRef(0.5); // animation speed inpixels per frame
+
+  useSseListeners(useMemo(() => [
+    {
+      type: "matchData",
+      action: (event: MessageEvent) => {
+        repository.setMatchData(JSON.parse(event.data));
+      },
+    },
+  ], [repository]));
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -183,7 +196,17 @@ const GameField: React.FC<GameFieldProps> = () => {
       window.removeEventListener("resize", ()=>handleResize(container));
       cancelAnimationFrame(animationFrameId);
     };
-  }, [boardRadius]);
+  }, []);
+
+  const generateHexagons = useCallback((newHexagons: hexagonProps[]) => {
+    fields.forEach(field => {
+      const q = field.pos.q;
+      const r = field.pos.r;
+      const x = (q + r/2) * Math.sqrt(3) * radius;
+      const y = r * (3/2) * radius;
+      newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip.toString(), resource: field.resource });
+    });
+  }, [fields]);
 
   useEffect(()=>{
     if(fields.length === 0) return;
@@ -192,17 +215,7 @@ const GameField: React.FC<GameFieldProps> = () => {
     setCorners(computeUniqueCorners(newHexagons));
     setEdges(computeUniqueEdges(newHexagons));
     setHexagons(newHexagons);
-  }, [fields]);
-
-  function generateHexagons(newHexagons: hexagonProps[]) {
-    fields.forEach(field => {
-      const q = field.pos.q;
-      const r = field.pos.r;
-      const x = (q + r/2) * Math.sqrt(3) * radius;
-      const y = r * (3/2) * radius;
-      newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip.toString(), resource: field.resource });
-    });
-}
+  }, [fields, generateHexagons]);
 
   function moveCamera(e: Konva.KonvaEventObject<MouseEvent>) {
     const halfWidth = containerClientSize.width / 2;

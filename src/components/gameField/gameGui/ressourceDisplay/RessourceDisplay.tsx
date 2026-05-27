@@ -1,23 +1,21 @@
-import type { PlayerRessources } from "@/repository/MatchRepository";
+import { resources, type PlayerResources } from "@/repository/MatchRepository";
 import styles from "./RessourceDisplay.module.scss";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
 
-const ressources: string[] = ["wood", "brick", "wheat", "sheep"];
-
 const RessourceDisplay: React.FC = () => {
 
-  const myRessources: PlayerRessources | undefined = useMyRessources();
+  const myRessources: PlayerResources | undefined = useMyRessources();
 
   return (
     <>
       {
         myRessources ? (
           <div className={styles.ressourceDisplayLayout}>
-            {ressources.map(ressource => 
-              <div key={ressource} className={`${styles.ressource} ${styles[ressource]}`}>
-                <img src={`${import.meta.env.BASE_URL}ressources/${ressource}.png`}></img>
-                <span className={styles.ressourceCountNumber}>{myRessources.get("wood")}</span>
-              </div>
+            {resources.map(resource => 
+              <div key={resource.toLowerCase()} className={`${styles.ressource} ${styles[resource.toLowerCase()]}`}>
+                <img src={`${import.meta.env.BASE_URL}ressources/${resource.toLowerCase()}.png`}></img>
+                <span className={styles.ressourceCountNumber}>{myRessources[resource] ?? 0}</span>
+              </div>,
             )}
             <button className={styles.bankButton}>
               <img src={`${import.meta.env.BASE_URL}ressources/bank.png`}></img>
