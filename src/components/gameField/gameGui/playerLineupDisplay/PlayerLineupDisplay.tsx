@@ -24,7 +24,7 @@ const PlayerLineupDisplay: React.FC = () => {
         <div key={player.username} className={`${styles.playerPortrait} ${(player.publicId === currentPlayersTurn) ? styles.highlightPlayer : ""}`}>
           {/* TODO: might be a security risk to directly insert the provided portrait name into the path */}
           <img src={`../playerIcons/${player.chosenPortrait}.png`} />
-          <p onClick={addPoint} className={styles.pointsText}>{`SP: ${player.points}`}</p>
+          <span onClick={addPoint} className={styles.pointsText}>{`Points: ${player.points}`}</span>
           {(player.publicId === myPublicId) && isItMyTurn ? (
             <p className={styles.portraitText}>Your Turn!</p>
           ) : ""}
