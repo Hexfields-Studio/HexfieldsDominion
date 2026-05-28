@@ -4,19 +4,14 @@ import RessourceDisplay from "@/components/gameField/gameGui/ressourceDisplay/Re
 import EndTurnButtonDisplay from "@/components/gameField/gameGui/endTurnButtonDisplay/EndTurnButtonDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import { useAuth, useGame } from "@/contexts/contexts";
 import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT } from "@/constants/constants";
-import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 import { useError } from "@/hooks/useError";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
-
-type DiceValuePairType = {
-  value1: number,
-  value2: number
-}
+import { useCurrentDiceResult } from "@/hooks/matchHooks/useCurrentDiceResult";
 
 const GameGui: React.FC = () => {
 
@@ -24,67 +19,67 @@ const GameGui: React.FC = () => {
   const { uuid } = useGame();
   const { isError } = useError();
   const isMyTurn = useIsMyTurn();
+  const currentDiceResult = useCurrentDiceResult();
   const [hideBoxedDices, setHideBoxedDices] = useState<boolean>(false);
 
-  const [rolledSides, setRolledSides] = useState<number[]>([0, 0]);
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
 
   const dialogRef = useRef<DialogHandle | null>(null);
 
-  useSseListeners(useMemo(() => [
-    {
-      type: "rollDice",
-      action: (event: MessageEvent) => {
-        highlightDiceAnimation(JSON.parse(event.data));
-      },
-    },
-  ], []));
-
   const rollDice = () => {
     (async () => {
+      sessionStorage.setItem("rolledDiceThisTurn", "true");
+
       const response = await fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
       if (isError(response)) {
+        // needs to be set to true asap for isNotShowingDialog so animation works. False to allow to try again if rollDice failed
+        sessionStorage.setItem("rolledDiceThisTurn", "false");
         return;
       }
 
-      const responseJson = await response?.json();
-
-      highlightDiceAnimation(responseJson);
-    })();
-  };
-
-  const highlightDiceAnimation = (diceValuePair: DiceValuePairType) => {
-    if(isMyTurn){
-      dialogRef.current?.toggleDialog();
-      setHideBoxedDices(true);
       setTimeout(() => {
         dialogRef.current?.toggleDialog();
         setHideBoxedDices(false);
       }, HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
-    }
-    setRolledSides([diceValuePair.value1, diceValuePair.value2]);
+    })();
   };
 
-  useEffect(()=>{
+  const isNotShowingDialog = useCallback(() => {
+    return isMyTurn && (sessionStorage.getItem("rolledDiceThisTurn") !== "true");
+  }, [isMyTurn]);
+
+  useEffect(() => {
+    if (isNotShowingDialog()) {
+      const showDialog = async () => {
+        dialogRef.current?.toggleDialog();
+        setHideBoxedDices(true);
+      };
+      showDialog();
+    }
+  }, [isNotShowingDialog]);
+
+  useEffect(() => {
+    if (currentDiceResult === null || isNotShowingDialog()) {
+      return;
+    }
     const triggerAnimation = async () => {
       setAnimationTrigger(a => a + 1);
     };
     triggerAnimation();
-  }, [rolledSides]);
+  }, [currentDiceResult]);
 
   return (
     <Layer>
       <Html divProps={{ className: styles.gui }}>
-        <Dialog id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
-          <DiceContainer className={styles["gui__diceContainer"]} rolledSides={rolledSides} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
+        <Dialog onClick={rollDice} id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
+          <h1 className={styles["gui__heading"]}>Du bist dran.</h1>
+          <DiceContainer className={styles["gui__diceContainer"]} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
+          <span className={styles["gui__footer"]}>Klicke auf eine beliebige Stelle, um zu würfeln.</span>
         </Dialog>
-        { isMyTurn &&
-          <button onClick={rollDice} style={{ pointerEvents: "all" }}>Test</button>
-        }
         <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
           <RessourceDisplay/>
-          <EndTurnButtonDisplay rolledSides={rolledSides} animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
+          <EndTurnButtonDisplay animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
         </div>
       </Html>
     </Layer>

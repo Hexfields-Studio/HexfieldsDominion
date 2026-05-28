@@ -5,10 +5,12 @@
     max-height: 90vh;
     background-color: var(--panel-bg-solid);
     color: var(--foreground);
+    outline: none;
 }
 
 dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.75);
+    pointer-events: all;
 }
 
 .closeContainer {
@@ -54,4 +56,5 @@ dialog::backdrop {
 .noBorderAndBackground {
     border: none;
     background: none;
+    outline: none;
 }
