@@ -11,7 +11,25 @@
         justify-content: space-between;
         width: 20%;
         transform: translate(-50%, -50%);
-        pointer-events: all; /* make the dices clickable */ /*TODO: make only the dices clickable, exclude the diceContainer*/
+        cursor: pointer;
+        pointer-events: all;
+    }
+
+    .gui__heading{
+        position: fixed;
+        top: 3%;
+        width: 100%;
+        text-align: center;
+        left: 0;
+    }
+
+    .gui__footer{
+        position: fixed;
+        bottom: 5%;
+        width: 100%;
+        text-align: center;
+        left: 0;
+        font-size: medium;
     }
 
     .gui__flexboxes > *{

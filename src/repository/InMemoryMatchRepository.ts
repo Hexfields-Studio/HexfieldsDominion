@@ -76,6 +76,15 @@ class InMemoryMatchRepository implements MatchRepository{
 
   getCurrentPlayersTurn = (): number | undefined => this.matchData?.playerCurrentTurn;
 
+  setCurrentDiceResult = (diceResult: number[] | null) => {
+    if (this.matchData === undefined) {
+      return;
+    }
+    this.matchData.currentDiceResult = diceResult;
+  };
+
+  getCurrentDiceResult = (): number[] | null => this.matchData?.currentDiceResult ?? null;
+
   // Always invoke this when unmounting from Match Page
   closeConnection = (): void => this.eventSource?.close();
 }
