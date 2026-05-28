@@ -204,7 +204,7 @@ const GameField: React.FC<GameFieldProps> = () => {
       const r = field.pos.r;
       const x = (q + r/2) * Math.sqrt(3) * radius;
       const y = r * (3/2) * radius;
-      newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip.toString(), resource: field.resource });
+      newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip !== 0 ? field.numberChip.toString() : "", resource: field.resource });
     });
   }, [fields]);
 
