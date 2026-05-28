@@ -45,7 +45,7 @@ const GameGui: React.FC = () => {
   };
 
   const isNotShowingDialog = useCallback(() => {
-    return isMyTurn && !(sessionStorage.getItem("rolledDiceThisTurn") === "true");
+    return isMyTurn && (sessionStorage.getItem("rolledDiceThisTurn") !== "true");
   }, [isMyTurn]);
 
   useEffect(() => {
