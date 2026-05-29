@@ -22,10 +22,25 @@ export type PlayerRepresentation = {
     points: number
 }
 
+export type StructureType = "TOWN" | "HARBOR" | "STREET";
+
+export type AxialPosition = {
+	q: number,
+	r: number
+}
+
+export type Structure = {
+	publicPlayerId: number,
+	name: StructureType,
+	pos: AxialPosition[],
+	recipe: any
+}
+
 export type MatchData = {
     playerCurrentTurn: number,
     players: PlayerRepresentation[],
-    currentDiceResult: number[] | null
+    currentDiceResult: number[] | null,
+    structures: Structure[]
 }
 
 export interface MatchRepository{
@@ -36,6 +51,8 @@ export interface MatchRepository{
     
     setFields: (fields: Field[]) => void
     getFields: () => Field[]
+    setStructures: (structures: Structure[]) => void
+    getStructures: () => Structure[]
     getMyPublicId: () => number | undefined
     getMyRessources: () => PlayerResources | undefined
     isItMyTurn: () => boolean

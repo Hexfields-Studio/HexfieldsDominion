@@ -1,4 +1,4 @@
-import type { Field, MatchData, MatchRepository, PlayerResources } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerResources, Structure } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
@@ -6,30 +6,19 @@ class InMemoryMatchRepository implements MatchRepository{
   subscribers: any[] = [];
   matchData: MatchData | undefined;
   fields: Field[] = [];
-
-  constructor(){
-    /* Connect to backends SSE endpoint. Example code:
-
-            const eventSource = new EventSource("http://localhost:3000/events"); // On connect backend could instantly send "loadMatches" data (see https://github.com/Hexfields-Studio/HexfieldsDominion-Artefacts/blob/main/srs/game/match_starten/match_starten.md#sequenzdiagramm)
-            
-            eventSource.onmessage = (event) => {        // Then collect the data
-                const data = JSON.parse(event.data);
-                updateAllHooks(data);
-            };
-
-            eventSource.onerror = (err) => {
-                console.error("SSE error:", err);
-            };
-        
-        */
-        
-  }
+  structures: Structure[] = [];
 
   setFields = (fields: Field[]) => {
     this.fields = fields;
   };
 
   getFields = () => this.fields;
+
+  setStructures = (structures: Structure[]) => {
+	  this.structures = structures;
+  };
+
+  getStructures = () => this.structures;
 
   /* useSyncExternalStore setup */
   subscribe = (listener: any) => {
@@ -43,6 +32,7 @@ class InMemoryMatchRepository implements MatchRepository{
 
   setMatchData = (matchData: MatchData) => {
     this.matchData = matchData;
+    this.structures = matchData.structures;
   };
 
   getMatchData = () => this.matchData;

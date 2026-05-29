@@ -1,8 +1,9 @@
-// src/components/gameField/Building.tsx
+import type { StructureType } from "@/repository/MatchRepository";
 import { useEffect, useState } from "react";
 import { Image } from "react-konva";
 
-export interface StructureProps {
+export interface StructureCompProps {
+    type: StructureType
     x: number;
     y: number;
     rotation: number; // degrees
@@ -12,8 +13,8 @@ export interface StructureProps {
     scale?: number;
 }
 
-export const Structure: React.FC<StructureProps> =
-    ({ x, y, rotation, src, width = 48, height = 32, scale = 1 }) => {
+export const StructureComp: React.FC<StructureCompProps> =
+    ({x, y, rotation, src, width = 48, height = 32, scale = 1 }) => {
       const [img, setImg] = useState<HTMLImageElement | null>(null);
 
       useEffect(() => {
