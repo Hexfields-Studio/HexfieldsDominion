@@ -57,4 +57,5 @@ dialog::backdrop {
     border: none;
     background: none;
     outline: none;
+    overflow: hidden;
 }

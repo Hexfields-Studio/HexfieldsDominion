@@ -15,7 +15,7 @@
         pointer-events: all;
     }
 
-    .gui__heading{
+    .gui__diceHeading{
         position: fixed;
         top: 3%;
         width: 100%;
@@ -23,13 +23,49 @@
         left: 0;
     }
 
-    .gui__footer{
+    .gui__diceFooter{
         position: fixed;
         bottom: 5%;
         width: 100%;
         text-align: center;
         left: 0;
         font-size: medium;
+    }
+
+    #gui__winnerDialog {
+        
+        h1{
+            font-size: 6vh;
+            border-bottom: 2px solid whitesmoke;
+            padding-bottom: 7vh;
+        }
+
+        .gui__winnerInfo{
+            text-align: center;
+            font-size: 4vh;
+            font-weight: 500;
+            margin-top: 15vh;
+            margin-bottom: 10vh;
+        }
+
+        .gui__winnerName{
+            text-align: center;
+            font-size: 4vh;
+            font-weight: bold;
+            margin-bottom: 15vh;
+            color: var(--foreground2);
+
+            padding: 1vh 0 1vh 0;
+            border: 2px solid rgba(var(--bg-panel-solid), 0.8);
+            border-radius: 3vh;
+            background-color: rgba(var(--bg-panel-solid), 0.65);
+        }
+
+        h2{
+            font-size: 3.5vh;
+            border-top: 2px solid whitesmoke;
+            padding-top: 7vh;
+        }
     }
 
     .gui__flexboxes > *{

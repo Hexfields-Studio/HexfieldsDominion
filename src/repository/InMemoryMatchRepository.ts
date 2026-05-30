@@ -1,29 +1,10 @@
-import type { Field, MatchData, MatchRepository, PlayerResources } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
-  eventSource: EventSource | undefined;
   subscribers: any[] = [];
   matchData: MatchData | undefined;
   fields: Field[] = [];
-
-  constructor(){
-    /* Connect to backends SSE endpoint. Example code:
-
-            const eventSource = new EventSource("http://localhost:3000/events"); // On connect backend could instantly send "loadMatches" data (see https://github.com/Hexfields-Studio/HexfieldsDominion-Artefacts/blob/main/srs/game/match_starten/match_starten.md#sequenzdiagramm)
-            
-            eventSource.onmessage = (event) => {        // Then collect the data
-                const data = JSON.parse(event.data);
-                updateAllHooks(data);
-            };
-
-            eventSource.onerror = (err) => {
-                console.error("SSE error:", err);
-            };
-        
-        */
-        
-  }
 
   setFields = (fields: Field[]) => {
     this.fields = fields;
@@ -87,8 +68,7 @@ class InMemoryMatchRepository implements MatchRepository{
 
   isRolledDiceThisTurn = (): boolean => this.matchData?.rolledDiceThisTurn ?? false;
 
-  // Always invoke this when unmounting from Match Page
-  closeConnection = (): void => this.eventSource?.close();
+  getWinner = (): PlayerRepresentation | null => this.matchData?.winner ?? null;
 }
 
 export default InMemoryMatchRepository;

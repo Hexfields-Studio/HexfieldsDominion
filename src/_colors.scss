@@ -1,7 +1,7 @@
 $gameGui: (
   lineupDisplay: (
     backgroundColor: darkslategray,
-    borderColor: black,
+    borderColor: rgb(var(--bg-panel-solid)),
     yourTurnColor: crimson
   ),
   ressourceDisplay: (
@@ -37,4 +37,16 @@ $gameGui: (
       dotColor: #ffffff
     )
   )
-)
+);
+
+// temporary exist next to index.css dark/light mode variables -> different names required
+:root {
+  // "array" so we can put it inside rgba and use custom alpha
+  --bg-panel-solid: 0, 0, 0;
+  --foreground2: 255, 255, 255;
+}
+
+[data-theme="light"]{
+  --bg-panel-solid: 255, 255, 255;
+  --foreground2: 0, 0, 0;
+}

@@ -54,12 +54,12 @@ const StartMenu = () => {
   return (
     <>
       {/* Join Lobby Dialog */}
-      <Dialog title="Lobby beitreten" id="lobbycodeDialog" ref={dialogEnterLobbycodeRef}>
+      <Dialog title="Join Lobby" id="lobbycodeDialog" ref={dialogEnterLobbycodeRef}>
         <form action={(e) => joinLobby(e)}>
-          <p>Lobbycode eingeben:</p>
+          <p>Enter Lobbycode:</p>
           <input className="input-center" type="text" name="lobbycode" value={lobbyCode} onChange={(e) => setLobbyCode(e.target.value.trim())} placeholder="Lobby Code" />
           <div className="center-row mb-12">
-            <button disabled={!isLobbycodeValid(lobbyCode)} type="submit">Beitreten</button>
+            <button disabled={!isLobbycodeValid(lobbyCode)} type="submit">Join</button>
           </div>
         </form>
       </Dialog>
@@ -73,11 +73,11 @@ const StartMenu = () => {
       {/* Center box */}
       <div className="boxed">
         <div className="center-row mb-12">
-          <button onClick={createLobby}>Lobby erstellen</button>
+          <button onClick={createLobby}>Create Lobby</button>
         </div>
 
         <div className="center-row mb-12">
-          <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Lobby beitreten</button>
+          <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Join Lobby</button>
         </div>
 
         <div style={{ marginTop: 8 }}>

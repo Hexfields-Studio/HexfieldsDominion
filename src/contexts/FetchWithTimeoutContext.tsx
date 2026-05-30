@@ -11,7 +11,7 @@ export const FetchWithTimeoutProvider = ({ children }: {children: ReactNode}) =>
   const { errorDialog, openErrorDialog } = useError();
 
   const onTimeout = () => {
-    openErrorDialog("Der Server ist gerade leider nicht erreichbar.");
+    openErrorDialog("Unfortunately, the server is currently unavailable.");
   };
 
   const fetchWithTimeout = async (input: RequestInfo | URL, init: RequestInit) => {
