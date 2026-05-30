@@ -51,7 +51,6 @@ const Lobby = () => {
     navi(`/match/${data.matchUUID}`);
   }, [navi]);
   
-  //TODO: statt useMemo außerhalb von const Lobby schieben
   const sseListeners: SseListener[] = useMemo(() => [
     {
       type: "lobbyUpdate",
