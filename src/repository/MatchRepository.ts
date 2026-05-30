@@ -1,24 +1,49 @@
 // Keep in mind: all existing ressources are actually sent from the backend
-export type Ressource = "wood" | "brick" | "wheat" | "sheep";
+export const resources = ["WOOD", "BRICK", "WHEAT", "SHEEP"] as const;
+export const resourcesFields = [...resources, "DUNES"] as const;
 
-export type PlayerRessources = Map<Ressource, number>;
+export type Field = {
+  numberChip: number;
+  pos: {
+    q: number;
+    r: number;
+  }
+  resource: typeof resourcesFields[number];
+}
+
+export type PlayerResources = Record<typeof resources[number], number>;
 
 // Keep in mind: This PlayerRepresentation is a simplified/untrue version of what the backend would actually send
 export type PlayerRepresentation = {
     username: string,
-    isThisPlayersTurn: boolean,
     publicId: number,   // Not sure if this is the correct use of the "publicId"
-    ressources: PlayerRessources
-    chosenPortrait: string //Invented, keep portraits or use colors?
+    resources: PlayerResources,
+    chosenPortrait: string, //Invented, keep portraits or use colors?
+    points: number
+}
+
+export type MatchData = {
+    playerCurrentTurn: number,
+    players: PlayerRepresentation[],
+    currentDiceResult: number[] | null,
+    rolledDiceThisTurn: boolean
 }
 
 export interface MatchRepository{
-    subscribe: (subscriber: any)=>void
-    getMatchData: ()=>PlayerRepresentation[]
-    emitChange: ()=>void
+    subscribe: (subscriber: any) => void
+    setMatchData: (matchData: MatchData) => void
+    getMatchData: () => MatchData | undefined
+    emitChange: () => void
     
-    getMyPublicId: ()=>number | undefined
-    getMyRessources: ()=>PlayerRessources | undefined
-    isItMyTurn: ()=>boolean
-    closeConnection: ()=>void
+    setFields: (fields: Field[]) => void
+    getFields: () => Field[]
+    getMyPublicId: () => number | undefined
+    getMyRessources: () => PlayerResources | undefined
+    isItMyTurn: () => boolean
+    setCurrentPlayersTurn: (publicId: number) => void
+    getCurrentPlayersTurn: () => number | undefined
+    setCurrentDiceResult: (diceResult: number[] | null) => void;
+    getCurrentDiceResult: () => number[] | null;
+    isRolledDiceThisTurn: () => boolean;
+    closeConnection: () => void
 }

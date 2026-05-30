@@ -8,11 +8,12 @@ import InMemoryMatchRepository from "@/repository/InMemoryMatchRepository";
 import { useMatchRepository, useAuth } from "@/contexts/contexts";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
 import { GameProvider } from "@/contexts/GameContext";
+import type { Field } from "@/repository/MatchRepository";
 
 const MatchPage = () => {
   const params = useParams();
   const matchUUID = params.uuid ?? "";
-  const { setRepository } = useMatchRepository();
+  const { repository, setRepository } = useMatchRepository();
   const { fetchWithAuth } = useAuth();
   const [lobbyCode, setLobbyCode] = useState<string | undefined>();
   useHeartbeat(lobbyCode);
@@ -27,12 +28,25 @@ const MatchPage = () => {
       }
 
       const responseJson = await response.json();
-
+      
       setLobbyCode(responseJson.lobbyCode);
     };
 
     fetchLobbyCode();
-  }, [setRepository, fetchWithAuth, matchUUID]);
+  }, []);
+
+  useEffect(()=>{
+    const fetchFields = async () => {
+      const res = await fetchWithAuth(`/games/${matchUUID}/fields`, "GET");
+      if (!res || res.status !== 200) {
+        return;
+      }
+
+      const resJson: Field[] = await res.json();
+      repository.setFields(resJson);
+    }
+    fetchFields();
+  }, [repository])
 
   return (
     <div className={styles.matchPageContainer}>

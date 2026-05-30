@@ -1,13 +1,14 @@
 $gameGui: (
   lineupDisplay: (
     backgroundColor: darkslategray,
-    borderColor: black
+    borderColor: black,
+    yourTurnColor: crimson
   ),
   ressourceDisplay: (
     wood: darkolivegreen,
     brick: darkred,
     wheat: darkkhaki,
-    sheep: ThreeDDarkShadow
+    sheep: rgb(37, 73, 61)
   ),
   endTurnButton: (
     borderWidth: 3px,

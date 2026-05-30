@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, Layer, Rect, Stage } from "react-konva";
 import "./game_field.scss";
 import type Konva from "konva";
@@ -6,6 +6,11 @@ import { Hexagon, type hexagonProps } from "./hexagon";
 import { Structure, type StructureProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
 import { Background } from "./background";
+import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
+import { useMatchRepository } from "@/contexts/contexts";
+import { resourcesFields } from "@/repository/MatchRepository";
+import { useFields } from "@/hooks/matchHooks/useFields";
+import type { Field } from "@/repository/MatchRepository";
 
 const radius: number = 100;
 
@@ -44,10 +49,6 @@ const edgeDirectionInDegrees: number[] = [30, 90, 150, 210, 270, 330];
 const MIN_SCALE = 0.75;
 const MAX_SCALE = 2;
 const SCALE_BY = 1.1;
-
-let numberChips: number[];
-
-const resourceTypes: ("wheat" | "sheep" | "brick" | "stone" | "wood" | "dunes")[] = ["wheat", "sheep", "brick", "stone", "wood", "dunes"];
 
 function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
   const edgeMap = new Map<string, Edge>();
@@ -101,29 +102,15 @@ function computeUniqueCorners(hexagons: hexagonProps[]): Corner[] {
   return [...cornerMap.values()];
 }
 
-function generateHexagons(newHexagons: hexagonProps[], boardRadius: number) {
-  for (let q = -boardRadius + 1; q <= boardRadius - 1; q++) {
-    const r1 = Math.max(-boardRadius + 1, -q - boardRadius + 1);
-    const r2 = Math.min(boardRadius - 1, -q + boardRadius - 1);
-    for (let r = r1; r <= r2; r++) {
-      const x = (q + r/2) * Math.sqrt(3) * radius;
-      const y = r * (3/2) * radius;
-      if (q === 0 && r === 0) { // center hex  
-        newHexagons.push({ q, r, x, y, fill: "gold", radius: radius, label: "7", resourceType: "dunes" });
-      }else{  
-        // TODO: Assign resources with game data
-        const randomResourceType = resourceTypes[Math.floor(Math.random() * resourceTypes.length)]; // random resource, testing only
-        newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: numberChips.pop()!.toString(), resourceType: randomResourceType });
-      }
-    }
-  }
-}
-
 interface GameFieldProps {
     boardRadius: number
 }
 
-const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
+const GameField: React.FC<GameFieldProps> = () => {
+
+  // subscriptions
+  const fields: Field[] = useFields();
+  const { repository } = useMatchRepository();
 
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [corners, setCorners] = useState<Corner[]>([]);
@@ -148,6 +135,15 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
   const [backgroundOffsetX, setBackgroundOffsetX] = useState(0);
   const backgroundDirectionRef = useRef(Math.random() > 0.5 ? 1 : -1); // 1 for east, -1 for west
   const backgroundSpeedRef = useRef(0.5); // animation speed inpixels per frame
+
+  useSseListeners(useMemo(() => [
+    {
+      type: "matchData",
+      action: (event: MessageEvent) => {
+        repository.setMatchData(JSON.parse(event.data));
+      },
+    },
+  ], [repository]));
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -183,15 +179,6 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
       });
     }
 
-    numberChips = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
-    numberChips.sort(() => Math.random() - 0.5); // Shuffle
-
-    const newHexagons: hexagonProps[] = [];
-    generateHexagons(newHexagons, boardRadius);
-    setCorners(computeUniqueCorners(newHexagons));
-    setEdges(computeUniqueEdges(newHexagons));
-    setHexagons(newHexagons);
-
     window.addEventListener("resize", ()=>handleResize(container));
     
     // Animation loop for background
@@ -210,6 +197,25 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
+
+  const generateHexagons = useCallback((newHexagons: hexagonProps[]) => {
+    fields.forEach(field => {
+      const q = field.pos.q;
+      const r = field.pos.r;
+      const x = (q + r/2) * Math.sqrt(3) * radius;
+      const y = r * (3/2) * radius;
+      newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip !== 0 ? field.numberChip.toString() : "", resource: field.resource });
+    });
+  }, [fields]);
+
+  useEffect(()=>{
+    if(fields.length === 0) return;
+    const newHexagons: hexagonProps[] = [];
+    generateHexagons(newHexagons);
+    setCorners(computeUniqueCorners(newHexagons));
+    setEdges(computeUniqueEdges(newHexagons));
+    setHexagons(newHexagons);
+  }, [fields, generateHexagons]);
 
   function moveCamera(e: Konva.KonvaEventObject<MouseEvent>) {
     const halfWidth = containerClientSize.width / 2;
@@ -305,7 +311,7 @@ const GameField: React.FC<GameFieldProps> = ({ boardRadius }) => {
         >
           <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
           {hexagons.map((hex, i) => (
-            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resourceType={hex.resourceType}/>
+            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
           ))}
 
           {edges.map((edge, i) => (
