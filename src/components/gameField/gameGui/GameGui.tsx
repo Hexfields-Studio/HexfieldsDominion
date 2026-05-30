@@ -66,7 +66,8 @@ const GameGui: React.FC = () => {
       setAnimationTrigger(a => a + 1);
     };
     triggerAnimation();
-  }, [currentDiceResult]);
+    // stringify to prevent trigger with the same value -> not object based
+  }, [JSON.stringify(currentDiceResult)]);
 
   return (
     <Layer>
