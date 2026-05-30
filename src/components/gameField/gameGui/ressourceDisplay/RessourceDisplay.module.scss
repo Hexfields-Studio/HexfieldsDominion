@@ -30,10 +30,43 @@
             height:100%;
         }
 
-        .ressourceCountNumber {
+        .resourceTextContainer{
+            height: 100%;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            min-width: 40px;
+        }
+
+        .resourceCountNumber {
+            width: 100%;
+            height: 100%;
             font-size: xx-large;
             font-weight: bold;
-            padding: 10px;
+            text-align: center;
+            align-content: center;
+        }
+
+        .resourceGrantedNumber{
+            width: 100%;
+            font-size: 100%;
+            font-weight: bold;
+            text-align: center;
+            align-content: center;
+            border: 2px solid rgba($color: #000000, $alpha: 0.8);
+            border-radius: 10px;
+            background-color: rgba($color: #000000, $alpha: 0.65);
+            transition: all 1300ms ease-in-out;
+
+            &.resourceGrantedNumber--active{
+                height: 100%;
+                opacity: 1;
+            }
+
+            &.resourceGrantedNumber--inactive{
+                height: 0;
+                opacity: 0;
+            }
         }
     }
 

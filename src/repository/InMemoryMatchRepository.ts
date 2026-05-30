@@ -85,6 +85,8 @@ class InMemoryMatchRepository implements MatchRepository{
 
   getCurrentDiceResult = (): number[] | null => this.matchData?.currentDiceResult ?? null;
 
+  isRolledDiceThisTurn = (): boolean => this.matchData?.rolledDiceThisTurn ?? false;
+
   // Always invoke this when unmounting from Match Page
   closeConnection = (): void => this.eventSource?.close();
 }

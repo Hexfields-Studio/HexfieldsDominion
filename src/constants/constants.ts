@@ -2,3 +2,4 @@ export const ACCESS_TOKEN_REFRESH_TIME_FRAME = 5000; // 5s to make sure there is
 export const HEARTBEAT_INTERVAL = 4000;
 export const HIGHLIGHT_DICE_ANIMATION_TIMEOUT = 3500;
 export const FETCH_TIMEOUT = 5000;
+export const HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT = 7500;
