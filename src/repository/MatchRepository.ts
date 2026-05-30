@@ -25,7 +25,8 @@ export type PlayerRepresentation = {
 export type MatchData = {
     playerCurrentTurn: number,
     players: PlayerRepresentation[],
-    currentDiceResult: number[] | null
+    currentDiceResult: number[] | null,
+    rolledDiceThisTurn: boolean
 }
 
 export interface MatchRepository{
@@ -43,5 +44,6 @@ export interface MatchRepository{
     getCurrentPlayersTurn: () => number | undefined
     setCurrentDiceResult: (diceResult: number[] | null) => void;
     getCurrentDiceResult: () => number[] | null;
+    isRolledDiceThisTurn: () => boolean;
     closeConnection: () => void
 }

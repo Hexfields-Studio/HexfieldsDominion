@@ -9,7 +9,7 @@ const RessourceDisplay: React.FC = () => {
   return (
     <>
       {
-        myRessources ? (
+        myRessources && (
           <div className={styles.ressourceDisplayLayout}>
             {resources.map(resource => 
               <div key={resource.toLowerCase()} className={`${styles.ressource} ${styles[resource.toLowerCase()]}`}>
@@ -21,8 +21,6 @@ const RessourceDisplay: React.FC = () => {
               <img src={`${import.meta.env.BASE_URL}ressources/bank.png`}></img>
             </button>
           </div>
-        ) : (
-          <span>ERROR!!!</span>
         )
       }
     </>

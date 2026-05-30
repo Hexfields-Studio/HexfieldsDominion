@@ -47,7 +47,6 @@ const Lobby = () => {
   useHeartbeat(code);
 
   const joinMatch = useCallback((data: MatchCreatedDataType) => {
-    console.log("joinMatch", data);
     localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, data.matchUUID);
     navi(`/match/${data.matchUUID}`);
   }, [navi]);

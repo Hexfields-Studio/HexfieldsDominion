@@ -12,6 +12,7 @@ import { useError } from "@/hooks/useError";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
 import { useCurrentDiceResult } from "@/hooks/matchHooks/useCurrentDiceResult";
+import { useIsRolledDiceThisTurn } from "@/hooks/matchHooks/useIsRolledDiceThisTurn";
 
 const GameGui: React.FC = () => {
 
@@ -20,6 +21,7 @@ const GameGui: React.FC = () => {
   const { isError } = useError();
   const isMyTurn = useIsMyTurn();
   const currentDiceResult = useCurrentDiceResult();
+  const isRolledDiceThisTurn = useIsRolledDiceThisTurn();
   const [hideBoxedDices, setHideBoxedDices] = useState<boolean>(false);
 
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
@@ -28,12 +30,8 @@ const GameGui: React.FC = () => {
 
   const rollDice = () => {
     (async () => {
-      sessionStorage.setItem("rolledDiceThisTurn", "true");
-
       const response = await fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
       if (isError(response)) {
-        // needs to be set to true asap for isNotShowingDialog so animation works. False to allow to try again if rollDice failed
-        sessionStorage.setItem("rolledDiceThisTurn", "false");
         return;
       }
 
@@ -45,8 +43,8 @@ const GameGui: React.FC = () => {
   };
 
   const isNotShowingDialog = useCallback(() => {
-    return isMyTurn && (sessionStorage.getItem("rolledDiceThisTurn") !== "true");
-  }, [isMyTurn]);
+    return isMyTurn && !isRolledDiceThisTurn;
+  }, [isMyTurn, isRolledDiceThisTurn]);
 
   useEffect(() => {
     if (isNotShowingDialog()) {
