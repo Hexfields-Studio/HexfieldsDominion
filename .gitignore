@@ -26,4 +26,3 @@ dist-ssr
 
 # Unfortunately cant keep these
 .env.production
-bun.lock
