@@ -11,7 +11,7 @@ export type Field = {
   resource: typeof resourcesFields[number];
 }
 
-export type PlayerResources = Record<typeof resources[number], number>;
+export type PlayerResources = Record<typeof resources[number], number | undefined>;
 
 // Keep in mind: This PlayerRepresentation is a simplified/untrue version of what the backend would actually send
 export type PlayerRepresentation = {

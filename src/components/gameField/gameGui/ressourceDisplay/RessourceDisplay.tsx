@@ -1,31 +1,36 @@
 import { resources, type PlayerResources } from "@/repository/MatchRepository";
 import styles from "./RessourceDisplay.module.scss";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
-import { useRef, useState } from "react";
-import type { DialogHandle } from "@/components/dialog/dialog";
-import Dialog from "@/components/dialog/dialog";
-
-const TRADE_GIVE_AMOUNT = 4;
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import TradeWithBankDialog, { type TradeWithBankDialogHandle } from "../tradingDialog/TradeWithBankDialog";
+import { HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT } from "@/constants/constants";
 
 type ResourceType = "WOOD" | "BRICK" | "WHEAT" | "SHEEP";
 
-type ResourceDisplayProps = {
-  grantedResources: PlayerResources | null
+export interface ResourceDisplayHandle {
+  queueGrantedResources: (grantedResources: PlayerResources) => void;
 }
 
-const RessourceDisplay: React.FC<ResourceDisplayProps> = ({ grantedResources }) => {
-
+const RessourceDisplay = forwardRef<ResourceDisplayHandle>((props, ref) => {
   const myRessources: PlayerResources | undefined = useMyRessources();
-  const tradingDialogRef = useRef<DialogHandle | null>(null);
 
-  const [selectedResourceGive, setSelectedResourceGive] = useState<ResourceType | null>(null);
-  const [selectedResourceGet, setSelectedResourceGet] = useState<ResourceType | null>(null);
+  const [grantedResources, setGrantedResources] = useState<PlayerResources | null>(null);
+  const [hideTimer, setHideTimer] = useState<number | null>(null);
+  const tradingDialogRef = useRef<TradeWithBankDialogHandle | null>(null);
 
-  const openTradeBankDialog = () => {
-    setSelectedResourceGive(null);
-    setSelectedResourceGet(null);
-    tradingDialogRef.current?.toggleDialog();
+  useImperativeHandle(ref, () => ({
+    queueGrantedResources,
+  }));
+
+  const queueGrantedResources = (grantedResources: PlayerResources) => {
+    if (hideTimer !== null) {
+      clearTimeout(hideTimer);
+    }
+    setHideTimer(setTimeout(hideGrantedResources, HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT));
+    setGrantedResources(grantedResources);
   };
+
+  const hideGrantedResources = () => setGrantedResources(null);
 
   const isResourceGranted = (resource: ResourceType) => {
     return grantedResources !== null && grantedResources[resource] !== undefined;
@@ -33,39 +38,7 @@ const RessourceDisplay: React.FC<ResourceDisplayProps> = ({ grantedResources }) 
 
   return (
     <>
-      <Dialog id={styles["tradeBankDialog"]} title="Trade with bank" ref={tradingDialogRef}>
-        <div className={styles["tradeBankDialog__config"]}>
-          <div className={styles["tradeBankDialog__config__column"]}>
-            <span>{`Give ${TRADE_GIVE_AMOUNT}x`}</span>
-            { myRessources && resources.map(resource => 
-              <button
-                key={resource}
-                className={styles[`${(selectedResourceGive === resource) ? "tradeBankDialog__config__button--selected" : "tradeBankDialog__config__button--default"}`]}
-                disabled={myRessources[resource] < TRADE_GIVE_AMOUNT}
-                onClick={() => {
-                  setSelectedResourceGive(resource);
-                  setSelectedResourceGet(null);
-                }}>
-                {resource.toLowerCase()}
-              </button>)
-            }
-          </div>
-          <span>→</span>
-          <div className={styles["tradeBankDialog__config__column"]}>
-            <span>Get 1x</span>
-            { resources.map(resource => 
-              <button
-                key={resource}
-                className={(selectedResourceGet === resource) ? styles["tradeBankDialog__config__button--selected"] : styles["tradeBankDialog__config__button--default"]}
-                disabled={!selectedResourceGive || (selectedResourceGive === resource)}
-                onClick={() => setSelectedResourceGet(resource)}>
-                {resource.toLowerCase()}
-              </button>)
-            }
-          </div>
-        </div>
-        <button disabled={!selectedResourceGive || !selectedResourceGet}>Trade</button>
-      </Dialog>
+      <TradeWithBankDialog ref={tradingDialogRef} setGrantedResources={queueGrantedResources}/>
       {
         myRessources && (
           <div className={styles.ressourceDisplayLayout}>
@@ -75,12 +48,12 @@ const RessourceDisplay: React.FC<ResourceDisplayProps> = ({ grantedResources }) 
                 <div className={styles.resourceTextContainer}>
                   <span className={styles.resourceCountNumber}>{myRessources[resource] ?? 0}</span>
                   <span className={`${styles.resourceGrantedNumber} ${isResourceGranted(resource) ? styles["resourceGrantedNumber--active"] : styles["resourceGrantedNumber--inactive"]}`}>
-                    {isResourceGranted(resource) ? `+${grantedResources?.[resource]}`: ""}
+                    {isResourceGranted(resource) ? `${((grantedResources?.[resource] ?? 0) > 0) ? "+" : ""}${grantedResources?.[resource]}`: ""}
                   </span>
                 </div>
               </div>,
             )}
-            <button className={styles.bankButton} onClick={openTradeBankDialog}>
+            <button className={styles.bankButton} onClick={() => tradingDialogRef.current?.open()}>
               <img src={`${import.meta.env.BASE_URL}ressources/bank.png`}></img>
             </button>
           </div>
@@ -88,6 +61,7 @@ const RessourceDisplay: React.FC<ResourceDisplayProps> = ({ grantedResources }) 
       }
     </>
   );
-};
+});
+RessourceDisplay.displayName = "RessourceDisplay";
 
 export default RessourceDisplay;
