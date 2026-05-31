@@ -1,8 +1,7 @@
-import type { Field, MatchData, MatchRepository, PlayerResources, Structure } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, Structure } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
-  eventSource: EventSource | undefined;
   subscribers: any[] = [];
   matchData: MatchData | undefined;
   fields: Field[] = [];
@@ -75,8 +74,9 @@ class InMemoryMatchRepository implements MatchRepository{
 
   getCurrentDiceResult = (): number[] | null => this.matchData?.currentDiceResult ?? null;
 
-  // Always invoke this when unmounting from Match Page
-  closeConnection = (): void => this.eventSource?.close();
+  isRolledDiceThisTurn = (): boolean => this.matchData?.rolledDiceThisTurn ?? false;
+
+  getWinner = (): PlayerRepresentation | null => this.matchData?.winner ?? null;
 }
 
 export default InMemoryMatchRepository;

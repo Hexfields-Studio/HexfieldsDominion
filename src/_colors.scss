@@ -1,14 +1,14 @@
 $gameGui: (
   lineupDisplay: (
     backgroundColor: darkslategray,
-    borderColor: black,
+    borderColor: rgb(var(--bg-panel-solid)),
     yourTurnColor: crimson
   ),
   ressourceDisplay: (
     wood: darkolivegreen,
     brick: darkred,
     wheat: darkkhaki,
-    sheep: ThreeDDarkShadow
+    sheep: rgb(37, 73, 61)
   ),
   endTurnButton: (
     borderWidth: 3px,
@@ -37,4 +37,16 @@ $gameGui: (
       dotColor: #ffffff
     )
   )
-)
+);
+
+// temporary exist next to index.css dark/light mode variables -> different names required
+:root {
+  // "array" so we can put it inside rgba and use custom alpha
+  --bg-panel-solid: 0, 0, 0;
+  --foreground2: 255, 255, 255;
+}
+
+[data-theme="light"]{
+  --bg-panel-solid: 255, 255, 255;
+  --foreground2: 0, 0, 0;
+}

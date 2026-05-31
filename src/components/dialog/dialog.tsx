@@ -57,7 +57,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
   }, [closeDialog]);
 
   const showHeader = closedBy === "any" || errorMessage || title;
-  const headerTitle: string = errorMessage ? "Fehler" : title;
+  const headerTitle: string = errorMessage ? "Error" : title;
 
   return (
     <>

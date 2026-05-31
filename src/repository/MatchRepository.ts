@@ -40,7 +40,9 @@ export type MatchData = {
     playerCurrentTurn: number,
     players: PlayerRepresentation[],
     currentDiceResult: number[] | null,
-    structures: Structure[]
+    structures: Structure[],
+    rolledDiceThisTurn: boolean,
+    winner: PlayerRepresentation | null
 }
 
 export interface MatchRepository{
@@ -60,5 +62,6 @@ export interface MatchRepository{
     getCurrentPlayersTurn: () => number | undefined
     setCurrentDiceResult: (diceResult: number[] | null) => void;
     getCurrentDiceResult: () => number[] | null;
-    closeConnection: () => void
+    isRolledDiceThisTurn: () => boolean;
+    getWinner: () => PlayerRepresentation | null;
 }

@@ -26,7 +26,7 @@ const OptionsButton = (props: OptionsButtonProps) => {
 
   return (
     <>
-      <Dialog title="Optionen" id="gearDialog" ref={dialogRef}>
+      <Dialog title="Options" id="gearDialog" ref={dialogRef}>
         {showLogOut && <button onClick={handleLogout}>Log out</button>}
         <button onClick={handleThemeToggle}>
           {theme === "dark" ? "Light Mode" : "Dark Mode"}

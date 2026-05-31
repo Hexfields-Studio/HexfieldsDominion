@@ -12,9 +12,9 @@
     flex-direction: column;
     justify-content: flex-end;   /* center vertically */
     align-items: center;    /* center items horizontally */
-    border: 2px solid black;
+    border: 2px solid rgb(var(--bg-panel-solid));
     border-radius: 15px;
-    background-color: rgba($color: #000000, $alpha: 0.75);
+    background-color: rgba(var(--bg-panel-solid), 0.75);
     overflow: hidden;
 
     .endTurnButtonDisplay__endTurnButton{
@@ -23,6 +23,7 @@
         box-sizing: border-box; /* include border inside the div */
         font-family: fantasy;
         margin: 0;
+        width: 100%;
 
         border-width: map.get($gameGui, endTurnButton, borderWidth);
         border-style: map.get($gameGui, endTurnButton, borderStyle);
@@ -31,11 +32,13 @@
         &.endTurnButtonDisplay__endTurnButton--active{
             background-color: map.get($gameGui, endTurnButton, active, backgroundColor);
             border-color: map.get($gameGui, endTurnButton, active, borderColor);
+            color: rgba($color: var(--foreground2), $alpha: 1);
         }
 
         &.endTurnButtonDisplay__endTurnButton--inactive{
             background-color: map.get($gameGui, endTurnButton, inactive, backgroundColor);
             border-color: map.get($gameGui, endTurnButton, inactive, borderColor);
+            color: rgba($color: var(--foreground2), $alpha: 0.5);
         }
     }
 

@@ -2,8 +2,7 @@ import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import styles from "./EndTurnButtonDisplay.module.scss";
 import DiceContainer from "../dice/DiceContainer";
 import { useAuth, useGame } from "@/contexts/contexts";
-import { useMemo, useState } from "react";
-import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
+import { useIsRolledDiceThisTurn } from "@/hooks/matchHooks/useIsRolledDiceThisTurn";
 
 type EndTurnButtonDisplayProps = {
     animationTrigger: number;
@@ -12,29 +11,16 @@ type EndTurnButtonDisplayProps = {
 
 const EndTurnButtonDisplay: React.FC<EndTurnButtonDisplayProps> = ({ animationTrigger, hideBoxedDices }) => {
   const isMyTurn = useIsMyTurn();
+  const isRolledDiceThisTurn = useIsRolledDiceThisTurn();
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
 
-  // hide dices until end of turn. Show again on rollDice
-  const [hideDicesInternal, setHideDicesInternal] = useState<boolean>(false);
-
-  useSseListeners(useMemo(() => [
-    {
-      type: "rollDice",
-      action: () => {
-        setHideDicesInternal(false);
-      },
-    },
-  ], []));
-
   const nextPlayer = () => {
-    setHideDicesInternal(true);
     fetchWithAuth(`/games/${uuid}/endTurn`, "POST");
-    sessionStorage.setItem("rolledDiceThisTurn", "false");
   };
 
   const hideDiceBox = () => {
-    return hideBoxedDices || hideDicesInternal;
+    return hideBoxedDices || !isRolledDiceThisTurn;
   };
 
   return (

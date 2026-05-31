@@ -19,8 +19,8 @@ interface Player {
 }
 
 const selectOptionsMultiplayerMode: SelectOption[] = [
-  { value: 0, label: "Echtzeit" },
-  { value: 1, label: "Zugbasiert" },
+  { value: 0, label: "Realtime" },
+  { value: 1, label: "Turn-Based" },
 ];
 
 const selectOptionsTurnTimeout: SelectOption[] = [
@@ -47,12 +47,10 @@ const Lobby = () => {
   useHeartbeat(code);
 
   const joinMatch = useCallback((data: MatchCreatedDataType) => {
-    console.log("joinMatch", data);
     localStorage.setItem(STORAGE_KEYS.LAST_MATCH_UUID, data.matchUUID);
     navi(`/match/${data.matchUUID}`);
   }, [navi]);
   
-  //TODO: statt useMemo außerhalb von const Lobby schieben
   const sseListeners: SseListener[] = useMemo(() => [
     {
       type: "lobbyUpdate",
@@ -128,7 +126,7 @@ const Lobby = () => {
     }
   };
 
-  const placeholder = isOwner ? "Auswählen" : "-";
+  const placeholder = isOwner ? "Select" : "-";
 
   return (
     <>
@@ -198,11 +196,11 @@ const Lobby = () => {
         {/* Right: Mods (boxed) */}
         <aside className="col-aside">
           <div className="boxed-aside">
-            <h3>Konfiguration</h3>
+            <h3>Configuration</h3>
             <div className="selectContainer">
-              <p>Multiplayer-Modus</p>
+              <p>Multiplayer-Mode</p>
               <Select isDisabled={!isOwner} defaultValue={selectedMultiplayerMode} options={selectOptionsMultiplayerMode} onChange={onSelectMultiplayerMode} placeholder={placeholder} styles={DefaultSelectStyle} isSearchable={false}/>
-              <p>Spielzug-Timeout</p>
+              <p>Turn-Timeout</p>
               <Select isDisabled={!isOwner} defaultValue={selectedTurnTimeout} options={selectOptionsTurnTimeout} onChange={onSelectTurnTimeout} placeholder={placeholder} styles={DefaultSelectStyle} isSearchable={false}/>
               <p>Mods</p>
               <Select isDisabled={!isOwner} defaultValue={selectedMods} options={selectOptionsMods} onChange={onSelectMods} placeholder={placeholder} styles={DefaultSelectStyle} isSearchable={false}/>

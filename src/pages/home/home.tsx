@@ -54,7 +54,7 @@ const HomePage = () => {
         </label>
 
         <label className="field-full">
-          Passwort
+          Password
           <br />
           <input
             className="input-center"
@@ -71,21 +71,21 @@ const HomePage = () => {
           </button>
 
           <button onClick={handleRegister} disabled={!isUsernameOrPwValid(username) || !isUsernameOrPwValid(password)}>
-            Registrieren
+            Register
           </button>
         </div>
 
         {/* Guest login */}
         <div className="form-row small row-seperated">
           <button onClick={handlePlayAsGuest}>
-            Als Gast spielen
+            Play as Guest
           </button>
         </div>
 
         {/* Password forgotten */}
         <div className="form-row small row-seperated">
           <button>
-            Password vergessen
+            Forgotten password
           </button>
         </div>
       </div>

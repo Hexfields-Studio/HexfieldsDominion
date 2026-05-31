@@ -7,51 +7,70 @@ import { Html } from "react-konva-utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
 import { useAuth, useGame } from "@/contexts/contexts";
-import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT } from "@/constants/constants";
+import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT, HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT } from "@/constants/constants";
 import { useError } from "@/hooks/useError";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
 import { useCurrentDiceResult } from "@/hooks/matchHooks/useCurrentDiceResult";
+import { useIsRolledDiceThisTurn } from "@/hooks/matchHooks/useIsRolledDiceThisTurn";
+import type { PlayerResources } from "@/repository/MatchRepository";
+import { useWinner } from "@/hooks/matchHooks/useWinner";
+import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
+import { useNavigate } from "react-router";
 
 const GameGui: React.FC = () => {
 
+  const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
   const { isError } = useError();
   const isMyTurn = useIsMyTurn();
   const currentDiceResult = useCurrentDiceResult();
+  const isRolledDiceThisTurn = useIsRolledDiceThisTurn();
+  const winner = useWinner();
+  const myPublicId = useMyPublicId();
+
   const [hideBoxedDices, setHideBoxedDices] = useState<boolean>(false);
-
   const [animationTrigger, setAnimationTrigger] = useState<number>(0);
+  const [grantedResources, setGrantedResources] = useState<PlayerResources | null>(null);
 
-  const dialogRef = useRef<DialogHandle | null>(null);
+  const dicesDialogRef = useRef<DialogHandle | null>(null);
+  const winnerDialogRef = useRef<DialogHandle | null>(null);
 
   const rollDice = () => {
     (async () => {
-      sessionStorage.setItem("rolledDiceThisTurn", "true");
-
       const response = await fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
       if (isError(response)) {
-        // needs to be set to true asap for isNotShowingDialog so animation works. False to allow to try again if rollDice failed
-        sessionStorage.setItem("rolledDiceThisTurn", "false");
         return;
       }
 
       setTimeout(() => {
-        dialogRef.current?.toggleDialog();
+        dicesDialogRef.current?.toggleDialog();
         setHideBoxedDices(false);
+        showGrantedResources();
       }, HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
     })();
   };
 
+  const showGrantedResources = async () => {
+    const response = await fetchWithAuth(`/games/${uuid}/grantedResources`, "GET");
+    if (response?.status === 204) {
+      return;
+    }
+    const responseJson = await response?.json();
+
+    setGrantedResources(responseJson);
+    setTimeout(() => setGrantedResources(null), HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT);
+  };
+
   const isNotShowingDialog = useCallback(() => {
-    return isMyTurn && (sessionStorage.getItem("rolledDiceThisTurn") !== "true");
-  }, [isMyTurn]);
+    return isMyTurn && !isRolledDiceThisTurn;
+  }, [isMyTurn, isRolledDiceThisTurn]);
 
   useEffect(() => {
     if (isNotShowingDialog()) {
       const showDialog = async () => {
-        dialogRef.current?.toggleDialog();
+        dicesDialogRef.current?.openDialog();
         setHideBoxedDices(true);
       };
       showDialog();
@@ -64,21 +83,39 @@ const GameGui: React.FC = () => {
     }
     const triggerAnimation = async () => {
       setAnimationTrigger(a => a + 1);
+      if (!isMyTurn) {
+        setTimeout(() => showGrantedResources(), 2000);
+      };
     };
     triggerAnimation();
-  }, [currentDiceResult]);
+    // stringify to prevent trigger with the same value -> not object based
+  }, [JSON.stringify(currentDiceResult)]);
+
+  useEffect(() => {
+    if (winner === null) {
+      return;
+    }
+    winnerDialogRef.current?.openDialog();
+  }, [winner]);
 
   return (
     <Layer>
       <Html divProps={{ className: styles.gui }}>
-        <Dialog onClick={rollDice} id="diceContainer" ref={dialogRef} useDefaultStyling={false} closedBy="none">
-          <h1 className={styles["gui__heading"]}>Du bist dran.</h1>
+        <Dialog onClick={rollDice} id="diceContainer" ref={dicesDialogRef} useDefaultStyling={false} closedBy="none">
+          <h1 className={styles["gui__diceHeading"]}>{"It's your turn."}</h1>
           <DiceContainer className={styles["gui__diceContainer"]} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
-          <span className={styles["gui__footer"]}>Klicke auf eine beliebige Stelle, um zu würfeln.</span>
+          <span className={styles["gui__diceFooter"]}>Click anywhere to roll the dice.</span>
+        </Dialog>
+        <Dialog id={styles["gui__winnerDialog"]} ref={winnerDialogRef} useDefaultStyling={false} closedBy="none">
+          <h1>The game is over. {(winner?.publicId === myPublicId) ? "You won 🎉" : "We have a winner."}</h1>
+          <p className={styles["gui__winnerInfo"]}>{(winner?.publicId === myPublicId) ? "You are the winner:" : "The winner is"}</p>
+          <p className={styles["gui__winnerName"]}>{winner?.username}</p>
+          <h2>🎉 Congratulations 🎉</h2>
+          <button className={styles["gui__backToStartMenu"]} onClick={() => navi("/play")}>← Back to Start Menu</button>
         </Dialog>
         <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
-          <RessourceDisplay/>
+          <RessourceDisplay grantedResources={grantedResources}/>
           <EndTurnButtonDisplay animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
         </div>
       </Html>
