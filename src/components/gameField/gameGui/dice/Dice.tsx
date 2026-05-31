@@ -1,5 +1,5 @@
 // This component is inspired by: https://codepen.io/abirana/pen/rNMLrPB
-import { useEffect, useState } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import styles from "./Dice.module.scss";
 
 //TODO: Refactor this so it doesnt store big strings
@@ -29,7 +29,7 @@ export type DiceSide = "highlighted" | "boxed";
 type DiceProps = {
     diceTheme: number;
     rolledSide: number;
-    animationTrigger: number;
+    animationTrigger: RefObject<number>;
     currentDiceSide: DiceSide
 }
 
@@ -39,7 +39,7 @@ const Dice: React.FC<DiceProps> = ({ diceTheme, rolledSide, animationTrigger, cu
 
   useEffect(()=>{
     setUseDefaultSide(!useDefaultSide);
-  }, [animationTrigger]);
+  }, [animationTrigger.current]);
     
   useEffect(()=>{
     setStyle({

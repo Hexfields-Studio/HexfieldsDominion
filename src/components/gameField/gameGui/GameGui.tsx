@@ -4,11 +4,10 @@ import RessourceDisplay from "@/components/gameField/gameGui/ressourceDisplay/Re
 import EndTurnButtonDisplay from "@/components/gameField/gameGui/endTurnButtonDisplay/EndTurnButtonDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Dialog, { type DialogHandle } from "@/components/dialog/dialog";
-import { useAuth, useGame } from "@/contexts/contexts";
-import { HIGHLIGHT_DICE_ANIMATION_TIMEOUT, HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT } from "@/constants/constants";
-import { useError } from "@/hooks/useError";
+import { useAuth, useGame, useMatchRepository } from "@/contexts/contexts";
+import { DICE_ANIMATION_DURATION, HIGHLIGHT_DICE_ANIMATION_TIMEOUT, HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT } from "@/constants/constants";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import DiceContainer from "@/components/gameField/gameGui/dice/DiceContainer";
 import { useCurrentDiceResult } from "@/hooks/matchHooks/useCurrentDiceResult";
@@ -17,13 +16,14 @@ import type { PlayerResources } from "@/repository/MatchRepository";
 import { useWinner } from "@/hooks/matchHooks/useWinner";
 import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
 import { useNavigate } from "react-router";
+import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 
 const GameGui: React.FC = () => {
 
   const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
-  const { isError } = useError();
+  const { repository } = useMatchRepository();
   const isMyTurn = useIsMyTurn();
   const currentDiceResult = useCurrentDiceResult();
   const isRolledDiceThisTurn = useIsRolledDiceThisTurn();
@@ -31,25 +31,27 @@ const GameGui: React.FC = () => {
   const myPublicId = useMyPublicId();
 
   const [hideBoxedDices, setHideBoxedDices] = useState<boolean>(false);
-  const [animationTrigger, setAnimationTrigger] = useState<number>(0);
   const [grantedResources, setGrantedResources] = useState<PlayerResources | null>(null);
+  const animationTrigger = useRef<number>(0);
+  const rollDiceAction = useRef<() => void>(() => {});
+  const triggeredInitialRollDice = useRef<boolean>(false);
 
   const dicesDialogRef = useRef<DialogHandle | null>(null);
   const winnerDialogRef = useRef<DialogHandle | null>(null);
 
-  const rollDice = () => {
-    (async () => {
-      const response = await fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
-      if (isError(response)) {
-        return;
-      }
+  useSseListeners(useMemo(() => [
+    {
+      type: "rollDice",
+      action: (event: MessageEvent) => {
+        repository.setMatchData(JSON.parse(event.data));
+        animationTrigger.current += 1;
+        rollDiceAction.current();
+      },
+    },
+  ], [repository]));
 
-      setTimeout(() => {
-        dicesDialogRef.current?.toggleDialog();
-        setHideBoxedDices(false);
-        showGrantedResources();
-      }, HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
-    })();
+  const rollDice = () => {
+    fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
   };
 
   const showGrantedResources = async () => {
@@ -75,21 +77,22 @@ const GameGui: React.FC = () => {
       };
       showDialog();
     }
-  }, [isNotShowingDialog]);
 
-  useEffect(() => {
-    if (currentDiceResult === null || isNotShowingDialog()) {
-      return;
-    }
-    const triggerAnimation = async () => {
-      setAnimationTrigger(a => a + 1);
-      if (!isMyTurn) {
-        setTimeout(() => showGrantedResources(), 2000);
+    // necessary because of sseListener in useMemo
+    rollDiceAction.current = isMyTurn
+      ? () => {
+        setTimeout(() => {
+          dicesDialogRef.current?.closeDialog();
+          setHideBoxedDices(false);
+          showGrantedResources();
+        }, HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
+      }
+      : () => {
+        setTimeout(() => {
+          showGrantedResources();
+        }, DICE_ANIMATION_DURATION);
       };
-    };
-    triggerAnimation();
-    // stringify to prevent trigger with the same value -> not object based
-  }, [JSON.stringify(currentDiceResult)]);
+  }, [isMyTurn]);
 
   useEffect(() => {
     if (winner === null) {
@@ -97,6 +100,15 @@ const GameGui: React.FC = () => {
     }
     winnerDialogRef.current?.openDialog();
   }, [winner]);
+
+  // show current result when reloading
+  useEffect(() => {
+    if (currentDiceResult === null || triggeredInitialRollDice.current) {
+      return;
+    }
+    triggeredInitialRollDice.current = true;
+    animationTrigger.current += 1;
+  }, [currentDiceResult]);
 
   return (
     <Layer>

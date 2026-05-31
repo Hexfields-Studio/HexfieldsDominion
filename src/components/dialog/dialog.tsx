@@ -15,6 +15,7 @@ interface DialogProps {
 export interface DialogHandle {
   toggleDialog: () => void;
   openDialog: () => void;
+  closeDialog: () => void;
 }
 
 const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
@@ -34,6 +35,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     toggleDialog,
     openDialog,
+    closeDialog
   }));
 
   const toggleDialog = () => (open ? closeDialog() : openDialog());
