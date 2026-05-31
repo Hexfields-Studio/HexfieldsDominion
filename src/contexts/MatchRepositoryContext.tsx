@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import InMemoryMatchRepository from "@/repository/InMemoryMatchRepository";
 import { MatchRepositoryContext } from "./contexts";
 
@@ -9,10 +9,6 @@ export interface MatchRepositoryContextType {
 
 export const RepositoryContextProvider = ({ children }: { children: ReactNode }) => {
   const [repository, setRepository] = useState(new InMemoryMatchRepository);
-
-  useEffect(() => {
-    return () => repository.closeConnection();
-  });
 
   return (
     <MatchRepositoryContext.Provider value={{ repository: repository, setRepository: setRepository }}>
