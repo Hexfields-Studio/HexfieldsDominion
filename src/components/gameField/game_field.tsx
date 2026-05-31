@@ -3,18 +3,18 @@ import { Circle, Layer, Rect, Stage } from "react-konva";
 import "./game_field.scss";
 import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
-import { Structure, type StructureProps } from "./structure";
+import { StructureComp, type StructureCompProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
 import { Background } from "./background";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
-import { useMatchRepository } from "@/contexts/contexts";
-import { resourcesFields } from "@/repository/MatchRepository";
+import { useAuth, useGame, useMatchRepository } from "@/contexts/contexts";
 import { useFields } from "@/hooks/matchHooks/useFields";
-import type { Field } from "@/repository/MatchRepository";
+import type { Field, MatchData, Structure, StructureType } from "@/repository/MatchRepository";
+import { useStructures } from "@/hooks/matchHooks/useStructures";
 
 const radius: number = 100;
 
-type Corner = { disabled: boolean, direction: number; x: number; y: number; adjacentHexes: { q: number; r: number }[] };
+type Corner = { key: string, disabled: boolean, direction: number; x: number; y: number; adjacentHexes: { q: number; r: number }[] };
 type CornerOffset = { direction: number; dx: number; dy: number };
 const cornerOffsetToAdjacentHexDeltas = [
   [{ q: 0, r: -1 }, { q: 1, r: -1 }],
@@ -35,7 +35,7 @@ for (let i = 0; i < 6; i++) {   // Precompute the 6 unit corner offsets for this
   });
 }
 
-type Edge = {direction: number; x: number, y: number; width: number; height: number; adjacentHexes: { q: number; r: number }[]};
+type Edge = {key: string, direction: number; x: number, y: number; width: number; height: number; adjacentHexes: { q: number; r: number }[]};
 const edgeDirectionToAdjacentHexDelta = [
   { q: 1, r: -1 },
   { q: 1, r: 0 },
@@ -44,13 +44,13 @@ const edgeDirectionToAdjacentHexDelta = [
   { q: -1, r: 0 },
   { q: 0, r: -1 },
 ];
-const edgeDirectionInDegrees: number[] = [30, 90, 150, 210, 270, 330];
+const edgeDirectionInDegrees: number[] = [30, 90, -30];
 
 const MIN_SCALE = 0.75;
 const MAX_SCALE = 2;
 const SCALE_BY = 1.1;
 
-function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
+function computeUniqueEdges(hexagons: hexagonProps[]): Map<string, Edge> {
   const edgeMap = new Map<string, Edge>();
     
   for (const hex of hexagons) {
@@ -62,7 +62,8 @@ function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
       const mapKey = adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|");
             
       if (!edgeMap.has(mapKey)) edgeMap.set(mapKey,{
-        direction: direction,
+        key: mapKey,
+        direction: direction % 3,
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2,
         width: radius,
@@ -72,10 +73,10 @@ function computeUniqueEdges(hexagons: hexagonProps[]): Edge[] {
     }
   }
     
-  return [...edgeMap.values()];
+  return edgeMap;
 }
 
-function computeUniqueCorners(hexagons: hexagonProps[]): Corner[] {
+function computeUniqueCorners(hexagons: hexagonProps[]): Map<string, Corner> {
   const cornerMap = new Map<string, Corner>();
 
   for (const hex of hexagons) {
@@ -86,20 +87,21 @@ function computeUniqueCorners(hexagons: hexagonProps[]): Corner[] {
       const corner_y = y + c.dy;
       const adjacentHexes = [{ q, r }, ...cornerOffsetToAdjacentHexDeltas[c.direction].map(delta => ({ q: q + delta.q, r: r + delta.r }))];
       const mapKey = adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|");
-
       if (!cornerMap.has(mapKey)) {
-        cornerMap.set(mapKey, {
+        const corner: Corner = {
+          key: mapKey,
           disabled: false,
           direction: c.direction,
           x: corner_x,
           y: corner_y,
-          adjacentHexes: adjacentHexes,
-        });
+          adjacentHexes: adjacentHexes
+        }
+        cornerMap.set(mapKey, corner);
       }
     }
   }
 
-  return [...cornerMap.values()];
+  return cornerMap;
 }
 
 interface GameFieldProps {
@@ -107,16 +109,23 @@ interface GameFieldProps {
 }
 
 const GameField: React.FC<GameFieldProps> = () => {
+  const {fetchWithAuth} = useAuth();
+  const { uuid } = useGame();
 
   // subscriptions
-  const fields: Field[] = useFields();
   const { repository } = useMatchRepository();
+  const fields: Field[] = useFields();
+  const structures: Structure[] = useStructures();
 
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
+  const [cornerMap, setCornerMap] = useState<Map<string, Corner>>(new Map<string, Corner>());
   const [corners, setCorners] = useState<Corner[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
   const [disabledCorners, setDisabledCorners] = useState<Set<string>>(new Set());
-  const [structures, setStructures] = useState<StructureProps[]>([]);
+  const [edgeMap, setEdgeMap] = useState<Map<string, Edge>>(new Map<string, Edge>());
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [disabledEdges, setDisabledEdges] = useState<Set<string>>(new Set());
+
+  const [structureComps, setStructureComps] = useState<StructureCompProps[]>([]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -140,10 +149,65 @@ const GameField: React.FC<GameFieldProps> = () => {
     {
       type: "matchData",
       action: (event: MessageEvent) => {
-        repository.setMatchData(JSON.parse(event.data));
+        const matchData: MatchData = JSON.parse(event.data);
+        repository.setMatchData(matchData);
       },
     },
   ], [repository]));
+
+  useEffect(()=>{
+    if(structures.length === 0) return;
+    const newCorners: Corner[] = [];
+    const newEdges: Edge[] = [];
+    structures.forEach(structure => {
+      const corner: Corner | undefined = cornerMap.get(structure.pos.map(h => `${h.q},${h.r}`).sort().join("|"));
+      const edge: Edge | undefined = edgeMap.get(structure.pos.map(h => `${h.q},${h.r}`).sort().join("|"));
+      if (corner) {
+        corner.disabled = true;
+        newCorners.push(corner);
+      }
+      if (edge){
+        newEdges.push(edge);
+      }
+    });
+    setDisabledCorners(new Set([...disabledCorners, ...newCorners.map(corner => 
+      corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|")
+    )]));
+    setDisabledEdges(new Set([...disabledEdges, ...newEdges.map(edge => 
+      edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|")
+    )]));
+
+    setStructureComps([
+        ...newEdges.map(edge => {
+          let rotation: number = edgeDirectionInDegrees[edge.direction]
+          let src: string = "../structures/bridgeHorizontal.png";
+          if(rotation === 90){
+            src = "../structures/bridgeVertical.png";
+          }
+          return {
+                type: "STREET" as StructureType,
+                x: edge.x,
+                y: edge.y,
+                rotation: rotation,
+                src: src,
+                width: edge.width,
+                height: edge.height,
+              }
+        }),
+        ...newCorners.map(corner => {
+            return {
+                type: "TOWN" as StructureType,
+                x: corner.x,
+                y: corner.y,
+                rotation: 0,
+                src: "../structures/house_small.png",
+                width: 120,
+                height: 120,
+                scale: 0.5,
+              }
+          }),
+      ]);
+  }, [structures])
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -212,8 +276,14 @@ const GameField: React.FC<GameFieldProps> = () => {
     if(fields.length === 0) return;
     const newHexagons: hexagonProps[] = [];
     generateHexagons(newHexagons);
-    setCorners(computeUniqueCorners(newHexagons));
-    setEdges(computeUniqueEdges(newHexagons));
+
+    const newCornerMap = computeUniqueCorners(newHexagons);
+    setCornerMap(newCornerMap);
+    setCorners([...newCornerMap.values()]);
+
+    const newEdgeMap = computeUniqueEdges(newHexagons);
+    setEdgeMap(newEdgeMap);
+    setEdges([...newEdgeMap.values()]);
     setHexagons(newHexagons);
   }, [fields, generateHexagons]);
 
@@ -314,38 +384,56 @@ const GameField: React.FC<GameFieldProps> = () => {
             <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
           ))}
 
-          {edges.map((edge, i) => (
-            <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{ x: edge.width/2, y: edge.height/2 }} fill={"gold"} opacity={0.3} rotation={edgeDirectionInDegrees[edge.direction]}/>
+          {edges.map((edge, i) => {
+            const isDisabled: boolean = disabledEdges.has(edge.key);
+            return (
+              <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{ x: edge.width/2, y: edge.height/2 }} fill={"gold"} opacity={isDisabled ? 0.0 : 0.3} rotation={edgeDirectionInDegrees[edge.direction]}
+              onClick={()=>{
+                if (isDisabled) return;
+                const sendBuildRequest = async () => {
+                    const pos: {q: number, r: number}[] = [];
+                    for (let adjacentHex of edge.adjacentHexes){
+                      pos.push(adjacentHex);
+                    }
+                    await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
+                      type: "BUILD",
+                      structureType: "STREET",
+                      pos: pos
+                    }));
+                  }
+                  sendBuildRequest();
+              }}/>
+            )
+          })}
+
+          {structureComps.map((structure, i) => (
+            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
           ))}
 
-          {corners.map((corner, i) => {
-            const id: string = `corner-${i}`;
-            const isDisabled: boolean = disabledCorners.has(id);
-
+          {corners.map(corner => {
+            const isDisabled: boolean = disabledCorners.has(corner.key);
             return (
-              <Circle key={id} x={corner.x} y={corner.y} radius={20} opacity={isDisabled ? 0.0 : 1}
+              <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} opacity={isDisabled ? 0.0 : 1}
                 fillLinearGradientStartPoint={{ x: -20, y: -20 }}
                 fillLinearGradientEndPoint={{ x: 20, y: 20 }}
                 fillLinearGradientColorStops={[0, "turquoise", 1, "blue"]}
                 onClick={()=>{
                   if (isDisabled) return;
-                  setStructures([... structures, {
-                    x: corner.x,
-                    y: corner.y,
-                    rotation: 0,
-                    src: "../structures/house_small.png",
-                    width: 120,
-                    height: 120,
-                    scale: 0.5,
-                  }]);
-                  setDisabledCorners(new Set(disabledCorners).add(id));
+                  const sendBuildRequest = async () => {
+                    const pos: {q: number, r: number}[] = [];
+                    for (let adjacentHex of corner.adjacentHexes){
+                      pos.push(adjacentHex);
+                    }
+                    await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
+                      type: "BUILD",
+                      structureType: "TOWN",
+                      pos: pos
+                    }));
+                  }
+                  sendBuildRequest();
                 }}/>
             );
           })}
-                    
-          {structures.map((structure, i) => (
-            <Structure key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
-          ))}
         </Layer>
         <GameGui/>
       </Stage>
