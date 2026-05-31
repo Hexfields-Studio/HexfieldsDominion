@@ -11,6 +11,7 @@ import { useAuth, useGame, useMatchRepository } from "@/contexts/contexts";
 import { useFields } from "@/hooks/matchHooks/useFields";
 import type { Field, MatchData, Structure, StructureType } from "@/repository/MatchRepository";
 import { useStructures } from "@/hooks/matchHooks/useStructures";
+import { useError } from "@/hooks/useError";
 
 const radius: number = 100;
 
@@ -111,6 +112,7 @@ interface GameFieldProps {
 const GameField: React.FC<GameFieldProps> = () => {
   const {fetchWithAuth} = useAuth();
   const { uuid } = useGame();
+  const { isError, openErrorDialogIfMessage, errorDialog } = useError();
 
   // subscriptions
   const { repository } = useMatchRepository();
@@ -350,94 +352,104 @@ const GameField: React.FC<GameFieldProps> = () => {
   };
 
   return (
-    <div ref={containerRef} className="full-page-container">
-      <Stage
-        width={dimensions.width}
-        height={dimensions.height}
-        onMouseDown={(e: Konva.KonvaEventObject<MouseEvent>) => {
-          setIsDragging(true);
-          setDragStart({
-            x_mouse: e.evt.clientX - cameraOffset.x,
-            y_mouse: e.evt.clientY - cameraOffset.y,
-          });
-        }}
+    <>
+      { errorDialog }
 
-        onMouseMove={(e: Konva.KonvaEventObject<MouseEvent>) => {
-          if (!isDragging) return;
-          moveCamera(e);
-        }}
-        onWheel={handleWheel}
-                
-        onTouchEnd={()=>setIsDragging(false)}
-        onMouseUp={()=>setIsDragging(false)}
-        onMouseLeave={()=>setIsDragging(false)}
-      >
-        <Layer
-          x={cameraOffset.x + dimensions.width / 2}
-          y={cameraOffset.y + dimensions.height / 2}
-          scaleX={scale}
-          scaleY={scale}
-          imageSmoothingEnabled={false}
+      <div ref={containerRef} className="full-page-container">
+        <Stage
+          width={dimensions.width}
+          height={dimensions.height}
+          onMouseDown={(e: Konva.KonvaEventObject<MouseEvent>) => {
+            setIsDragging(true);
+            setDragStart({
+              x_mouse: e.evt.clientX - cameraOffset.x,
+              y_mouse: e.evt.clientY - cameraOffset.y,
+            });
+          }}
+
+          onMouseMove={(e: Konva.KonvaEventObject<MouseEvent>) => {
+            if (!isDragging) return;
+            moveCamera(e);
+          }}
+          onWheel={handleWheel}
+                  
+          onTouchEnd={()=>setIsDragging(false)}
+          onMouseUp={()=>setIsDragging(false)}
+          onMouseLeave={()=>setIsDragging(false)}
         >
-          <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
-          {hexagons.map((hex, i) => (
-            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
-          ))}
+          <Layer
+            x={cameraOffset.x + dimensions.width / 2}
+            y={cameraOffset.y + dimensions.height / 2}
+            scaleX={scale}
+            scaleY={scale}
+            imageSmoothingEnabled={false}
+          >
+            <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
+            {hexagons.map((hex, i) => (
+              <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
+            ))}
 
-          {edges.map((edge, i) => {
-            const isDisabled: boolean = disabledEdges.has(edge.key);
-            return (
-              <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{ x: edge.width/2, y: edge.height/2 }} fill={"gold"} opacity={isDisabled ? 0.0 : 0.3} rotation={edgeDirectionInDegrees[edge.direction]}
-              onClick={()=>{
-                if (isDisabled) return;
-                const sendBuildRequest = async () => {
-                    const pos: {q: number, r: number}[] = [];
-                    for (let adjacentHex of edge.adjacentHexes){
-                      pos.push(adjacentHex);
-                    }
-                    await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
-                      type: "BUILD",
-                      structureType: "STREET",
-                      pos: pos
-                    }));
-                  }
-                  sendBuildRequest();
-              }}/>
-            )
-          })}
+            {edges.map((edge, i) => {
+              const isDisabled: boolean = disabledEdges.has(edge.key);
+              return (
+                <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{ x: edge.width/2, y: edge.height/2 }} fill={"gold"} opacity={isDisabled ? 0.0 : 0.3} rotation={edgeDirectionInDegrees[edge.direction]}
+                  onClick={()=>{
+                    if (isDisabled) return;
+                    const sendBuildRequest = async () => {
+                      const pos: {q: number, r: number}[] = [];
+                      for (let adjacentHex of edge.adjacentHexes){
+                        pos.push(adjacentHex);
+                      }
+                      const response = await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
+                        type: "BUILD",
+                        structureType: "STREET",
+                        pos: pos,
+                      }));
+                      if (isError(response)) {
+                        openErrorDialogIfMessage(response);
+                      }
+                    };
+                    sendBuildRequest();
+                  }}/>
+              );
+            })}
 
-          {structureComps.map((structure, i) => (
-            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
-          ))}
+            {structureComps.map((structure, i) => (
+              <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
+            ))}
 
-          {corners.map(corner => {
-            const isDisabled: boolean = disabledCorners.has(corner.key);
-            return (
-              <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} opacity={isDisabled ? 0.0 : 1}
-                fillLinearGradientStartPoint={{ x: -20, y: -20 }}
-                fillLinearGradientEndPoint={{ x: 20, y: 20 }}
-                fillLinearGradientColorStops={[0, "turquoise", 1, "blue"]}
-                onClick={()=>{
-                  if (isDisabled) return;
-                  const sendBuildRequest = async () => {
-                    const pos: {q: number, r: number}[] = [];
-                    for (let adjacentHex of corner.adjacentHexes){
-                      pos.push(adjacentHex);
-                    }
-                    await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
-                      type: "BUILD",
-                      structureType: "TOWN",
-                      pos: pos
-                    }));
-                  }
-                  sendBuildRequest();
-                }}/>
-            );
-          })}
-        </Layer>
-        <GameGui/>
-      </Stage>
-    </div>
+            {corners.map(corner => {
+              const isDisabled: boolean = disabledCorners.has(corner.key);
+              return (
+                <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} opacity={isDisabled ? 0.0 : 1}
+                  fillLinearGradientStartPoint={{ x: -20, y: -20 }}
+                  fillLinearGradientEndPoint={{ x: 20, y: 20 }}
+                  fillLinearGradientColorStops={[0, "turquoise", 1, "blue"]}
+                  onClick={()=>{
+                    if (isDisabled) return;
+                    const sendBuildRequest = async () => {
+                      const pos: {q: number, r: number}[] = [];
+                      for (let adjacentHex of corner.adjacentHexes){
+                        pos.push(adjacentHex);
+                      }
+                      const response = await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
+                        type: "BUILD",
+                        structureType: "TOWN",
+                        pos: pos,
+                      }));
+                      if (isError(response)) {
+                        openErrorDialogIfMessage(response);
+                      }
+                    };
+                    sendBuildRequest();
+                  }}/>
+              );
+            })}
+          </Layer>
+          <GameGui/>
+        </Stage>
+      </div>
+    </>
   );
 };
 
