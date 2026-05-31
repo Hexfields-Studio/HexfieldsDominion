@@ -1,3 +1,60 @@
+#tradeBankDialog{
+    display: flex;
+    flex-direction: column;
+    width: 22vw;
+    padding: 10px;
+    align-items: center;
+
+    .tradeBankDialog__config {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 1vw;
+        justify-content: space-evenly;
+        padding-bottom: 20px;
+        
+        .tradeBankDialog__config__column{
+            display: flex;
+            flex-direction: column;
+
+            & > *{
+                width: 100%;
+                text-align: center;
+            }
+
+            & > span{
+                font-size: 2.2vh;
+                height: 4vh;
+            }
+        }
+
+        & > span{
+            font-size: 7vh;
+            margin-top: 4vh;
+            align-content: center;
+        }
+
+        .tradeBankDialog__config__button--default{
+            background-color: map.get($gameGui, trade, default, backgroundColor);
+            border-color: map.get($gameGui, trade, default, borderColor);
+
+            &:disabled{
+                background-color: map.get($gameGui, trade, disabled, backgroundColor);
+                border-color: map.get($gameGui, trade, disabled, borderColor);
+            }
+        }
+
+        .tradeBankDialog__config__button--selected{
+            background-color: map.get($gameGui, trade, selected, backgroundColor);
+            border-color: map.get($gameGui, trade, selected, borderColor);
+        }
+    }
+
+    & > button{
+        width: 50%;
+    }
+}
+
 .ressourceDisplayLayout{
     height:100%;
     display: flex;

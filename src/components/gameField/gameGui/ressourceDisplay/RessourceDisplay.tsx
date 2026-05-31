@@ -1,6 +1,13 @@
 import { resources, type PlayerResources } from "@/repository/MatchRepository";
 import styles from "./RessourceDisplay.module.scss";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
+import { useRef, useState } from "react";
+import type { DialogHandle } from "@/components/dialog/dialog";
+import Dialog from "@/components/dialog/dialog";
+
+const TRADE_GIVE_AMOUNT = 4;
+
+type ResourceType = "WOOD" | "BRICK" | "WHEAT" | "SHEEP";
 
 type ResourceDisplayProps = {
   grantedResources: PlayerResources | null
@@ -9,13 +16,56 @@ type ResourceDisplayProps = {
 const RessourceDisplay: React.FC<ResourceDisplayProps> = ({ grantedResources }) => {
 
   const myRessources: PlayerResources | undefined = useMyRessources();
+  const tradingDialogRef = useRef<DialogHandle | null>(null);
 
-  const isResourceGranted = (resource: "WOOD" | "BRICK" | "WHEAT" | "SHEEP") => {
+  const [selectedResourceGive, setSelectedResourceGive] = useState<ResourceType | null>(null);
+  const [selectedResourceGet, setSelectedResourceGet] = useState<ResourceType | null>(null);
+
+  const openTradeBankDialog = () => {
+    setSelectedResourceGive(null);
+    setSelectedResourceGet(null);
+    tradingDialogRef.current?.toggleDialog();
+  };
+
+  const isResourceGranted = (resource: ResourceType) => {
     return grantedResources !== null && grantedResources[resource] !== undefined;
   };
 
   return (
     <>
+      <Dialog id={styles["tradeBankDialog"]} title="Trade with bank" ref={tradingDialogRef}>
+        <div className={styles["tradeBankDialog__config"]}>
+          <div className={styles["tradeBankDialog__config__column"]}>
+            <span>{`Give ${TRADE_GIVE_AMOUNT}x`}</span>
+            { myRessources && resources.map(resource => 
+              <button
+                key={resource}
+                className={styles[`${(selectedResourceGive === resource) ? "tradeBankDialog__config__button--selected" : "tradeBankDialog__config__button--default"}`]}
+                disabled={myRessources[resource] < TRADE_GIVE_AMOUNT}
+                onClick={() => {
+                  setSelectedResourceGive(resource);
+                  setSelectedResourceGet(null);
+                }}>
+                {resource.toLowerCase()}
+              </button>)
+            }
+          </div>
+          <span>→</span>
+          <div className={styles["tradeBankDialog__config__column"]}>
+            <span>Get 1x</span>
+            { resources.map(resource => 
+              <button
+                key={resource}
+                className={(selectedResourceGet === resource) ? styles["tradeBankDialog__config__button--selected"] : styles["tradeBankDialog__config__button--default"]}
+                disabled={!selectedResourceGive || (selectedResourceGive === resource)}
+                onClick={() => setSelectedResourceGet(resource)}>
+                {resource.toLowerCase()}
+              </button>)
+            }
+          </div>
+        </div>
+        <button disabled={!selectedResourceGive || !selectedResourceGet}>Trade</button>
+      </Dialog>
       {
         myRessources && (
           <div className={styles.ressourceDisplayLayout}>
@@ -30,7 +80,7 @@ const RessourceDisplay: React.FC<ResourceDisplayProps> = ({ grantedResources }) 
                 </div>
               </div>,
             )}
-            <button className={styles.bankButton}>
+            <button className={styles.bankButton} onClick={openTradeBankDialog}>
               <img src={`${import.meta.env.BASE_URL}ressources/bank.png`}></img>
             </button>
           </div>
