@@ -16,9 +16,11 @@ import { useIsRolledDiceThisTurn } from "@/hooks/matchHooks/useIsRolledDiceThisT
 import type { PlayerResources } from "@/repository/MatchRepository";
 import { useWinner } from "@/hooks/matchHooks/useWinner";
 import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
+import { useNavigate } from "react-router";
 
 const GameGui: React.FC = () => {
 
+  const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
   const { isError } = useError();
@@ -109,6 +111,7 @@ const GameGui: React.FC = () => {
           <p className={styles["gui__winnerInfo"]}>{(winner?.publicId === myPublicId) ? "You are the winner:" : "The winner is"}</p>
           <p className={styles["gui__winnerName"]}>{winner?.username}</p>
           <h2>🎉 Congratulations 🎉</h2>
+          <button className={styles["gui__backToStartMenu"]} onClick={() => navi("/play")}>← Back to Start Menu</button>
         </Dialog>
         <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>

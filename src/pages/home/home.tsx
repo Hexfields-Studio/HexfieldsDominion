@@ -54,7 +54,7 @@ const HomePage = () => {
         </label>
 
         <label className="field-full">
-          Passwort
+          Password
           <br />
           <input
             className="input-center"
