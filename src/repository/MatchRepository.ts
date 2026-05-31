@@ -19,7 +19,13 @@ export type PlayerRepresentation = {
     publicId: number,   // Not sure if this is the correct use of the "publicId"
     resources: PlayerResources,
     chosenPortrait: string, //Invented, keep portraits or use colors?
-    points: number
+    points: number,
+    color: {
+        red: number,
+        green: number,
+        blue: number,
+        alpha: number
+    }
 }
 
 export type StructureType = "TOWN" | "HARBOR" | "STREET";

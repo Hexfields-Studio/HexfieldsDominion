@@ -1,6 +1,8 @@
 import type { StructureType } from "@/repository/MatchRepository";
-import { useEffect, useState } from "react";
-import { Image } from "react-konva";
+import { useEffect, useState, useRef } from "react";
+import { Image as KonvaImage } from "react-konva";
+import Konva from "konva";
+import { rgbToHue } from "@/utils/colorUtils";
 
 export interface StructureCompProps {
     type: StructureType
@@ -11,11 +13,18 @@ export interface StructureCompProps {
     width?: number;
     height?: number;
     scale?: number;
+    playerColor?: {
+        red: number;
+        green: number;
+        blue: number;
+        alpha: number;
+    }
 }
 
 export const StructureComp: React.FC<StructureCompProps> =
-    ({x, y, rotation, src, width = 48, height = 32, scale = 1 }) => {
+    ({x, y, rotation, src, width = 48, height = 32, scale = 1, playerColor }) => {
       const [img, setImg] = useState<HTMLImageElement | null>(null);
+      const imageRef = useRef<Konva.Image>(null);
 
       useEffect(() => {
         const i = new window.Image();
@@ -23,12 +32,28 @@ export const StructureComp: React.FC<StructureCompProps> =
         i.onload = () => setImg(i);
       }, [src]);
 
+      useEffect(() => {
+        if (imageRef.current && img) {
+          if (!playerColor) {
+            // Apply grayscale filter (zero saturation)
+            imageRef.current.filters([Konva.Filters.Desaturate]);
+          } else {
+            // Apply hue rotation filter
+            const hue = rgbToHue(playerColor.red, playerColor.green, playerColor.blue);
+            imageRef.current.hue(hue);
+            imageRef.current.saturation(1); // Full saturation
+            imageRef.current.filters([Konva.Filters.Hue, Konva.Filters.Saturate]);
+          }
+        }
+      }, [playerColor, img]);
 
       if (!img) {
         return null;
       }
+
       return (
-        <Image
+        <KonvaImage
+          ref={imageRef}
           image={img}
           x={x}
           y={y}
@@ -39,7 +64,7 @@ export const StructureComp: React.FC<StructureCompProps> =
           height={height}
           scaleX={scale}
           scaleY={scale}
-          listening // set to false if you don't want interaction
+          listening
         />
       );
     };

@@ -116,6 +116,7 @@ const GameField: React.FC<GameFieldProps> = () => {
   const { repository } = useMatchRepository();
   const fields: Field[] = useFields();
   const structures: Structure[] = useStructures();
+  const matchData = repository.getMatchData();
 
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [cornerMap, setCornerMap] = useState<Map<string, Corner>>(new Map<string, Corner>());
@@ -157,6 +158,15 @@ const GameField: React.FC<GameFieldProps> = () => {
 
   useEffect(()=>{
     if(structures.length === 0) return;
+
+    // Create a lookup map for player colors by publicId
+    const playerColorMap = new Map<number, { red: number; green: number; blue: number; alpha: number }>();
+    if (matchData?.players) {
+      matchData.players.forEach(player => {
+        playerColorMap.set(player.publicId, player.color);
+      });
+    }
+
     const newCorners: Corner[] = [];
     const newEdges: Edge[] = [];
     structures.forEach(structure => {
@@ -171,43 +181,55 @@ const GameField: React.FC<GameFieldProps> = () => {
       }
     });
     setDisabledCorners(new Set([...disabledCorners, ...newCorners.map(corner => 
-      corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|")
+      corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
     )]));
     setDisabledEdges(new Set([...disabledEdges, ...newEdges.map(edge => 
-      edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|")
+      edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
     )]));
 
     setStructureComps([
-        ...newEdges.map(edge => {
-          let rotation: number = edgeDirectionInDegrees[edge.direction]
-          let src: string = "../structures/bridgeHorizontal.png";
-          if(rotation === 90){
-            src = "../structures/bridgeVertical.png";
-          }
-          return {
-                type: "STREET" as StructureType,
-                x: edge.x,
-                y: edge.y,
-                rotation: rotation,
-                src: src,
-                width: edge.width,
-                height: edge.height,
-              }
-        }),
-        ...newCorners.map(corner => {
-            return {
-                type: "TOWN" as StructureType,
-                x: corner.x,
-                y: corner.y,
-                rotation: 0,
-                src: "../structures/house_small.png",
-                width: 120,
-                height: 120,
-                scale: 0.5,
-              }
-          }),
-      ]);
-  }, [structures])
+      ...newEdges.map(edge => {
+        const rotation: number = edgeDirectionInDegrees[edge.direction];
+        let src: string = "../structures/bridgeHorizontal.png";
+        if(rotation === 90){
+          src = "../structures/bridgeVertical.png";
+        }
+        // Find the structure that corresponds to this edge to get the owner's color
+        const structure = structures.find(s => 
+          s.pos.map(h => `${h.q},${h.r}`).sort().join("|") === 
+          edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
+        );
+        return {
+          type: "STREET" as StructureType,
+          x: edge.x,
+          y: edge.y,
+          rotation: rotation,
+          src: src,
+          width: edge.width,
+          height: edge.height,
+          playerColor: structure ? playerColorMap.get(structure.publicPlayerId) : undefined,
+        };
+      }),
+      ...newCorners.map(corner => {
+        // Find the structure that corresponds to this corner to get the owner's color
+        const structure = structures.find(s => 
+          s.pos.map(h => `${h.q},${h.r}`).sort().join("|") === 
+          corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
+        );
+        return {
+          type: "TOWN" as StructureType,
+          x: corner.x,
+          y: corner.y,
+          rotation: 0,
+          src: "../structures/house_small.png",
+          width: 120,
+          height: 120,
+          scale: 0.5,
+          playerColor: structure ? playerColorMap.get(structure.publicPlayerId) : undefined,
+        };
+      }),
+    ]);
+  }, [structures, matchData])
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -407,7 +429,7 @@ const GameField: React.FC<GameFieldProps> = () => {
           })}
 
           {structureComps.map((structure, i) => (
-            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
+            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale} playerColor={structure.playerColor}/>
           ))}
 
           {corners.map(corner => {
