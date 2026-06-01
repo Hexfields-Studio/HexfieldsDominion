@@ -5,7 +5,7 @@
 
     .playerPortrait {
         height: 90px;
-        background-color: #ee0000; //color will be hue-shifted in the component
+        background-color: map.get($gameGui, lineupDisplay, backgroundColor);
         border: 3px solid map.get($gameGui, lineupDisplay, borderColor);
         box-sizing: border-box;     //Include border inside the element
         transition: all 0.2s ease;
