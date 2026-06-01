@@ -19,8 +19,7 @@ export type PlayerRepresentation = {
     publicId: number,   // Not sure if this is the correct use of the "publicId"
     resources: PlayerResources,
     chosenPortrait: string, //Invented, keep portraits or use colors?
-    points: number,
-    playerHue: number // hue value where 0 = #ff0000, 120 = #00ff00, 240 = #0000ff, etc.
+    points: number
 }
 
 export type StructureType = "TOWN" | "HARBOR" | "STREET";
@@ -31,7 +30,7 @@ export type AxialPosition = {
 }
 
 export type Structure = {
-	ownerId: number,
+	publicPlayerId: number,
 	name: StructureType,
 	pos: AxialPosition[],
 	recipe: any
@@ -44,10 +43,7 @@ export type MatchData = {
     structures: Structure[],
     rolledDiceThisTurn: boolean,
     winner: PlayerRepresentation | null
-    playerHueMap: PlayerHueMap
 }
-
-export type PlayerHueMap = Map<number, number>; // Map<publicId, playerHue>
 
 export interface MatchRepository{
     subscribe: (subscriber: any) => void
