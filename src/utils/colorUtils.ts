@@ -1,8 +1,31 @@
 /**
- * Converts RGB color to HSL hue rotation (0-360 degrees)
- * @param red - Red component (0-255)
- * @param green - Green component (0-255)
- * @param blue - Blue component (0-255)
+ * Converts hex color string to HSL hue rotation (0-360 degrees)
+ * @param hexColor - Hex color string in format "#rrggbb"
+ * @returns Hue value in degrees (0-360)
+*/
+export function hexToHue(hexColor: string): number {
+  const { red, green, blue } = hexToRgb(hexColor);
+  return rgbToHue(red, green, blue);
+}
+
+/**
+ * Converts hex color string to RGB components
+ * @param hexColor - Hex color string in format "#rrggbb" or "rrggbb"
+ * @returns Object with red, green, blue components (0-255)
+ */
+export function hexToRgb(hexColor: string): { red: number; green: number; blue: number } {
+  // Remove # if present
+  const hex = hexColor.replace("#", "");
+  
+  const red = parseInt(hex.substring(0, 2), 16);
+  const green = parseInt(hex.substring(2, 4), 16);
+  const blue = parseInt(hex.substring(4, 6), 16);
+  
+  return { red, green, blue };
+}
+
+/**
+ * Converts RGB color to HSL hue rotation
  * @returns Hue rotation in degrees (0-360)
  */
 export function rgbToHue(red: number, green: number, blue: number): number {
@@ -28,25 +51,4 @@ export function rgbToHue(red: number, green: number, blue: number): number {
   }
 
   return hue;
-}
-
-/**
- * Generates a CSS hue-rotation filter value based on RGB color
- * @param red - Red component (0-255)
- * @param green - Green component (0-255)
- * @param blue - Blue component (0-255)
- * @returns CSS filter string for hue rotation, or grayscale filter for default fallback
- */
-export function getHueRotateFilter(red: number, green: number, blue: number): string {
-  // If color is essentially black (0,0,0), use grayscale fallback
-  if (red === 0 && green === 0 && blue === 0) {
-    return "saturate(0)"; // Zero saturation = grayscale
-  }
-
-  const hue = rgbToHue(red, green, blue);
-  // Rotate from red (0 degrees) to the target hue
-  // Since structures are initially red, we need to rotate from red hue (0) to target
-  const hueRotate = hue;
-  
-  return `hue-rotate(${hueRotate}deg)`;
 }

@@ -20,12 +20,7 @@ export type PlayerRepresentation = {
     resources: PlayerResources,
     chosenPortrait: string, //Invented, keep portraits or use colors?
     points: number,
-    color: {
-        red: number,
-        green: number,
-        blue: number,
-        alpha: number
-    }
+    colorString: string // Hex color string, e.g. "#ff0000"
 }
 
 export type StructureType = "TOWN" | "HARBOR" | "STREET";
@@ -36,7 +31,7 @@ export type AxialPosition = {
 }
 
 export type Structure = {
-	publicPlayerId: number,
+	ownerId: number,
 	name: StructureType,
 	pos: AxialPosition[],
 	recipe: any

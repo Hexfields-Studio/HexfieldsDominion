@@ -94,8 +94,8 @@ function computeUniqueCorners(hexagons: hexagonProps[]): Map<string, Corner> {
           direction: c.direction,
           x: corner_x,
           y: corner_y,
-          adjacentHexes: adjacentHexes
-        }
+          adjacentHexes: adjacentHexes,
+        };
         cornerMap.set(mapKey, corner);
       }
     }
@@ -109,7 +109,7 @@ interface GameFieldProps {
 }
 
 const GameField: React.FC<GameFieldProps> = () => {
-  const {fetchWithAuth} = useAuth();
+  const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
 
   // subscriptions
@@ -160,10 +160,10 @@ const GameField: React.FC<GameFieldProps> = () => {
     if(structures.length === 0) return;
 
     // Create a lookup map for player colors by publicId
-    const playerColorMap = new Map<number, { red: number; green: number; blue: number; alpha: number }>();
+    const playerColorMap = new Map<number, string>();
     if (matchData?.players) {
       matchData.players.forEach(player => {
-        playerColorMap.set(player.publicId, player.color);
+        playerColorMap.set(player.publicId, player.colorString);
       });
     }
 
@@ -207,7 +207,7 @@ const GameField: React.FC<GameFieldProps> = () => {
           src: src,
           width: edge.width,
           height: edge.height,
-          playerColor: structure ? playerColorMap.get(structure.publicPlayerId) : undefined,
+          playerColor: structure ? playerColorMap.get(structure.ownerId) : undefined,
         };
       }),
       ...newCorners.map(corner => {
@@ -216,6 +216,7 @@ const GameField: React.FC<GameFieldProps> = () => {
           s.pos.map(h => `${h.q},${h.r}`).sort().join("|") === 
           corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
         );
+        
         return {
           type: "TOWN" as StructureType,
           x: corner.x,
@@ -225,11 +226,11 @@ const GameField: React.FC<GameFieldProps> = () => {
           width: 120,
           height: 120,
           scale: 0.5,
-          playerColor: structure ? playerColorMap.get(structure.publicPlayerId) : undefined,
+          playerColor: structure ? playerColorMap.get(structure.ownerId) : undefined,
         };
       }),
     ]);
-  }, [structures, matchData])
+  }, [structures, matchData]);
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -410,22 +411,22 @@ const GameField: React.FC<GameFieldProps> = () => {
             const isDisabled: boolean = disabledEdges.has(edge.key);
             return (
               <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{ x: edge.width/2, y: edge.height/2 }} fill={"gold"} opacity={isDisabled ? 0.0 : 0.3} rotation={edgeDirectionInDegrees[edge.direction]}
-              onClick={()=>{
-                if (isDisabled) return;
-                const sendBuildRequest = async () => {
+                onClick={()=>{
+                  if (isDisabled) return;
+                  const sendBuildRequest = async () => {
                     const pos: {q: number, r: number}[] = [];
-                    for (let adjacentHex of edge.adjacentHexes){
+                    for (const adjacentHex of edge.adjacentHexes){
                       pos.push(adjacentHex);
                     }
                     await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
                       type: "BUILD",
                       structureType: "STREET",
-                      pos: pos
+                      pos: pos,
                     }));
-                  }
+                  };
                   sendBuildRequest();
-              }}/>
-            )
+                }}/>
+            );
           })}
 
           {structureComps.map((structure, i) => (
@@ -443,15 +444,15 @@ const GameField: React.FC<GameFieldProps> = () => {
                   if (isDisabled) return;
                   const sendBuildRequest = async () => {
                     const pos: {q: number, r: number}[] = [];
-                    for (let adjacentHex of corner.adjacentHexes){
+                    for (const adjacentHex of corner.adjacentHexes){
                       pos.push(adjacentHex);
                     }
                     await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
                       type: "BUILD",
                       structureType: "TOWN",
-                      pos: pos
+                      pos: pos,
                     }));
-                  }
+                  };
                   sendBuildRequest();
                 }}/>
             );
