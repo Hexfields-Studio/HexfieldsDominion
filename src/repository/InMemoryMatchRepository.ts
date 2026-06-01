@@ -6,7 +6,7 @@ class InMemoryMatchRepository implements MatchRepository{
   matchData: MatchData | undefined;
   fields: Field[] = [];
   structures: Structure[] = [];
-  playerHueMap: Map<number, number> = new Map<number, number>();
+  playerHueMap: PlayerHueMap = new Map<number, number>();
 
   setFields = (fields: Field[]) => {
     this.fields = fields;
