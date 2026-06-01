@@ -33,7 +33,11 @@ class InMemoryMatchRepository implements MatchRepository{
   setMatchData = (matchData: MatchData) => {
     this.matchData = matchData;
     this.structures = matchData.structures;
-    this.playerHueMap = matchData.playerHueMap;
+    const hueMap = new Map<number, number>();
+    matchData.players.forEach(player => {
+      hueMap.set(player.publicId, player.playerHue);
+    });
+    this.playerHueMap = hueMap;
   };
   getMatchData = () => this.matchData;
 
