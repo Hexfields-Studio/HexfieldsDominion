@@ -20,7 +20,7 @@ export type PlayerRepresentation = {
     resources: PlayerResources,
     chosenPortrait: string, //Invented, keep portraits or use colors?
     points: number,
-    colorString: string // Hex color string, e.g. "#ff0000"
+    playerHue: number // hue value where 0 = #ff0000, 120 = #00ff00, 240 = #0000ff, etc.
 }
 
 export type StructureType = "TOWN" | "HARBOR" | "STREET";

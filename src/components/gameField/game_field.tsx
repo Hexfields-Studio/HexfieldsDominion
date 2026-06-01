@@ -159,11 +159,11 @@ const GameField: React.FC<GameFieldProps> = () => {
   useEffect(()=>{
     if(structures.length === 0) return;
 
-    // Create a lookup map for player colors by publicId
-    const playerColorMap = new Map<number, string>();
+    // Create a lookup map for player hues by publicId
+    const playerHueMap = new Map<number, number>();
     if (matchData?.players) {
       matchData.players.forEach(player => {
-        playerColorMap.set(player.publicId, player.colorString);
+        playerHueMap.set(player.publicId, player.playerHue);
       });
     }
 
@@ -194,7 +194,7 @@ const GameField: React.FC<GameFieldProps> = () => {
         if(rotation === 90){
           src = "../structures/bridgeVertical.png";
         }
-        // Find the structure that corresponds to this edge to get the owner's color
+        // Find the structure that corresponds to this edge to get the owner's hue
         const structure = structures.find(s => 
           s.pos.map(h => `${h.q},${h.r}`).sort().join("|") === 
           edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
@@ -207,11 +207,11 @@ const GameField: React.FC<GameFieldProps> = () => {
           src: src,
           width: edge.width,
           height: edge.height,
-          playerColor: structure ? playerColorMap.get(structure.ownerId) : undefined,
+          playerHue: structure ? playerHueMap.get(structure.ownerId) : undefined,
         };
       }),
       ...newCorners.map(corner => {
-        // Find the structure that corresponds to this corner to get the owner's color
+        // Find the structure that corresponds to this corner to get the owner's hue
         const structure = structures.find(s => 
           s.pos.map(h => `${h.q},${h.r}`).sort().join("|") === 
           corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
@@ -226,7 +226,7 @@ const GameField: React.FC<GameFieldProps> = () => {
           width: 120,
           height: 120,
           scale: 0.5,
-          playerColor: structure ? playerColorMap.get(structure.ownerId) : undefined,
+          playerHue: structure ? playerHueMap.get(structure.ownerId) : undefined,
         };
       }),
     ]);
@@ -430,7 +430,7 @@ const GameField: React.FC<GameFieldProps> = () => {
           })}
 
           {structureComps.map((structure, i) => (
-            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale} playerColor={structure.playerColor}/>
+            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale} playerHue={structure.playerHue}/>
           ))}
 
           {corners.map(corner => {
