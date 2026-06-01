@@ -1,145 +1,46 @@
 .buildPanel {
   position: fixed;
-  bottom: 20px;
+  bottom: 0px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
   z-index: 1000;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  background: var(--panel-bg);
-  backdrop-filter: blur(10px);
-  border-radius: 60px;
-  padding: 8px 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent 94%);
-  transition: background-color .45s ease, color .45s ease, border-color .25s ease;
   pointer-events: all;
-  animation: slideUp 0.3s ease-out;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateX(-50%) translateY(100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-}
-
-.buttonContainer {
-  display: flex;
-  gap: 8px;
-}
-
-.buildButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.buildButton, .toggleButton {
   padding: 10px 20px;
-  background: var(--input-background);
-  border: 2px solid var(--accent-green);
-  border-radius: 40px;
-  cursor: pointer;
   font-size: 16px;
-  font-weight: 500;
-  color: var(--foreground);
+  cursor: pointer;
+  background: crimson;
+  border: 2px solid black;
+  border-radius: 8px;
+  color: white;
   transition: all 0.2s ease;
-  pointer-events: all;
 
   &:hover {
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-green) 12%, transparent 88%);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &.selected {
-    background: linear-gradient(135deg, #ffd700, #ffb347);
-    border-color: #ffd700;
-    color: #1a1a1a;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-
-    .icon {
-      animation: bounce 0.3s ease;
-    }
+    transform: translateY(-2px);
   }
 }
 
-.icon {
-  font-size: 20px;
-}
-
-.label {
-  font-size: 14px;
-  font-weight: 600;
+.buildButton.selected {
+  background: darkred;
+  border-color: white;
+  transform: scale(1.05);
 }
 
 .toggleButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--input-background);
-  border: 2px solid var(--accent-green);
-  cursor: pointer;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  color: var(--foreground);
-  pointer-events: all;
-
-  &:hover {
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-green) 12%, transparent 88%);
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  padding: 10px 15px;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-}
-
-/* Responsive - matches your existing media queries */
 @media (max-width: 600px) {
   .buildPanel {
-    padding: 6px 12px;
-    gap: 8px;
     bottom: 10px;
   }
 
-  .buildButton {
-    padding: 8px 16px;
-  }
-
-  .label {
-    display: none;
-  }
-
-  .buildButton {
-    padding: 10px;
-  }
-
-  .icon {
-    font-size: 24px;
-  }
-
-  .toggleButton {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+  .buildButton, .toggleButton {
+    padding: 8px 12px;
+    font-size: 14px;
   }
 }

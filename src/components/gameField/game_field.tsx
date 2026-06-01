@@ -409,7 +409,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                 offset={{ x: edge.width/2, y: edge.height/2 }} 
                 fill={"gold"} opacity={
                   isDisabled ? 0.0 : 
-                    (selectedBuildType === "road" && showAllHitboxes ? 0.7 : 
+                    (selectedBuildType === "ROAD" && showAllHitboxes ? 0.7 : 
                       (showAllHitboxes ? 0.3 : 0.0))
                 }
                 rotation={edgeDirectionInDegrees[edge.direction]}
@@ -418,7 +418,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                   if (isDisabled) return;
 
                   // Only build if road is selected
-                  if (selectedBuildType === "road") {
+                  if (selectedBuildType === "ROAD") {
                     // TODO: Send build request to backend
                     console.log("Building ROAD at:", edge.adjacentHexes);
 
@@ -429,7 +429,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                       }
                       await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
                         type: "BUILD",
-                        structureType: "STREET",
+                        structureType: "ROAD",
                         pos: pos,
                       }));
                     };
@@ -450,7 +450,7 @@ const GameField: React.FC<GameFieldProps> = () => {
               <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} 
                 opacity={
                   isDisabled ? 0.0 : 
-                    ((selectedBuildType === "house" || selectedBuildType === "big_house") && showAllHitboxes ? 0.8 : 
+                    ((selectedBuildType === "SETTLEMENT" || selectedBuildType === "TOWN") && showAllHitboxes ? 0.8 : 
                       (showAllHitboxes ? 0.4 : 0.0))
                 }
                 fillLinearGradientStartPoint={{ x: -20, y: -20 }}
@@ -460,9 +460,9 @@ const GameField: React.FC<GameFieldProps> = () => {
                   if (isDisabled) return;
                 
                   // Build house or big house based on selection
-                  if (selectedBuildType === "house") {
+                  if (selectedBuildType === "SETTLEMENT") {
                   // TODO: Send build request to backend
-                    console.log("Building HOUSE at:", corner.adjacentHexes);
+                    console.log("Building SETTLEMENT at:", corner.adjacentHexes);
                   
                     const sendBuildRequest = async () => {
                       const pos: {q: number, r: number}[] = [];
@@ -478,9 +478,9 @@ const GameField: React.FC<GameFieldProps> = () => {
                     sendBuildRequest();
                     setSelectedBuildType(null);
                   } 
-                  else if (selectedBuildType === "big_house") {
+                  else if (selectedBuildType === "TOWN") {
                   // TODO: Send build request to backend
-                    console.log("Building BIG HOUSE at:", corner.adjacentHexes);
+                    console.log("Building TOWN at:", corner.adjacentHexes);
                   
                     const sendBuildRequest = async () => {
                       const pos: {q: number, r: number}[] = [];
@@ -489,7 +489,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                       }
                       await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
                         type: "BUILD",
-                        structureType: "TOWN", // Upgrade SETTLEMENT to TOWN
+                        structureType: "TOWN", // TOWN = Upgrade to SETTLEMENT (see above)
                         pos: pos,
                       }));
                     };
