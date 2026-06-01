@@ -11,6 +11,7 @@ import { useAuth, useGame, useMatchRepository } from "@/contexts/contexts";
 import { useFields } from "@/hooks/matchHooks/useFields";
 import type { Field, MatchData, Structure, StructureType } from "@/repository/MatchRepository";
 import { useStructures } from "@/hooks/matchHooks/useStructures";
+import { usePlayerHueMap } from "@/hooks/matchHooks/usePlayerHueMap";
 
 const radius: number = 100;
 
@@ -76,6 +77,19 @@ function computeUniqueEdges(hexagons: hexagonProps[]): Map<string, Edge> {
   return edgeMap;
 }
 
+// Helper function to find a structure that occupies a given set of adjacent hexes
+function findStructureByAdjacentHexes(
+  structures: Structure[], 
+  adjacentHexes: { q: number; r: number }[]): Structure | undefined {
+  const targetKey = adjacentHexes
+    .map(h => `${h.q},${h.r}`)
+    .sort().join("|");
+
+  return structures
+    .find(s => s.pos.map(h => `${h.q},${h.r}`)
+      .sort().join("|") === targetKey);
+};
+
 function computeUniqueCorners(hexagons: hexagonProps[]): Map<string, Corner> {
   const cornerMap = new Map<string, Corner>();
 
@@ -116,7 +130,7 @@ const GameField: React.FC<GameFieldProps> = () => {
   const { repository } = useMatchRepository();
   const fields: Field[] = useFields();
   const structures: Structure[] = useStructures();
-  const matchData = repository.getMatchData();
+  const playerHueMap: Map<number, number> = usePlayerHueMap();
 
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [cornerMap, setCornerMap] = useState<Map<string, Corner>>(new Map<string, Corner>());
@@ -159,14 +173,6 @@ const GameField: React.FC<GameFieldProps> = () => {
   useEffect(()=>{
     if(structures.length === 0) return;
 
-    // Create a lookup map for player hues by publicId
-    const playerHueMap = new Map<number, number>();
-    if (matchData?.players) {
-      matchData.players.forEach(player => {
-        playerHueMap.set(player.publicId, player.playerHue);
-      });
-    }
-
     const newCorners: Corner[] = [];
     const newEdges: Edge[] = [];
     structures.forEach(structure => {
@@ -189,16 +195,15 @@ const GameField: React.FC<GameFieldProps> = () => {
 
     setStructureComps([
       ...newEdges.map(edge => {
+        // Determine rotation and image source based on edge direction
         const rotation: number = edgeDirectionInDegrees[edge.direction];
         let src: string = "../structures/bridgeHorizontal.png";
         if(rotation === 90){
           src = "../structures/bridgeVertical.png";
         }
-        // Find the structure that corresponds to this edge to get the owner's hue
-        const structure = structures.find(s => 
-          s.pos.map(h => `${h.q},${h.r}`).sort().join("|") === 
-          edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
-        );
+
+        // Find the structure that occupies this edge
+        const structure = findStructureByAdjacentHexes(structures, edge.adjacentHexes);
         return {
           type: "STREET" as StructureType,
           x: edge.x,
@@ -211,12 +216,8 @@ const GameField: React.FC<GameFieldProps> = () => {
         };
       }),
       ...newCorners.map(corner => {
-        // Find the structure that corresponds to this corner to get the owner's hue
-        const structure = structures.find(s => 
-          s.pos.map(h => `${h.q},${h.r}`).sort().join("|") === 
-          corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
-        );
-        
+        // Find the structure that occupies this corner
+        const structure = findStructureByAdjacentHexes(structures, corner.adjacentHexes);
         return {
           type: "TOWN" as StructureType,
           x: corner.x,
@@ -230,7 +231,7 @@ const GameField: React.FC<GameFieldProps> = () => {
         };
       }),
     ]);
-  }, [structures, matchData]);
+  }, [structures, cornerMap, edgeMap, disabledCorners, disabledEdges, playerHueMap]);
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;

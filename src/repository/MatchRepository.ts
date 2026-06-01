@@ -44,7 +44,10 @@ export type MatchData = {
     structures: Structure[],
     rolledDiceThisTurn: boolean,
     winner: PlayerRepresentation | null
+    playerHueMap: PlayerHueMap
 }
+
+export type PlayerHueMap = Map<number, number>; // Map<publicId, playerHue>
 
 export interface MatchRepository{
     subscribe: (subscriber: any) => void
