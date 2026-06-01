@@ -5,7 +5,7 @@ import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { StructureComp, type StructureCompProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
-import BuildPanel from "./gameGui/buildPanel/buildPanel";
+import BuildPanel, { type BuildType } from "./gameGui/buildPanel/buildPanel";
 import { Background } from "./background";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 import { useAuth, useGame, useMatchRepository } from "@/contexts/contexts";
@@ -121,7 +121,7 @@ const GameField: React.FC<GameFieldProps> = () => {
   const structures: Structure[] = useStructures();
 
   // Build panel states
-  const [selectedBuildType, setSelectedBuildType] = useState<string | null>(null);
+  const [selectedBuildType, setSelectedBuildType] = useState<BuildType>(null);
   const [showAllHitboxes, setShowAllHitboxes] = useState<boolean>(false);
   const isMyTurn = useIsMyTurn(); // You need to import this hook if not already imported
 
@@ -215,7 +215,7 @@ const GameField: React.FC<GameFieldProps> = () => {
         };
       }),
     ]);
-  }, [structures]);
+  }, [structures, cornerMap, edgeMap, disabledCorners, disabledEdges]);
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -359,6 +359,14 @@ const GameField: React.FC<GameFieldProps> = () => {
 
   return (
     <div ref={containerRef} className="full-page-container">
+      {/* Build Panel - appears only during player's turn */}
+      <BuildPanel
+        isMyTurn={isMyTurn}
+        selectedBuildType={selectedBuildType}
+        onSelectBuildType={setSelectedBuildType}
+        onShowHitboxes={setShowAllHitboxes}
+        showHitboxes={showAllHitboxes}
+      />
       <Stage
         width={dimensions.width}
         height={dimensions.height}
