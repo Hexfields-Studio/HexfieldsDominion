@@ -135,7 +135,7 @@ const Lobby = () => {
       <OptionsButton/>
 
       <div style={{ textAlign: "left", margin: "2em 0em 0em 2em" }}>
-        <img className="logo" src="../public/logo_big.png" alt="Logo" style={{ width: "10em", height: "auto" }} />
+        <img className="logo" src={`${import.meta.env.BASE_URL}logo_big.png`} alt="Logo" style={{ width: "10em", height: "auto" }} />
       </div>
 
       <h1>Lobby</h1>
