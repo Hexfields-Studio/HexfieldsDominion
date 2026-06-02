@@ -1,36 +1,33 @@
 import { resources, type PlayerResources } from "@/repository/MatchRepository";
 import styles from "./RessourceDisplay.module.scss";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import TradeWithBankDialog, { type TradeWithBankDialogHandle } from "../tradingDialog/TradeWithBankDialog";
+import { useEffect, useState } from "react";
 import { HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT } from "@/constants/constants";
+import TradeBankOrAllButton from "../tradingDialog/TradeBankOrAllButton";
+import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
+import { useGame } from "@/contexts/contexts";
 
 type ResourceType = "WOOD" | "BRICK" | "WHEAT" | "SHEEP";
 
-export interface ResourceDisplayHandle {
-  queueGrantedResources: (grantedResources: PlayerResources) => void;
-}
-
-const RessourceDisplay = forwardRef<ResourceDisplayHandle>((props, ref) => {
+const RessourceDisplay = () => {
   const myRessources: PlayerResources | undefined = useMyRessources();
+  const isMyTurn = useIsMyTurn();
+  const { showGrantedResourcesActionRef } = useGame();
 
   const [grantedResources, setGrantedResources] = useState<PlayerResources | null>(null);
   const [hideTimer, setHideTimer] = useState<number | null>(null);
-  const tradingDialogRef = useRef<TradeWithBankDialogHandle | null>(null);
-
-  useImperativeHandle(ref, () => ({
-    queueGrantedResources,
-  }));
-
-  const queueGrantedResources = (grantedResources: PlayerResources) => {
-    if (hideTimer !== null) {
-      clearTimeout(hideTimer);
-    }
-    setHideTimer(setTimeout(hideGrantedResources, HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT));
-    setGrantedResources(grantedResources);
-  };
 
   const hideGrantedResources = () => setGrantedResources(null);
+
+  useEffect(() => {
+    showGrantedResourcesActionRef.current = ((grantedResources: PlayerResources) => {
+      if (hideTimer !== null) {
+        clearTimeout(hideTimer);
+      }
+      setHideTimer(setTimeout(hideGrantedResources, HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT));
+      setGrantedResources(grantedResources);
+    });
+  }, []);
 
   const isResourceGranted = (resource: ResourceType) => {
     return grantedResources !== null && grantedResources[resource] !== undefined;
@@ -38,7 +35,6 @@ const RessourceDisplay = forwardRef<ResourceDisplayHandle>((props, ref) => {
 
   return (
     <>
-      <TradeWithBankDialog ref={tradingDialogRef} setGrantedResources={queueGrantedResources}/>
       {
         myRessources && (
           <div className={styles.ressourceDisplayLayout}>
@@ -53,15 +49,15 @@ const RessourceDisplay = forwardRef<ResourceDisplayHandle>((props, ref) => {
                 </div>
               </div>,
             )}
-            <button className={styles.bankButton} onClick={() => tradingDialogRef.current?.open()}>
-              <img src={`${import.meta.env.BASE_URL}ressources/bank.png`}></img>
-            </button>
+            { isMyTurn &&
+              <TradeBankOrAllButton className={styles.bankButton}/>
+            }
           </div>
         )
       }
     </>
   );
-});
+};
 RessourceDisplay.displayName = "RessourceDisplay";
 
 export default RessourceDisplay;

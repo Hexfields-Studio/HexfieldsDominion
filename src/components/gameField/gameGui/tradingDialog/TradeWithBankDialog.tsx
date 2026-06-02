@@ -12,20 +12,14 @@ const TRADE_GET_AMOUNT = 1;
 
 type ResourceType = "WOOD" | "BRICK" | "WHEAT" | "SHEEP";
 
-type TradeWithBankDialogProps = {
-  setGrantedResources: (grantedResources: PlayerResources) => void;
-}
-
 export interface TradeWithBankDialogHandle {
   open: () => void;
 }
 
-const TradeWithBankDialog = forwardRef<TradeWithBankDialogHandle, TradeWithBankDialogProps>((props, ref) => {
-  const { setGrantedResources } = props;
-
+const TradeWithBankDialog = forwardRef<TradeWithBankDialogHandle>((props, ref) => {
   const myRessources: PlayerResources | undefined = useMyRessources();
   const { fetchWithAuth } = useAuth();
-  const { uuid } = useGame();
+  const { uuid, showGrantedResources } = useGame();
   const { isError, openErrorDialogIfMessage, errorDialog } = useError();
 
   const [selectedResourceGive, setSelectedResourceGive] = useState<ResourceType | null>(null);
@@ -56,7 +50,7 @@ const TradeWithBankDialog = forwardRef<TradeWithBankDialogHandle, TradeWithBankD
       return;
     }
     dialogRef.current?.closeDialog();
-    setGrantedResources({
+    showGrantedResources({
       "BRICK": getGrantedAmount("BRICK"),
       "SHEEP": getGrantedAmount("SHEEP"),
       "WHEAT": getGrantedAmount("WHEAT"),

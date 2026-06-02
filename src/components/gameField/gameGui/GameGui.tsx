@@ -1,6 +1,6 @@
 import { Layer } from "react-konva";
 import PlayerLineupDisplay from "@/components/gameField/gameGui/playerLineupDisplay/PlayerLineupDisplay";
-import RessourceDisplay, { type ResourceDisplayHandle } from "@/components/gameField/gameGui/ressourceDisplay/RessourceDisplay";
+import RessourceDisplay from "@/components/gameField/gameGui/ressourceDisplay/RessourceDisplay";
 import EndTurnButtonDisplay from "@/components/gameField/gameGui/endTurnButtonDisplay/EndTurnButtonDisplay";
 import styles from "./GameGui.module.scss";
 import { Html } from "react-konva-utils";
@@ -21,7 +21,7 @@ const GameGui: React.FC = () => {
 
   const navi = useNavigate();
   const { fetchWithAuth } = useAuth();
-  const { uuid } = useGame();
+  const { uuid, showGrantedResources } = useGame();
   const { repository } = useMatchRepository();
   const isMyTurn = useIsMyTurn();
   const currentDiceResult = useCurrentDiceResult();
@@ -36,7 +36,6 @@ const GameGui: React.FC = () => {
 
   const dicesDialogRef = useRef<DialogHandle | null>(null);
   const winnerDialogRef = useRef<DialogHandle | null>(null);
-  const resourceDisplayRef = useRef<ResourceDisplayHandle | null>(null);
 
   useSseListeners(useMemo(() => [
     {
@@ -53,14 +52,14 @@ const GameGui: React.FC = () => {
     fetchWithAuth(`/games/${uuid}/rollDice`, "POST");
   };
 
-  const showGrantedResources = async () => {
+  const getAndShowGrantedResources = async () => {
     const response = await fetchWithAuth(`/games/${uuid}/grantedResources`, "GET");
     if (response?.status === 204) {
       return;
     }
     const responseJson = await response?.json();
 
-    resourceDisplayRef.current?.queueGrantedResources(responseJson);
+    showGrantedResources(responseJson);
   };
 
   const isNotShowingDialog = useCallback(() => {
@@ -82,12 +81,12 @@ const GameGui: React.FC = () => {
         setTimeout(() => {
           dicesDialogRef.current?.closeDialog();
           setHideBoxedDices(false);
-          showGrantedResources();
+          getAndShowGrantedResources();
         }, HIGHLIGHT_DICE_ANIMATION_TIMEOUT);
       }
       : () => {
         setTimeout(() => {
-          showGrantedResources();
+          getAndShowGrantedResources();
         }, DICE_ANIMATION_DURATION);
       };
   }, [isMyTurn]);
@@ -125,7 +124,7 @@ const GameGui: React.FC = () => {
         </Dialog>
         <div className={styles["gui__flexboxes"]}>
           <PlayerLineupDisplay/>
-          <RessourceDisplay ref={resourceDisplayRef}/>
+          <RessourceDisplay/>
           <EndTurnButtonDisplay animationTrigger={animationTrigger} hideBoxedDices={hideBoxedDices}/>
         </div>
       </Html>

@@ -1,4 +1,4 @@
-import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, Structure } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, PlayerTrade, Structure } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
@@ -6,6 +6,7 @@ class InMemoryMatchRepository implements MatchRepository{
   matchData: MatchData | undefined;
   fields: Field[] = [];
   structures: Structure[] = [];
+  playerTrades: PlayerTrade[] = [];
 
   setFields = (fields: Field[]) => {
     this.fields = fields;
@@ -18,6 +19,12 @@ class InMemoryMatchRepository implements MatchRepository{
   };
 
   getStructures = () => this.structures;
+
+  setPlayerTrades = (playerTrades: PlayerTrade[]) => {
+	  this.playerTrades = playerTrades;
+  };
+
+  getPlayerTrades = () => this.playerTrades;
 
   /* useSyncExternalStore setup */
   subscribe = (listener: any) => {

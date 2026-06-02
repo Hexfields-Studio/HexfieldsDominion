@@ -36,6 +36,23 @@ export type Structure = {
 	recipe: any
 }
 
+export type TradingStatus = "OFFERED" | "CHANGED" | "ACCEPTED" | "DENIED" | "CANCELLED";
+
+export type TradingTarget = {
+  allPlayers: boolean,
+  playerId?: number | undefined
+}
+
+export type PlayerTrade = {
+  id: number,
+  predecessorId?: number,
+  status: TradingStatus,
+  target: TradingTarget,
+  createdBy: number,
+  offered: PlayerResources,
+  requested: PlayerResources,
+}
+
 export type MatchData = {
     playerCurrentTurn: number,
     players: PlayerRepresentation[],
@@ -55,6 +72,8 @@ export interface MatchRepository{
     getFields: () => Field[]
     setStructures: (structures: Structure[]) => void
     getStructures: () => Structure[]
+    setPlayerTrades: (playerTrades: PlayerTrade[]) => void
+    getPlayerTrades: () => PlayerTrade[]
     getMyPublicId: () => number | undefined
     getMyRessources: () => PlayerResources | undefined
     isItMyTurn: () => boolean
