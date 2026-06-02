@@ -418,7 +418,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                 fillLinearGradientEndPoint={{ x: 20, y: 20 }}
                 fillLinearGradientColorStops={[0, "turquoise", 1, "blue"]}
                 onClick={()=>{
-                  if (isDisabled) return;
+                  //if (isDisabled) return;
                   const sendBuildRequest = async () => {
                     const pos: {q: number, r: number}[] = [];
                     for (let adjacentHex of corner.adjacentHexes){
@@ -426,7 +426,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                     }
                     await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
                       type: "BUILD",
-                      structureType: "SETTLEMENT",
+                      structureType: !isDisabled ? "SETTLEMENT" : "TOWN",
                       pos: pos
                     }));
                   }

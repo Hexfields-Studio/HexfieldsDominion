@@ -13,6 +13,7 @@
     "test": "echo 'No tests implemented' && exit 0"
   },
   "dependencies": {
+    "js-confetti": "^0.13.1",
     "jwt-decode": "^4.0.0",
     "konva": "^10.3.0",
     "react": "^19.2.6",
