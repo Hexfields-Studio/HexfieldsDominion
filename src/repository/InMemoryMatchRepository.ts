@@ -1,12 +1,19 @@
-import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, Structure, PlayerHueMap } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, Structure, PlayerHueMap, Recipes } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
   subscribers: any[] = [];
   matchData: MatchData | undefined;
+  recipes: Recipes | undefined;
   fields: Field[] = [];
   structures: Structure[] = [];
   playerHueMap: PlayerHueMap = new Map<number, number>();
+
+  setRecipes = (recipes: Recipes) => {
+    this.recipes = recipes;
+  }
+
+  getRecipes = (): Recipes | undefined => this.recipes;
 
   setFields = (fields: Field[]) => {
     this.fields = fields;
@@ -37,15 +44,6 @@ class InMemoryMatchRepository implements MatchRepository{
       this.structures.find(old => old.pos.map(h => `${h.q},${h.r}`).sort().join("|") === structure.pos.map(h => `${h.q},${h.r}`).sort().join("|") && old.type === structure.type)
       ?? ({...structure, rotation: Math.random() * 20 - 10} as Structure)
     )
-
-    console.log(this.structures.length)
-
-    //const newStructures: Structure[] =  matchData.structures
-    //    .filter(structure => !this.structures.find(old => old.pos.map(h => `${h.q},${h.r}`).sort().join("|") === structure.pos.map(h => `${h.q},${h.r}`).sort().join("|") && old.type !== structure.type))
-    //    .map(structure => ({...structure, rotation: Math.random() * 20 - 10} as Structure))
-
-    //this.structures = [...this.structures, ...newStructures];
-     //= matchData.structures.map(structure => ({...structure, rotation: Math.random() * 20 - 10} as Structure));
     const hueMap = new Map<number, number>();
     matchData.players.forEach(player => {
       hueMap.set(player.publicId, player.playerHue);
@@ -64,7 +62,7 @@ class InMemoryMatchRepository implements MatchRepository{
   };
 
   getMyRessources = (): PlayerResources | undefined => {
-    return this.matchData?.players.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.resources;
+    return this.matchData?.players.find(player => player.publicId === this.getMyPublicId())?.resources;
   };
 
   isItMyTurn = (): boolean => {

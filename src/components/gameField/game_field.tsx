@@ -10,11 +10,13 @@ import { Background } from "./background";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 import { useAuth, useGame, useMatchRepository } from "@/contexts/contexts";
 import { useFields } from "@/hooks/matchHooks/useFields";
-import type { AxialPosition, Field, MatchData, Structure, StructureType } from "@/repository/MatchRepository";
+import type { AxialPosition, Field, MatchData, resources, Structure, StructureType } from "@/repository/MatchRepository";
 import { useStructures } from "@/hooks/matchHooks/useStructures";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import { usePlayerHueMap } from "@/hooks/matchHooks/usePlayerHueMap";
 import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
+import { useRecipes } from "@/hooks/matchHooks/useRecipes";
+import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
 
 const radius: number = 100;
 
@@ -126,20 +128,22 @@ interface GameFieldProps {
 }
 
 const GameField: React.FC<GameFieldProps> = () => {
+  // subscriptions
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
   const myPublicId = useMyPublicId();
-
-  // subscriptions
+  const recipes = useRecipes();
+  const myResources = useMyRessources();
   const { repository } = useMatchRepository();
   const fields: Field[] = useFields();
   const structures: Structure[] = useStructures();
   const playerHueMap: Map<number, number> = usePlayerHueMap();
+  const isMyTurn = useIsMyTurn();
 
   // Build panel states
   const [selectedBuildType, setSelectedBuildType] = useState<BuildType>(null);
   const [showAllHitboxes, setShowAllHitboxes] = useState<boolean>(false);
-  const isMyTurn = useIsMyTurn();
+  const [disabledBuildButtons, setDisabledBuildButtons] = useState<Map<StructureType, boolean>>(new Map());
 
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [cornerMap, setCornerMap] = useState<Map<string, Corner>>(new Map<string, Corner>());
@@ -180,8 +184,25 @@ const GameField: React.FC<GameFieldProps> = () => {
   ], [repository]));
 
   useEffect(()=>{
-    setShowAllHitboxes(false);
+    if (!isMyTurn) setShowAllHitboxes(false);
   }, [isMyTurn]);
+
+  useEffect(()=>{
+    if (!recipes || !myResources) return;
+
+    const newDisabledBuildButtonsMap = new Map<StructureType, boolean>();
+    for(const structure of Object.keys(recipes) as StructureType[]){
+      let isDisabled = false;
+      for(const resource of Object.keys(recipes[structure]) as typeof resources[number][]){
+        if(!myResources[resource] || myResources[resource] < recipes[structure][resource]) {
+          isDisabled = true;
+          break;
+        }
+      }
+      newDisabledBuildButtonsMap.set(structure, isDisabled);
+    }
+    setDisabledBuildButtons(newDisabledBuildButtonsMap);
+  }, [myResources]);
 
   useEffect(()=>{
     if(structures.length === 0) return;
@@ -221,7 +242,6 @@ const GameField: React.FC<GameFieldProps> = () => {
 
         // Find the structure that occupies this edge
         const structure = findStructureByAdjacentHexes(structures, edge.adjacentHexes) as Structure;
-        if(!structure) console.log();
         return {
           type: structure.type,
           ownerId: structure.ownerId,
@@ -410,6 +430,7 @@ const GameField: React.FC<GameFieldProps> = () => {
       {/*TODO: REFACTOR THIS, IT SHOULD BE INSIDE THE GUI COMPONENT*/}
       <BuildPanel
         isMyTurn={isMyTurn}
+        disabledButtons={disabledBuildButtons}
         selectedBuildType={selectedBuildType}
         onSelectBuildType={setSelectedBuildType}
         onShowHitboxes={setShowAllHitboxes}
@@ -482,8 +503,8 @@ const GameField: React.FC<GameFieldProps> = () => {
                 playerHue={structure.playerHue}
                 adjacentHexes={structure.adjacentHexes}
                 onClick={()=>{
-                  if(selectedBuildType !== "TOWN") return;
-                  sendBuildRequest(structure.adjacentHexes, "TOWN");
+                  if(selectedBuildType !== "STREET") return;
+                  sendBuildRequest(structure.adjacentHexes, "STREET");
                   setSelectedBuildType(null);
                 }}
               />

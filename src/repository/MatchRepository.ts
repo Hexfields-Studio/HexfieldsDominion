@@ -13,6 +13,8 @@ export type Field = {
 
 export type PlayerResources = Record<typeof resources[number], number>;
 
+export type Recipes = Record<StructureType, Record<typeof resources[number], number>>;
+
 // Keep in mind: This PlayerRepresentation is a simplified/untrue version of what the backend would actually send
 export type PlayerRepresentation = {
     username: string,
@@ -56,6 +58,8 @@ export interface MatchRepository{
     getMatchData: () => MatchData | undefined
     emitChange: () => void
     
+    setRecipes: (recipes: Recipes) => void
+    getRecipes: () => Recipes | undefined
     setFields: (fields: Field[]) => void
     getFields: () => Field[]
     setStructures: (structures: Structure[]) => void
