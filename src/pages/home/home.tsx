@@ -39,7 +39,7 @@ const HomePage = () => {
       <OptionsButton showLogOut={false}/>
 
       <div style={{ textAlign: "center", margin: "2em 0em 1em 0em" }}>
-        <img className="logo" src="logo_big.png" alt="Logo" style={{ width: "20em", height: "auto" }} />
+        <img className="logo" src={`${import.meta.env.BASE_URL}logo_big.png`} alt="Logo" style={{ width: "20em", height: "auto" }} />
       </div>
 
       <div className="boxed">
