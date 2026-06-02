@@ -13,6 +13,8 @@ export type Field = {
 
 export type PlayerResources = Record<typeof resources[number], number>;
 
+export type Recipes = Record<StructureType, Record<typeof resources[number], number>>;
+
 // Keep in mind: This PlayerRepresentation is a simplified/untrue version of what the backend would actually send
 export type PlayerRepresentation = {
     username: string,
@@ -23,7 +25,7 @@ export type PlayerRepresentation = {
     playerHue: number // hue value where 0 = #ff0000, 120 = #00ff00, 240 = #0000ff, etc.
 }
 
-export type StructureType = "TOWN" | "HARBOR" | "STREET";
+export type StructureType = "SETTLEMENT" | "TOWN" | "STREET";
 
 export type AxialPosition = {
 	q: number,
@@ -31,8 +33,9 @@ export type AxialPosition = {
 }
 
 export type Structure = {
+  rotation: number,
+  type: StructureType,
 	ownerId: number,
-	name: StructureType,
 	pos: AxialPosition[],
 	recipe: any
 }
@@ -55,6 +58,8 @@ export interface MatchRepository{
     getMatchData: () => MatchData | undefined
     emitChange: () => void
     
+    setRecipes: (recipes: Recipes) => void
+    getRecipes: () => Recipes | undefined
     setFields: (fields: Field[]) => void
     getFields: () => Field[]
     setStructures: (structures: Structure[]) => void

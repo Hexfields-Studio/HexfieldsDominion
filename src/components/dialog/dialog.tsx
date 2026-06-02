@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import "./dialog.css";
 import "@/index.css";
+import JSConfetti from 'js-confetti';
 
 interface DialogProps {
     title?: string;
@@ -10,6 +11,7 @@ interface DialogProps {
     closedBy?: "none" | "any";
     useDefaultStyling?: boolean;
     onClick?: () => void | undefined;
+    showConfetti?: boolean;
 }
 
 export interface DialogHandle {
@@ -26,10 +28,12 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     closedBy = "any",
     useDefaultStyling = true,
     onClick = undefined,
+    showConfetti = false,
   } = props;
 
   const [open, setOpen] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useImperativeHandle(ref, () => ({
     toggleDialog,
@@ -42,6 +46,19 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
     dialogRef.current?.showModal();
     setOpen(true);
   };
+
+  useEffect(()=>{
+    if (!canvasRef.current) return;
+    if (!showConfetti) return;
+    canvasRef.current.className = "confetti";
+    const jsConfetti = new JSConfetti({
+      canvas: canvasRef.current,
+    });
+    jsConfetti.addConfetti({
+      confettiRadius: 6,
+      confettiNumber: 500,
+    });
+  }, [showConfetti]);
 
   const closeDialog = useCallback(() => {
     dialogRef.current?.close();
@@ -62,6 +79,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
   return (
     <>
       <dialog className={`${useDefaultStyling ? "dialog" : "noBorderAndBackground"} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} onClick={onClick}>
+        {showConfetti && <canvas ref={canvasRef} width={"100%"} height={"100%"}></canvas>}
         {showHeader && (
           <div className="closeContainer">
             {headerTitle && (
