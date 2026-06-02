@@ -475,60 +475,41 @@ const GameField: React.FC<GameFieldProps> = () => {
           onMouseUp={()=>setIsDragging(false)}
           onMouseLeave={()=>setIsDragging(false)}
         >
-          <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
+          <Layer>
+            <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
 
-          <Coast key={"coast"} coastRadius={coastRadius}/>      
+            <Coast key={"coast"} coastRadius={coastRadius}/>      
 
-          {hexagons.map((hex, i) => (
-            <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
-          ))}
+            {hexagons.map((hex, i) => (
+              <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
+            ))}
 
-          {edges.map((edge, i) => {
-            const isDisabled: boolean = disabledEdges.has(edge.key);
-            return (!isDisabled && showAllHitboxes) && (
-              <Rect 
-                key={`edge-${i}`} x={edge.x} y={edge.y} 
-                width={edge.width} height={edge.height} 
-                offset={{ x: edge.width/2, y: edge.height/2 }} 
-                fill={"gold"} opacity={
-                  isDisabled ? 0.0 : 
-                    (selectedBuildType === "STREET" && showAllHitboxes ? 0.7 : 
-                      (showAllHitboxes ? 0.3 : 0.0))
-                }
-                rotation={edgeDirectionInDegrees[edge.direction]}
+            {edges.map((edge, i) => {
+              const isDisabled: boolean = disabledEdges.has(edge.key);
+              return (!isDisabled && showAllHitboxes) && (
+                <Rect 
+                  key={`edge-${i}`} x={edge.x} y={edge.y} 
+                  width={edge.width} height={edge.height} 
+                  offset={{ x: edge.width/2, y: edge.height/2 }} 
+                  fill={"gold"} opacity={
+                    isDisabled ? 0.0 : 
+                      (selectedBuildType === "STREET" && showAllHitboxes ? 0.7 : 
+                        (showAllHitboxes ? 0.3 : 0.0))
+                  }
+                  rotation={edgeDirectionInDegrees[edge.direction]}
 
-                onClick={()=>{
-                  if (isDisabled || selectedBuildType !== "STREET") return;
-                  sendBuildRequest(edge.adjacentHexes, "STREET");
-                  setSelectedBuildType(null);
-                }}/>
-            );
-          })}
+                  onClick={()=>{
+                    if (isDisabled || selectedBuildType !== "STREET") return;
+                    sendBuildRequest(edge.adjacentHexes, "STREET");
+                    setSelectedBuildType(null);
+                  }}/>
+              );
+            })}
 
-          {structureComps
-            .filter(structure => structure.type === "STREET")
-            .map((structure, i) => (
-            <StructureComp
-                type={structure.type}
-                ownerId={structure.ownerId}
-                key={`structure-${i}-structure`} x={structure.x} y={structure.y} rotation={structure.rotation} 
-                src={structure.src}
-                width={structure.width} height={structure.height} scale={structure.scale}
-                playerHue={structure.playerHue}
-                adjacentHexes={structure.adjacentHexes}
-                onClick={()=>{
-                  if(selectedBuildType !== "STREET") return;
-                  sendBuildRequest(structure.adjacentHexes, "STREET");
-                  setSelectedBuildType(null);
-                }}
-              />
-          ))}
-
-          { (selectedBuildType === "TOWN" && showAllHitboxes) && 
-            structureComps
-              .filter(structure => structure.type === "SETTLEMENT" && structure.ownerId === myPublicId)
+            {structureComps
+              .filter(structure => structure.type === "STREET")
               .map((structure, i) => (
-                <StructureComp
+              <StructureComp
                   type={structure.type}
                   ownerId={structure.ownerId}
                   key={`structure-${i}-structure`} x={structure.x} y={structure.y} rotation={structure.rotation} 
@@ -537,32 +518,52 @@ const GameField: React.FC<GameFieldProps> = () => {
                   playerHue={structure.playerHue}
                   adjacentHexes={structure.adjacentHexes}
                   onClick={()=>{
-                    if(selectedBuildType !== "TOWN") return;
-                    sendBuildRequest(structure.adjacentHexes, "TOWN");
+                    if(selectedBuildType !== "STREET") return;
+                    sendBuildRequest(structure.adjacentHexes, "STREET");
                     setSelectedBuildType(null);
                   }}
                 />
-              ))}
+            ))}
 
-            {corners.map(corner => {
-              const isDisabled: boolean = disabledCorners.has(corner.key);
-              return (!isDisabled && showAllHitboxes) && (
-                <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} 
-                  opacity={
-                    isDisabled ? 0.0 : 
-                      (selectedBuildType === "SETTLEMENT" && showAllHitboxes ? 0.8 : 
-                        (showAllHitboxes ? 0.4 : 0.0))
-                  }
-                  fillLinearGradientStartPoint={{ x: -20, y: -20 }}
-                  fillLinearGradientEndPoint={{ x: 20, y: 20 }}
-                  fillLinearGradientColorStops={[0, "turquoise", 1, "blue"]}
-                  onClick={()=>{
-                    if (isDisabled || selectedBuildType !== "SETTLEMENT") return;
-                    sendBuildRequest(corner.adjacentHexes, "SETTLEMENT");
-                    setSelectedBuildType(null);
-                  }}/>
-              );
-            })}
+            { (selectedBuildType === "TOWN" && showAllHitboxes) && 
+              structureComps
+                .filter(structure => structure.type === "SETTLEMENT" && structure.ownerId === myPublicId)
+                .map((structure, i) => (
+                  <StructureComp
+                    type={structure.type}
+                    ownerId={structure.ownerId}
+                    key={`structure-${i}-structure`} x={structure.x} y={structure.y} rotation={structure.rotation} 
+                    src={structure.src}
+                    width={structure.width} height={structure.height} scale={structure.scale}
+                    playerHue={structure.playerHue}
+                    adjacentHexes={structure.adjacentHexes}
+                    onClick={()=>{
+                      if(selectedBuildType !== "TOWN") return;
+                      sendBuildRequest(structure.adjacentHexes, "TOWN");
+                      setSelectedBuildType(null);
+                    }}
+                  />
+                ))}
+
+              {corners.map(corner => {
+                const isDisabled: boolean = disabledCorners.has(corner.key);
+                return (!isDisabled && showAllHitboxes) && (
+                  <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} 
+                    opacity={
+                      isDisabled ? 0.0 : 
+                        (selectedBuildType === "SETTLEMENT" && showAllHitboxes ? 0.8 : 
+                          (showAllHitboxes ? 0.4 : 0.0))
+                    }
+                    fillLinearGradientStartPoint={{ x: -20, y: -20 }}
+                    fillLinearGradientEndPoint={{ x: 20, y: 20 }}
+                    fillLinearGradientColorStops={[0, "turquoise", 1, "blue"]}
+                    onClick={()=>{
+                      if (isDisabled || selectedBuildType !== "SETTLEMENT") return;
+                      sendBuildRequest(corner.adjacentHexes, "SETTLEMENT");
+                      setSelectedBuildType(null);
+                    }}/>
+                );
+              })}
           </Layer>
           <GameGui/>
         </Stage>
