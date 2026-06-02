@@ -1,9 +1,10 @@
 import { useCurrentDiceResult } from "@/hooks/matchHooks/useCurrentDiceResult";
 import Dice, { type DiceSide } from "./Dice";
+import type { RefObject } from "react";
 
 type DiceContainerProps = {
     className: string;
-    animationTrigger: number;
+    animationTrigger: RefObject<number>;
     currentDiceSide: DiceSide;
 }
 

@@ -1,4 +1,4 @@
-import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, Structure, PlayerHueMap, Recipes } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, PlayerTrade, Structure, PlayerHueMap, Recipes } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
@@ -7,11 +7,12 @@ class InMemoryMatchRepository implements MatchRepository{
   recipes: Recipes | undefined;
   fields: Field[] = [];
   structures: Structure[] = [];
+  playerTrades: PlayerTrade[] = [];
   playerHueMap: PlayerHueMap = new Map<number, number>();
 
   setRecipes = (recipes: Recipes) => {
     this.recipes = recipes;
-  }
+  };
 
   getRecipes = (): Recipes | undefined => this.recipes;
 
@@ -26,6 +27,12 @@ class InMemoryMatchRepository implements MatchRepository{
   };
 
   getStructures = () => this.structures;
+
+  setPlayerTrades = (playerTrades: PlayerTrade[]) => {
+	  this.playerTrades = playerTrades;
+  };
+
+  getPlayerTrades = () => this.playerTrades;
 
   /* useSyncExternalStore setup */
   subscribe = (listener: any) => {
@@ -42,8 +49,8 @@ class InMemoryMatchRepository implements MatchRepository{
 
     this.structures = matchData.structures.map(structure =>
       this.structures.find(old => old.pos.map(h => `${h.q},${h.r}`).sort().join("|") === structure.pos.map(h => `${h.q},${h.r}`).sort().join("|") && old.type === structure.type)
-      ?? ({...structure, rotation: Math.random() * 20 - 10} as Structure)
-    )
+      ?? ({ ...structure, rotation: Math.random() * 20 - 10 } as Structure),
+    );
     const hueMap = new Map<number, number>();
     matchData.players.forEach(player => {
       hueMap.set(player.publicId, player.playerHue);

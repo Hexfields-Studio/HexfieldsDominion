@@ -68,19 +68,22 @@ const StartMenu = () => {
       
       <OptionsButton/>
 
-      <h1>Start Menu</h1>
+      <div style={{ textAlign: "center", margin: "2em 0em 1em 0em" }}>
+        <img className="logo" src={`${import.meta.env.BASE_URL}logo_big.png`} alt="Logo" style={{ width: "20em", height: "auto" }} />
+      </div>
+
 
       {/* Center box */}
       <div className="boxed">
-        <div className="center-row mb-12">
-          <button onClick={createLobby}>Create Lobby</button>
-        </div>
 
-        <div className="center-row mb-12">
+        <h2>Start Menu</h2>
+
+        <div className="center-row">
+          <button onClick={createLobby}>Create Lobby</button>
           <button onClick={() => dialogEnterLobbycodeRef.current?.toggleDialog()}>Join Lobby</button>
         </div>
 
-        <div style={{ marginTop: 8 }}>
+        <div style={{ marginTop: 20 }}>
           Last Lobby Code: <strong>{lobbyCode ? lobbyCode : "None"}</strong>
         </div>
       </div>

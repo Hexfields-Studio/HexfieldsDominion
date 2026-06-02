@@ -1,7 +1,10 @@
-[![CI/CD Pipeline](https://github.com/Hexfields-Studio/HexfieldsDominion/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Hexfields-Studio/HexfieldsDominion/actions/workflows/ci-cd.yml)
-# 🎮 Hexfields: Dominion
+<p align="center">
+    <img src="./public/logo_big.png" alt="Hexfields: Dominion Logo" width="300" height="auto" />
+    <br />
+    <img src="https://github.com/Hexfields-Studio/HexfieldsDominion/actions/workflows/ci-cd.yml/badge.svg" alt="Pipeline Badge" />
+</p>
 
-This is the frontend for our game **Hexfields: Dominion**, an alternative to Settlers of Catan.
+This is the frontend for our game **Hexfields: Dominion**, an online alternative to the board game *The Settlers of Catan*.
 
 Players are supposed to access this via the browser. This code is not meant for installation, rather just for development and deployment.
 

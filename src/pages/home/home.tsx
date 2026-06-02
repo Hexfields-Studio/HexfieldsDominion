@@ -38,10 +38,14 @@ const HomePage = () => {
       
       <OptionsButton showLogOut={false}/>
 
-      <h1>Home Page</h1>
+      <div style={{ textAlign: "center", margin: "2em 0em 1em 0em" }}>
+        <img className="logo" src={`${import.meta.env.BASE_URL}logo_big.png`} alt="Logo" style={{ width: "20em", height: "auto" }} />
+      </div>
 
       <div className="boxed">
         {/* Username + Password */}
+        <h2 style={{ textAlign: "center" }}>Sign in</h2>
+
         <label className="field-full">
           Username
           <br />
@@ -75,6 +79,13 @@ const HomePage = () => {
           </button>
         </div>
 
+        {/* Password forgotten */}
+        <div className="form-row small">
+          <button onClick={() => alert("Password recovery not implemented yet. \n\nIf issues persist, contact us on GitHub: \ngithub.com/Hexfields-Studio")}>
+            Forgotten password
+          </button>
+        </div>
+
         {/* Guest login */}
         <div className="form-row small row-seperated">
           <button onClick={handlePlayAsGuest}>
@@ -82,12 +93,6 @@ const HomePage = () => {
           </button>
         </div>
 
-        {/* Password forgotten */}
-        <div className="form-row small row-seperated">
-          <button>
-            Forgotten password
-          </button>
-        </div>
       </div>
     </>
   );
