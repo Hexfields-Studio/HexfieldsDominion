@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./BuildPanel.module.scss";
+import styles from "./buildPanel.module.scss";
 
 export type BuildType = "SETTLEMENT" | "STREET" | "TOWN" | null;
 
