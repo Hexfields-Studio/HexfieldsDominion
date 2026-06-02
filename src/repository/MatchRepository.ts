@@ -31,8 +31,9 @@ export type AxialPosition = {
 }
 
 export type Structure = {
+  rotation: number,
+  type: StructureType,
 	ownerId: number,
-	name: StructureType,
 	pos: AxialPosition[],
 	recipe: any
 }

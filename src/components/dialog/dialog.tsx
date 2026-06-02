@@ -79,7 +79,7 @@ const Dialog = forwardRef<DialogHandle, DialogProps>((props, ref) => {
   return (
     <>
       <dialog className={`${useDefaultStyling ? "dialog" : "noBorderAndBackground"} ${errorMessage ? "errorDialog" : ""}`} ref={dialogRef} onClick={onClick}>
-        {<canvas ref={canvasRef} width={"100%"} height={"100%"}></canvas>}
+        {showConfetti && <canvas ref={canvasRef} width={"100%"} height={"100%"}></canvas>}
         {showHeader && (
           <div className="closeContainer">
             {headerTitle && (

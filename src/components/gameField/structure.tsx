@@ -1,4 +1,4 @@
-import type { StructureType } from "@/repository/MatchRepository";
+import type { AxialPosition, StructureType } from "@/repository/MatchRepository";
 import { useEffect, useState, useRef } from "react";
 import { Image as KonvaImage } from "react-konva";
 import Konva from "konva";
@@ -7,16 +7,18 @@ export interface StructureCompProps {
     type: StructureType
     x: number;
     y: number;
-    rotation: number; // degrees
+    rotation?: number; // degrees
     src: string;
     width?: number;
     height?: number;
     scale?: number;
     playerHue?: number; // Hue value (0-360)
+    onClick?: ()=>void;
+    adjacentHexes: AxialPosition[];
 }
 
 export const StructureComp: React.FC<StructureCompProps> =
-    ({ x, y, rotation, src, width = 48, height = 32, scale = 1, playerHue }) => {
+    ({ x, y, rotation = 0, src, width = 48, height = 32, scale = 1, playerHue, onClick = ()=>{}}) => {
       const [img, setImg] = useState<HTMLImageElement | null>(null);
       const imageRef = useRef<Konva.Image>(null);
 
@@ -59,7 +61,7 @@ export const StructureComp: React.FC<StructureCompProps> =
           height={height}
           scaleX={scale}
           scaleY={scale}
-          listening
+          onClick={onClick}
         />
       );
     };

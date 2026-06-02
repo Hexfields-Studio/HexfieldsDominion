@@ -32,7 +32,20 @@ class InMemoryMatchRepository implements MatchRepository{
 
   setMatchData = (matchData: MatchData) => {
     this.matchData = matchData;
-    this.structures = matchData.structures;
+
+    this.structures = matchData.structures.map(structure =>
+      this.structures.find(old => old.pos.map(h => `${h.q},${h.r}`).sort().join("|") === structure.pos.map(h => `${h.q},${h.r}`).sort().join("|") && old.type === structure.type)
+      ?? ({...structure, rotation: Math.random() * 20 - 10} as Structure)
+    )
+
+    console.log(this.structures.length)
+
+    //const newStructures: Structure[] =  matchData.structures
+    //    .filter(structure => !this.structures.find(old => old.pos.map(h => `${h.q},${h.r}`).sort().join("|") === structure.pos.map(h => `${h.q},${h.r}`).sort().join("|") && old.type !== structure.type))
+    //    .map(structure => ({...structure, rotation: Math.random() * 20 - 10} as Structure))
+
+    //this.structures = [...this.structures, ...newStructures];
+     //= matchData.structures.map(structure => ({...structure, rotation: Math.random() * 20 - 10} as Structure));
     const hueMap = new Map<number, number>();
     matchData.players.forEach(player => {
       hueMap.set(player.publicId, player.playerHue);

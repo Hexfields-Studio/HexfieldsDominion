@@ -17,7 +17,6 @@ import type { PlayerResources } from "@/repository/MatchRepository";
 import { useWinner } from "@/hooks/matchHooks/useWinner";
 import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
 import { useNavigate } from "react-router";
-import JSConfetti from "js-confetti";
 
 const GameGui: React.FC = () => {
 
