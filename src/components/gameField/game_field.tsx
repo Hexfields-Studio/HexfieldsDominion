@@ -18,6 +18,7 @@ import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
 import { useRecipes } from "@/hooks/matchHooks/useRecipes";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
 import { useError } from "@/hooks/useError";
+import { Coast } from "./coast";
 
 const radius: number = 100;
 
@@ -154,6 +155,7 @@ const GameField: React.FC<GameFieldProps> = () => {
   const [edgeMap, setEdgeMap] = useState<Map<string, Edge>>(new Map<string, Edge>());
   const [edges, setEdges] = useState<Edge[]>([]);
   const [disabledEdges, setDisabledEdges] = useState<Set<string>>(new Set());
+  const [coastRadius, setCoastRadius] = useState<number>(0);
 
   const [structureComps, setStructureComps] = useState<StructureCompProps[]>([]);
 
@@ -338,6 +340,11 @@ const GameField: React.FC<GameFieldProps> = () => {
       const y = r * (3/2) * radius;
       newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip !== 0 ? field.numberChip.toString() : "", resource: field.resource });
     });
+
+    const centerToEdgeRadius = (Math.sqrt(3)/2) * radius;
+    const times = (Math.round((1 + Math.sqrt(1 + (4 * fields.length) / 3))/2) - 1);
+    const r = times * (centerToEdgeRadius * 2) + centerToEdgeRadius - 25;
+    setCoastRadius(r);
   }, [fields]);
 
   useEffect(()=>{
@@ -471,6 +478,7 @@ const GameField: React.FC<GameFieldProps> = () => {
             imageSmoothingEnabled={false}
           >
             <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
+            <Coast key={"coast"} coastRadius={coastRadius}/>
             {hexagons.map((hex, i) => (
               <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
             ))}
