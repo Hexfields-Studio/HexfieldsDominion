@@ -4,7 +4,8 @@ import { Image as KonvaImage } from "react-konva";
 import Konva from "konva";
 
 export interface StructureCompProps {
-    type: StructureType
+    type: StructureType;
+    ownerId: number;
     x: number;
     y: number;
     rotation?: number; // degrees

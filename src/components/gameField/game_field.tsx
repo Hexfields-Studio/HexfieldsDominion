@@ -14,6 +14,7 @@ import type { AxialPosition, Field, MatchData, Structure, StructureType } from "
 import { useStructures } from "@/hooks/matchHooks/useStructures";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import { usePlayerHueMap } from "@/hooks/matchHooks/usePlayerHueMap";
+import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
 
 const radius: number = 100;
 
@@ -127,6 +128,7 @@ interface GameFieldProps {
 const GameField: React.FC<GameFieldProps> = () => {
   const { fetchWithAuth } = useAuth();
   const { uuid } = useGame();
+  const myPublicId = useMyPublicId();
 
   // subscriptions
   const { repository } = useMatchRepository();
@@ -178,6 +180,10 @@ const GameField: React.FC<GameFieldProps> = () => {
   ], [repository]));
 
   useEffect(()=>{
+    setShowAllHitboxes(false);
+  }, [isMyTurn]);
+
+  useEffect(()=>{
     if(structures.length === 0) return;
 
     const newCorners: Corner[] = [];
@@ -218,6 +224,7 @@ const GameField: React.FC<GameFieldProps> = () => {
         if(!structure) console.log();
         return {
           type: structure.type,
+          ownerId: structure.ownerId,
           x: edge.x,
           y: edge.y,
           adjacentHexes: structure.pos,
@@ -235,6 +242,7 @@ const GameField: React.FC<GameFieldProps> = () => {
         const structure = findStructureByAdjacentHexes(structures, corner.adjacentHexes) as Structure;
         return {
           type: structure.type,
+          ownerId: structure.ownerId,
           x: corner.x,
           y: corner.y,
           adjacentHexes: structure.pos,
@@ -462,9 +470,44 @@ const GameField: React.FC<GameFieldProps> = () => {
             );
           })}
 
-          {structureComps.map((structure, i) => (
+          {structureComps
+            .filter(structure => structure.type === "STREET")
+            .map((structure, i) => (
             <StructureComp
                 type={structure.type}
+                ownerId={structure.ownerId}
+                key={`structure-${i}-structure`} x={structure.x} y={structure.y} rotation={structure.rotation} 
+                src={structure.src}
+                width={structure.width} height={structure.height} scale={structure.scale}
+                playerHue={structure.playerHue}
+                adjacentHexes={structure.adjacentHexes}
+                onClick={()=>{
+                  if(selectedBuildType !== "TOWN") return;
+                  sendBuildRequest(structure.adjacentHexes, "TOWN");
+                  setSelectedBuildType(null);
+                }}
+              />
+          ))}
+
+          { (selectedBuildType === "TOWN" && showAllHitboxes) && 
+            structureComps
+              .filter(structure => structure.type === "SETTLEMENT" && structure.ownerId === myPublicId)
+              .map((structure, i) => (
+              <Circle
+                  type={structure.type}
+                  key={`structure-${i}-circle`} x={structure.x} y={structure.y} radius={25}
+                  fill={"red"}
+                  opacity={0.8}
+                />
+            ))
+          }
+
+          {structureComps
+            .filter(structure => structure.type !== "STREET")
+            .map((structure, i) => (
+            <StructureComp
+                type={structure.type}
+                ownerId={structure.ownerId}
                 key={`structure-${i}-structure`} x={structure.x} y={structure.y} rotation={structure.rotation} 
                 src={structure.src}
                 width={structure.width} height={structure.height} scale={structure.scale}
