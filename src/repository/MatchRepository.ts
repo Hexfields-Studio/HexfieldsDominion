@@ -22,7 +22,7 @@ export type PlayerRepresentation = {
     points: number
 }
 
-export type StructureType = "TOWN" | "HARBOR" | "STREET";
+export type StructureType = "SETTLEMENT" | "TOWN" | "STREET";
 
 export type AxialPosition = {
 	q: number,

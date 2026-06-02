@@ -196,7 +196,7 @@ const GameField: React.FC<GameFieldProps> = () => {
         }),
         ...newCorners.map(corner => {
             return {
-                type: "TOWN" as StructureType,
+                type: "SETTLEMENT" as StructureType,
                 x: corner.x,
                 y: corner.y,
                 rotation: 0,
@@ -426,7 +426,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                     }
                     await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
                       type: "BUILD",
-                      structureType: "TOWN",
+                      structureType: "SETTLEMENT",
                       pos: pos
                     }));
                   }

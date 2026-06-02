@@ -15,6 +15,7 @@ class InMemoryMatchRepository implements MatchRepository{
 
   setStructures = (structures: Structure[]) => {
 	  this.structures = structures;
+    console.log(structures);
   };
 
   getStructures = () => this.structures;
@@ -32,6 +33,7 @@ class InMemoryMatchRepository implements MatchRepository{
   setMatchData = (matchData: MatchData) => {
     this.matchData = matchData;
     this.structures = matchData.structures;
+    console.log(this.structures);
   };
 
   getMatchData = () => this.matchData;
