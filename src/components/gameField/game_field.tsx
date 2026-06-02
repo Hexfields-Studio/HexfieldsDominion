@@ -475,7 +475,13 @@ const GameField: React.FC<GameFieldProps> = () => {
           onMouseUp={()=>setIsDragging(false)}
           onMouseLeave={()=>setIsDragging(false)}
         >
-          <Layer>
+          <Layer
+            x={cameraOffset.x + dimensions.width / 2}
+            y={cameraOffset.y + dimensions.height / 2}
+            scaleX={scale}
+            scaleY={scale}
+            imageSmoothingEnabled={false}
+          >
             <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
 
             <Coast key={"coast"} coastRadius={coastRadius}/>      
