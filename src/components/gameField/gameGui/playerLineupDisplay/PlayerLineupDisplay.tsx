@@ -33,7 +33,10 @@ const PlayerLineupDisplay: React.FC = () => {
             key={player.username}
             onClick={() => openTradingPlayerDialog(player)}
             className={`${styles.playerPortrait} ${(player.publicId === currentPlayersTurn) ? styles.highlightPlayer : ""}`}
-            style={{ cursor: (isItMyTurn || (!isItMyTurn && player.publicId === currentPlayersTurn)) ? "pointer" : "not-allowed" }}
+            style={{
+              cursor: (isItMyTurn || (!isItMyTurn && player.publicId === currentPlayersTurn)) ? "pointer" : "not-allowed",
+              backgroundColor: `hsl(${player.playerHue}, 100%, 50%)`,
+            }}
             title={((!isItMyTurn && player.publicId !== currentPlayersTurn) ? "You can only trade with player current turn" : undefined)}>
             <span className={styles.playerName}>{`${(player.publicId === myPublicId) ? "YOU: " : ""}${player.username}`}</span>
             {/* TODO: might be a security risk to directly insert the provided portrait name into the path */}
