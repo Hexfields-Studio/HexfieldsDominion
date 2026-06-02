@@ -1,4 +1,4 @@
-import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, Structure } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, Structure, PlayerHueMap } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
@@ -6,6 +6,7 @@ class InMemoryMatchRepository implements MatchRepository{
   matchData: MatchData | undefined;
   fields: Field[] = [];
   structures: Structure[] = [];
+  playerHueMap: PlayerHueMap = new Map<number, number>();
 
   setFields = (fields: Field[]) => {
     this.fields = fields;
@@ -32,8 +33,12 @@ class InMemoryMatchRepository implements MatchRepository{
   setMatchData = (matchData: MatchData) => {
     this.matchData = matchData;
     this.structures = matchData.structures;
+    const hueMap = new Map<number, number>();
+    matchData.players.forEach(player => {
+      hueMap.set(player.publicId, player.playerHue);
+    });
+    this.playerHueMap = hueMap;
   };
-
   getMatchData = () => this.matchData;
 
   emitChange = (): void => {
@@ -77,6 +82,9 @@ class InMemoryMatchRepository implements MatchRepository{
   isRolledDiceThisTurn = (): boolean => this.matchData?.rolledDiceThisTurn ?? false;
 
   getWinner = (): PlayerRepresentation | null => this.matchData?.winner ?? null;
-}
 
+  getPlayerHueMap = () => this.playerHueMap;
+
+  setPlayerHueMap = (map: PlayerHueMap) => this.playerHueMap = map;
+}
 export default InMemoryMatchRepository;
