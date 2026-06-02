@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Circle, Layer, Rect, Stage } from "react-konva";
+import { Circle, Group, Image, Layer, Rect, Stage } from "react-konva";
 import "./game_field.scss";
 import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
@@ -17,6 +17,7 @@ import { usePlayerHueMap } from "@/hooks/matchHooks/usePlayerHueMap";
 import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
 import { useRecipes } from "@/hooks/matchHooks/useRecipes";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
+import { Coast } from "./coast";
 
 const radius: number = 100;
 
@@ -145,6 +146,8 @@ const GameField: React.FC<GameFieldProps> = () => {
   const [showAllHitboxes, setShowAllHitboxes] = useState<boolean>(false);
   const [disabledBuildButtons, setDisabledBuildButtons] = useState<Map<StructureType, boolean>>(new Map());
 
+  // GameField
+  const [coastRadius, setCoastRadius] = useState<number>(0);
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [cornerMap, setCornerMap] = useState<Map<string, Corner>>(new Map<string, Corner>());
   const [corners, setCorners] = useState<Corner[]>([]);
@@ -336,10 +339,19 @@ const GameField: React.FC<GameFieldProps> = () => {
       const y = r * (3/2) * radius;
       newHexagons.push({ q, r, x, y, fill: "green", radius: radius, label: field.numberChip !== 0 ? field.numberChip.toString() : "", resource: field.resource });
     });
+    
+    const centerToEdgeRadius = (Math.sqrt(3)/2) * radius;
+    const times = (Math.round((1 + Math.sqrt(1 + (4 * fields.length) / 3))/2) - 1);
+    const r = times * (centerToEdgeRadius * 2) + centerToEdgeRadius - 25;
+    console.log(times);
+    console.log(r);
+    setCoastRadius(r);
+    
   }, [fields]);
 
   useEffect(()=>{
     if(fields.length === 0) return;
+    console.log("wtf");
     const newHexagons: hexagonProps[] = [];
     generateHexagons(newHexagons);
 
@@ -463,6 +475,9 @@ const GameField: React.FC<GameFieldProps> = () => {
           imageSmoothingEnabled={false}
         >
           <Background imagePath="fields/waterSeamless.png" gridSize={6} scale={0.5} offsetX={backgroundOffsetX} />
+
+          <Coast key={"coast"} coastRadius={coastRadius}/>      
+
           {hexagons.map((hex, i) => (
             <Hexagon key={`hex-${i}`} q={hex.q} r={hex.r} x={hex.x} y={hex.y} fill={hex.fill} radius={radius} label={hex.label} resource={hex.resource}/>
           ))}
