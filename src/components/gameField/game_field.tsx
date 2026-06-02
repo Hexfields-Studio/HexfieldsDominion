@@ -409,7 +409,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                 offset={{ x: edge.width/2, y: edge.height/2 }} 
                 fill={"gold"} opacity={
                   isDisabled ? 0.0 : 
-                    (selectedBuildType === "ROAD" && showAllHitboxes ? 0.7 : 
+                    (selectedBuildType === "STREET" && showAllHitboxes ? 0.7 : 
                       (showAllHitboxes ? 0.3 : 0.0))
                 }
                 rotation={edgeDirectionInDegrees[edge.direction]}
@@ -418,9 +418,9 @@ const GameField: React.FC<GameFieldProps> = () => {
                   if (isDisabled) return;
 
                   // Only build if road is selected
-                  if (selectedBuildType === "ROAD") {
+                  if (selectedBuildType === "STREET") {
                     // TODO: Send build request to backend
-                    console.log("Building ROAD at:", edge.adjacentHexes);
+                    console.log("Building STREET at:", edge.adjacentHexes);
 
                     const sendBuildRequest = async () => {
                       const pos: {q: number, r: number}[] = [];
@@ -429,7 +429,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                       }
                       await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
                         type: "BUILD",
-                        structureType: "ROAD",
+                        structureType: "STREET",
                         pos: pos,
                       }));
                     };

@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./BuildPanel.module.scss";
 
-export type BuildType = "SETTLEMENT" | "ROAD" | "TOWN" | null;
+export type BuildType = "SETTLEMENT" | "STREET" | "TOWN" | null;
 
 interface BuildPanelProps {
   isMyTurn: boolean;
@@ -38,8 +38,8 @@ const BuildPanel: React.FC<BuildPanelProps> = ({
         🏠 Settlement
       </button>
       <button
-        className={`${styles.buildButton} ${selectedBuildType === "ROAD" ? styles.selected : ""}`}
-        onClick={() => handleBuildSelect("ROAD")}
+        className={`${styles.buildButton} ${selectedBuildType === "STREET" ? styles.selected : ""}`}
+        onClick={() => handleBuildSelect("STREET")}
       >
         🛣️ Road
       </button>
