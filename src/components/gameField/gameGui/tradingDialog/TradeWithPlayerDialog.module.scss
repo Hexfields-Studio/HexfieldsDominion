@@ -1,0 +1,120 @@
+#overviewDialog{
+    min-width: 220px;
+    min-height: 100px;
+    max-height: 80vh;
+
+    .overviewDialog__trade{
+        width: max(35vw, 350px);
+        margin-top: 10px;
+        border: 2px solid map.get($gameGui, trade, list, borderColor);
+        border-radius: 15px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+
+        .overviewDialog__trade__resources{
+            display: flex;
+            flex-direction: row;
+            gap: 1vw;
+            justify-content: space-evenly;
+            border-top: 2px solid map.get($gameGui, trade, list, borderColor);
+            padding-top: 5px;
+            margin-top: 5px;
+            border-bottom: 2px solid map.get($gameGui, trade, list, borderColor);
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+
+            .overviewDialog__trade__resources__column{
+                display: flex;
+                flex-direction: column;
+                width: 45%;
+                white-space: nowrap;
+                overflow: hidden;
+
+                & > *{
+                    width: 100%;
+                    text-align: center;
+                }
+
+                & > span{
+                    font-size: 2.2vh;
+                    height: 4vh;
+                }
+
+                span:nth-child(1) {
+                    font-size: small;
+                }
+                span:nth-child(2) {
+                    font-weight: bold;
+                    border-bottom: 1px solid map.get($gameGui, trade, list, borderColor);
+                    margin-bottom: 5px;
+                }
+            }
+
+            & > span{
+                font-size: 2.2vh;
+                margin-top: 8vh;
+                align-content: center;
+            }
+        }
+    }
+}
+
+#createEditDialog{
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    min-width: 260px;
+    padding: 10px;
+    align-items: center;
+
+    .createEditDialog__config {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 1vw;
+        justify-content: space-evenly;
+        margin-bottom: 20px;
+        
+        .createEditDialog__config__column{
+            display: flex;
+            flex-direction: column;
+            width: 35%;
+            white-space: nowrap;
+            overflow: hidden;
+
+            & > *{
+                width: 100%;
+                text-align: center;
+            }
+
+            & > span{
+                font-size: 2.2vh;
+                height: 4vh;
+            }
+
+            .createEditDialog__config__column__resourceInfo{
+                display: flex;
+                justify-content: space-between;
+
+                & > input{
+                    width: max(2.7vw, 40px);
+
+                    &:disabled{
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+
+        & > span{
+            font-size: 4vh;
+            margin-top: 4vh;
+            align-content: center;
+        }
+    }
+
+    & > button{
+        width: 50%;
+    }
+}

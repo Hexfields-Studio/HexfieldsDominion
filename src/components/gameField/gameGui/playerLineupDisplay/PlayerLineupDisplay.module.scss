@@ -11,9 +11,25 @@
         transition: all 0.2s ease;
         position: relative;
         display: inline-block;
+        pointer-events: all;
+
+        .playerName{
+            position: absolute;
+            width: 100%;
+            padding: 0 1px 0 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            height: 15px;
+            font-size: x-small;
+            align-content: center;
+            border-bottom: 2px solid rgba(var(--bg-panel-solid), 0.7);
+            border-radius: 0 0 5px 5px;
+            background-color: rgba(var(--bg-panel-solid), 0.5);
+        }
 
         img {
-            height: 100%;
+            margin: 15px 5px 0 5px;
+            height: calc(100% - 15px);
             filter: brightness(0.7);
             opacity: 0.7;
             display: block;
@@ -28,7 +44,7 @@
             }
 
             .pointsText{
-                font-size: 90%;
+                font-size: 85%;
             }
         }
 
@@ -46,7 +62,7 @@
             border: 2px solid rgba(var(--bg-panel-solid), 0.8);
             border-radius: 15px;
             background-color: rgba(var(--bg-panel-solid), 0.65);
-            font-size: 80%;
+            font-size: 75%;
             margin: 0;
             pointer-events: all;
             text-align: center;

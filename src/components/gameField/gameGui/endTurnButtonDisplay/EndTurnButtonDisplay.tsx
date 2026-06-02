@@ -3,9 +3,10 @@ import styles from "./EndTurnButtonDisplay.module.scss";
 import DiceContainer from "../dice/DiceContainer";
 import { useAuth, useGame } from "@/contexts/contexts";
 import { useIsRolledDiceThisTurn } from "@/hooks/matchHooks/useIsRolledDiceThisTurn";
+import type { RefObject } from "react";
 
 type EndTurnButtonDisplayProps = {
-    animationTrigger: number;
+    animationTrigger: RefObject<number>;
     hideBoxedDices: boolean;
 }
 

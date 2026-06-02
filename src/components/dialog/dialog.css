@@ -15,6 +15,7 @@
     background-color: var(--panel-bg-solid);
     color: var(--foreground);
     outline: none;
+    pointer-events: all;
 }
 
 dialog::backdrop {
