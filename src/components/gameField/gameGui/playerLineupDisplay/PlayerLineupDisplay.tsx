@@ -35,6 +35,7 @@ const PlayerLineupDisplay: React.FC = () => {
             className={`${styles.playerPortrait} ${(player.publicId === currentPlayersTurn) ? styles.highlightPlayer : ""}`}
             style={{ cursor: (isItMyTurn || (!isItMyTurn && player.publicId === currentPlayersTurn)) ? "pointer" : "not-allowed" }}
             title={((!isItMyTurn && player.publicId !== currentPlayersTurn) ? "You can only trade with player current turn" : undefined)}>
+            <span className={styles.playerName}>{`${(player.publicId === myPublicId) ? "You: " : ""}${player.username}`}</span>
             {/* TODO: might be a security risk to directly insert the provided portrait name into the path */}
             <img src={`../playerIcons/${player.chosenPortrait}.png`} />
             {/*//TODO: info for trade? ! or number in circle or similar*/}
