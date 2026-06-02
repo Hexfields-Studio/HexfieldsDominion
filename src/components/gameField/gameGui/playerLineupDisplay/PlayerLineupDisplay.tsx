@@ -1,5 +1,5 @@
 import { useCurrentPlayersTurn } from "@/hooks/matchHooks/useCurrentPlayersTurn";
-import styles from "./PlayerLineupDisplay.module.scss";
+import styles from "@/components/gameField/gameGui/playerLineupDisplay/PlayerLineupDisplay.module.scss";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
 import { useMatchData } from "@/hooks/matchHooks/useMatchData";
 import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";

@@ -5,17 +5,23 @@ import type Konva from "konva";
 import { Hexagon, type hexagonProps } from "./hexagon";
 import { StructureComp, type StructureCompProps } from "./structure";
 import GameGui from "./gameGui/GameGui";
+import BuildPanel, { type BuildType } from "./gameGui/buildPanel/buildPanel";
 import { Background } from "./background";
 import { useSseListeners } from "@/hooks/sseHooks/useSseListeners";
 import { useAuth, useGame, useMatchRepository } from "@/contexts/contexts";
 import { useFields } from "@/hooks/matchHooks/useFields";
-import type { Field, MatchData, Structure, StructureType } from "@/repository/MatchRepository";
+import type { AxialPosition, Field, MatchData, resources, Structure, StructureType } from "@/repository/MatchRepository";
 import { useStructures } from "@/hooks/matchHooks/useStructures";
+import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
+import { usePlayerHueMap } from "@/hooks/matchHooks/usePlayerHueMap";
+import { useMyPublicId } from "@/hooks/matchHooks/useMyPublicId";
+import { useRecipes } from "@/hooks/matchHooks/useRecipes";
+import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
 import { useError } from "@/hooks/useError";
 
 const radius: number = 100;
 
-type Corner = { key: string, disabled: boolean, direction: number; x: number; y: number; adjacentHexes: { q: number; r: number }[] };
+type Corner = { key: string, disabled: boolean, direction: number; x: number; y: number; adjacentHexes: AxialPosition[] };
 type CornerOffset = { direction: number; dx: number; dy: number };
 const cornerOffsetToAdjacentHexDeltas = [
   [{ q: 0, r: -1 }, { q: 1, r: -1 }],
@@ -36,7 +42,7 @@ for (let i = 0; i < 6; i++) {   // Precompute the 6 unit corner offsets for this
   });
 }
 
-type Edge = {key: string, direction: number; x: number, y: number; width: number; height: number; adjacentHexes: { q: number; r: number }[]};
+type Edge = {key: string, direction: number; x: number, y: number; width: number; height: number; adjacentHexes: AxialPosition[]};
 const edgeDirectionToAdjacentHexDelta = [
   { q: 1, r: -1 },
   { q: 1, r: 0 },
@@ -77,6 +83,19 @@ function computeUniqueEdges(hexagons: hexagonProps[]): Map<string, Edge> {
   return edgeMap;
 }
 
+// Helper function to find a structure that occupies a given set of adjacent hexes
+function findStructureByAdjacentHexes(
+  structures: Structure[], 
+  adjacentHexes: { q: number; r: number }[]): Structure | undefined {
+  const targetKey = adjacentHexes
+    .map(h => `${h.q},${h.r}`)
+    .sort().join("|");
+
+  return structures
+    .find(s => s.pos.map(h => `${h.q},${h.r}`)
+      .sort().join("|") === targetKey);
+};
+
 function computeUniqueCorners(hexagons: hexagonProps[]): Map<string, Corner> {
   const cornerMap = new Map<string, Corner>();
 
@@ -95,8 +114,8 @@ function computeUniqueCorners(hexagons: hexagonProps[]): Map<string, Corner> {
           direction: c.direction,
           x: corner_x,
           y: corner_y,
-          adjacentHexes: adjacentHexes
-        }
+          adjacentHexes: adjacentHexes,
+        };
         cornerMap.set(mapKey, corner);
       }
     }
@@ -110,14 +129,23 @@ interface GameFieldProps {
 }
 
 const GameField: React.FC<GameFieldProps> = () => {
-  const {fetchWithAuth} = useAuth();
-  const { uuid } = useGame();
-  const { isError, openErrorDialogIfMessage, errorDialog } = useError();
-
   // subscriptions
+  const { fetchWithAuth } = useAuth();
+  const { uuid } = useGame();
+  const myPublicId = useMyPublicId(); 
+  const recipes = useRecipes();
+  const myResources = useMyRessources();
+  const { isError, openErrorDialogIfMessage, errorDialog } = useError();
   const { repository } = useMatchRepository();
   const fields: Field[] = useFields();
   const structures: Structure[] = useStructures();
+  const playerHueMap: Map<number, number> = usePlayerHueMap();
+  const isMyTurn = useIsMyTurn();
+
+  // Build panel states
+  const [selectedBuildType, setSelectedBuildType] = useState<BuildType>(null);
+  const [showAllHitboxes, setShowAllHitboxes] = useState<boolean>(false);
+  const [disabledBuildButtons, setDisabledBuildButtons] = useState<Map<StructureType, boolean>>(new Map());
 
   const [hexagons, setHexagons] = useState<hexagonProps[]>([]);
   const [cornerMap, setCornerMap] = useState<Map<string, Corner>>(new Map<string, Corner>());
@@ -158,7 +186,29 @@ const GameField: React.FC<GameFieldProps> = () => {
   ], [repository]));
 
   useEffect(()=>{
+    if (!isMyTurn) setShowAllHitboxes(false);
+  }, [isMyTurn]);
+
+  useEffect(()=>{
+    if (!recipes || !myResources) return;
+
+    const newDisabledBuildButtonsMap = new Map<StructureType, boolean>();
+    for(const structure of Object.keys(recipes) as StructureType[]){
+      let isDisabled = false;
+      for(const resource of Object.keys(recipes[structure]) as typeof resources[number][]){
+        if(!myResources[resource] || myResources[resource] < recipes[structure][resource]) {
+          isDisabled = true;
+          break;
+        }
+      }
+      newDisabledBuildButtonsMap.set(structure, isDisabled);
+    }
+    setDisabledBuildButtons(newDisabledBuildButtonsMap);
+  }, [myResources]);
+
+  useEffect(()=>{
     if(structures.length === 0) return;
+
     const newCorners: Corner[] = [];
     const newEdges: Edge[] = [];
     structures.forEach(structure => {
@@ -173,43 +223,59 @@ const GameField: React.FC<GameFieldProps> = () => {
       }
     });
     setDisabledCorners(new Set([...disabledCorners, ...newCorners.map(corner => 
-      corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|")
+      corner.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
     )]));
     setDisabledEdges(new Set([...disabledEdges, ...newEdges.map(edge => 
-      edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|")
+      edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
     )]));
 
     setStructureComps([
-        ...newEdges.map(edge => {
-          let rotation: number = edgeDirectionInDegrees[edge.direction]
-          let src: string = "../structures/bridgeHorizontal.png";
-          if(rotation === 90){
-            src = "../structures/bridgeVertical.png";
-          }
-          return {
-                type: "STREET" as StructureType,
-                x: edge.x,
-                y: edge.y,
-                rotation: rotation,
-                src: src,
-                width: edge.width,
-                height: edge.height,
-              }
-        }),
-        ...newCorners.map(corner => {
-            return {
-                type: "TOWN" as StructureType,
-                x: corner.x,
-                y: corner.y,
-                rotation: 0,
-                src: "../structures/house_small.png",
-                width: 120,
-                height: 120,
-                scale: 0.5,
-              }
-          }),
-      ]);
-  }, [structures])
+      ...newEdges
+      .filter(edge => findStructureByAdjacentHexes(structures, edge.adjacentHexes))
+      .map(edge => {
+        // Determine rotation and image source based on edge direction
+        const rotation: number = edgeDirectionInDegrees[edge.direction];
+        let src: string = "../structures/bridgeHorizontal.png";
+        if(rotation === 90){
+          src = "../structures/bridgeVertical.png";
+        }
+
+        // Find the structure that occupies this edge
+        const structure = findStructureByAdjacentHexes(structures, edge.adjacentHexes) as Structure;
+        return {
+          type: structure.type,
+          ownerId: structure.ownerId,
+          x: edge.x,
+          y: edge.y,
+          adjacentHexes: structure.pos,
+          rotation: rotation,
+          src: src,
+          width: edge.width,
+          height: edge.height,
+          playerHue: playerHueMap.get(structure.ownerId),
+        };
+      }),
+      ...newCorners
+      .filter(edge => findStructureByAdjacentHexes(structures, edge.adjacentHexes))
+      .map(corner => {
+        // Find the structure that occupies this corner
+        const structure = findStructureByAdjacentHexes(structures, corner.adjacentHexes) as Structure;
+        return {
+          type: structure.type,
+          ownerId: structure.ownerId,
+          x: corner.x,
+          y: corner.y,
+          adjacentHexes: structure.pos,
+          rotation: structure.rotation,
+          src: `../structures/${structure.type.toLowerCase()}.png`,
+          width: 120,
+          height: 120,
+          scale: structure.type === "SETTLEMENT" ? 0.5 : 0.6,
+          playerHue: playerHueMap.get(structure.ownerId),
+        };
+      }),
+    ]);
+  }, [structures, cornerMap, edgeMap, disabledCorners, disabledEdges, playerHueMap]);
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -351,11 +417,31 @@ const GameField: React.FC<GameFieldProps> = () => {
     }
   };
 
+  const sendBuildRequest = async (pos: {q: number, r: number}[], structureType: StructureType) => {
+    const response = await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
+      type: "BUILD",
+      structureType: structureType,
+      pos: pos,
+    }));
+    if (isError(response)) {
+      openErrorDialogIfMessage(response);
+    }
+  };
+
   return (
     <>
       { errorDialog }
 
       <div ref={containerRef} className="full-page-container">
+        {/*TODO: REFACTOR THIS, IT SHOULD BE INSIDE THE GUI COMPONENT*/}
+        <BuildPanel
+          isMyTurn={isMyTurn}
+          disabledButtons={disabledBuildButtons}
+          selectedBuildType={selectedBuildType}
+          onSelectBuildType={setSelectedBuildType}
+          onShowHitboxes={setShowAllHitboxes}
+          showHitboxes={showAllHitboxes}
+        />
         <Stage
           width={dimensions.width}
           height={dimensions.height}
@@ -391,57 +477,93 @@ const GameField: React.FC<GameFieldProps> = () => {
 
             {edges.map((edge, i) => {
               const isDisabled: boolean = disabledEdges.has(edge.key);
-              return (
-                <Rect key={`edge-${i}`} x={edge.x} y={edge.y} width={edge.width} height={edge.height} offset={{ x: edge.width/2, y: edge.height/2 }} fill={"gold"} opacity={isDisabled ? 0.0 : 0.3} rotation={edgeDirectionInDegrees[edge.direction]}
+              return (!isDisabled && showAllHitboxes) && (
+                <Rect 
+                  key={`edge-${i}`} x={edge.x} y={edge.y} 
+                  width={edge.width} height={edge.height} 
+                  offset={{ x: edge.width/2, y: edge.height/2 }} 
+                  fill={"gold"} opacity={
+                    isDisabled ? 0.0 : 
+                      (selectedBuildType === "STREET" && showAllHitboxes ? 0.7 : 
+                        (showAllHitboxes ? 0.3 : 0.0))
+                  }
+                  rotation={edgeDirectionInDegrees[edge.direction]}
+
                   onClick={()=>{
-                    if (isDisabled) return;
-                    const sendBuildRequest = async () => {
-                      const pos: {q: number, r: number}[] = [];
-                      for (let adjacentHex of edge.adjacentHexes){
-                        pos.push(adjacentHex);
-                      }
-                      const response = await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
-                        type: "BUILD",
-                        structureType: "STREET",
-                        pos: pos,
-                      }));
-                      if (isError(response)) {
-                        openErrorDialogIfMessage(response);
-                      }
-                    };
-                    sendBuildRequest();
+                    if (isDisabled || selectedBuildType !== "STREET") return;
+                    sendBuildRequest(edge.adjacentHexes, "STREET");
+                    setSelectedBuildType(null);
                   }}/>
               );
             })}
 
-            {structureComps.map((structure, i) => (
-              <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
-            ))}
+            {structureComps
+              .filter(structure => structure.type === "STREET")
+              .map((structure, i) => (
+                <StructureComp
+                  type={structure.type}
+                  ownerId={structure.ownerId}
+                  key={`structure-${i}-structure`} x={structure.x} y={structure.y} rotation={structure.rotation} 
+                  src={structure.src}
+                  width={structure.width} height={structure.height} scale={structure.scale}
+                  playerHue={structure.playerHue}
+                  adjacentHexes={structure.adjacentHexes}
+                  onClick={()=>{
+                    if(selectedBuildType !== "STREET") return;
+                    sendBuildRequest(structure.adjacentHexes, "STREET");
+                    setSelectedBuildType(null);
+                  }}
+                />
+              ))}
+
+            { (selectedBuildType === "TOWN" && showAllHitboxes) && 
+              structureComps
+                .filter(structure => structure.type === "SETTLEMENT" && structure.ownerId === myPublicId)
+                .map((structure, i) => (
+                  <Circle
+                    type={structure.type}
+                    key={`structure-${i}-circle`} x={structure.x} y={structure.y} radius={25}
+                    fill={"red"}
+                    opacity={0.8}
+                  />
+                ))
+            }
+
+            {structureComps
+              .filter(structure => structure.type !== "STREET")
+              .map((structure, i) => (
+                <StructureComp
+                  type={structure.type}
+                  ownerId={structure.ownerId}
+                  key={`structure-${i}-structure`} x={structure.x} y={structure.y} rotation={structure.rotation} 
+                  src={structure.src}
+                  width={structure.width} height={structure.height} scale={structure.scale}
+                  playerHue={structure.playerHue}
+                  adjacentHexes={structure.adjacentHexes}
+                  onClick={()=>{
+                    if(selectedBuildType !== "TOWN") return;
+                    sendBuildRequest(structure.adjacentHexes, "TOWN");
+                    setSelectedBuildType(null);
+                  }}
+                />
+              ))}
 
             {corners.map(corner => {
               const isDisabled: boolean = disabledCorners.has(corner.key);
-              return (
-                <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} opacity={isDisabled ? 0.0 : 1}
+              return (!isDisabled && showAllHitboxes) && (
+                <Circle key={corner.key} x={corner.x} y={corner.y} radius={20} 
+                  opacity={
+                    isDisabled ? 0.0 : 
+                      (selectedBuildType === "SETTLEMENT" && showAllHitboxes ? 0.8 : 
+                        (showAllHitboxes ? 0.4 : 0.0))
+                  }
                   fillLinearGradientStartPoint={{ x: -20, y: -20 }}
                   fillLinearGradientEndPoint={{ x: 20, y: 20 }}
                   fillLinearGradientColorStops={[0, "turquoise", 1, "blue"]}
                   onClick={()=>{
-                    if (isDisabled) return;
-                    const sendBuildRequest = async () => {
-                      const pos: {q: number, r: number}[] = [];
-                      for (let adjacentHex of corner.adjacentHexes){
-                        pos.push(adjacentHex);
-                      }
-                      const response = await fetchWithAuth(`/games/${uuid}/makeMove`, "POST", JSON.stringify({
-                        type: "BUILD",
-                        structureType: "TOWN",
-                        pos: pos,
-                      }));
-                      if (isError(response)) {
-                        openErrorDialogIfMessage(response);
-                      }
-                    };
-                    sendBuildRequest();
+                    if (isDisabled || selectedBuildType !== "SETTLEMENT") return;
+                    sendBuildRequest(corner.adjacentHexes, "SETTLEMENT");
+                    setSelectedBuildType(null);
                   }}/>
               );
             })}

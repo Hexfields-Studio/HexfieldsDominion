@@ -107,6 +107,8 @@ const GameGui: React.FC = () => {
     animationTrigger.current += 1;
   }, [currentDiceResult]);
 
+  const didIWin: boolean = winner?.publicId === myPublicId;
+
   return (
     <Layer>
       <Html divProps={{ className: styles.gui }}>
@@ -115,9 +117,9 @@ const GameGui: React.FC = () => {
           <DiceContainer className={styles["gui__diceContainer"]} animationTrigger={animationTrigger} currentDiceSide={"highlighted"} />
           <span className={styles["gui__diceFooter"]}>Click anywhere to roll the dice.</span>
         </Dialog>
-        <Dialog id={styles["gui__winnerDialog"]} ref={winnerDialogRef} useDefaultStyling={false} closedBy="none">
-          <h1>The game is over. {(winner?.publicId === myPublicId) ? "You won 🎉" : "We have a winner."}</h1>
-          <p className={styles["gui__winnerInfo"]}>{(winner?.publicId === myPublicId) ? "You are the winner:" : "The winner is"}</p>
+        <Dialog id={styles["gui__winnerDialog"]} ref={winnerDialogRef} useDefaultStyling={false} closedBy="none" showConfetti={didIWin}>
+          <h1>The game is over. {didIWin ? "You won 🎉" : "We have a winner."}</h1>
+          <p className={styles["gui__winnerInfo"]}>{didIWin ? "You are the winner:" : "The winner is"}</p>
           <p className={styles["gui__winnerName"]}>{winner?.username}</p>
           <h2>🎉 Congratulations 🎉</h2>
           <button className={styles["gui__backToStartMenu"]} onClick={() => navi("/play")}>← Back to Start Menu</button>

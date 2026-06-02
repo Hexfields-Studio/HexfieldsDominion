@@ -13,16 +13,19 @@ export type Field = {
 
 export type PlayerResources = Record<typeof resources[number], number | undefined>;
 
+export type Recipes = Record<StructureType, Record<typeof resources[number], number>>;
+
 // Keep in mind: This PlayerRepresentation is a simplified/untrue version of what the backend would actually send
 export type PlayerRepresentation = {
     username: string,
     publicId: number,   // Not sure if this is the correct use of the "publicId"
     resources: PlayerResources,
     chosenPortrait: string, //Invented, keep portraits or use colors?
-    points: number
+    points: number,
+    playerHue: number // hue value where 0 = #ff0000, 120 = #00ff00, 240 = #0000ff, etc.
 }
 
-export type StructureType = "TOWN" | "HARBOR" | "STREET";
+export type StructureType = "SETTLEMENT" | "TOWN" | "STREET";
 
 export type AxialPosition = {
 	q: number,
@@ -30,8 +33,9 @@ export type AxialPosition = {
 }
 
 export type Structure = {
-	publicPlayerId: number,
-	name: StructureType,
+  rotation: number,
+  type: StructureType,
+	ownerId: number,
 	pos: AxialPosition[],
 	recipe: any
 }
@@ -60,7 +64,10 @@ export type MatchData = {
     structures: Structure[],
     rolledDiceThisTurn: boolean,
     winner: PlayerRepresentation | null
+    playerHueMap: PlayerHueMap
 }
+
+export type PlayerHueMap = Map<number, number>; // Map<publicId, playerHue>
 
 export interface MatchRepository{
     subscribe: (subscriber: any) => void
@@ -68,6 +75,8 @@ export interface MatchRepository{
     getMatchData: () => MatchData | undefined
     emitChange: () => void
     
+    setRecipes: (recipes: Recipes) => void
+    getRecipes: () => Recipes | undefined
     setFields: (fields: Field[]) => void
     getFields: () => Field[]
     setStructures: (structures: Structure[]) => void

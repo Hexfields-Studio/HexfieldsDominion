@@ -4,6 +4,7 @@
 
     width: var(--current_dice_size);
     height: var(--current_dice_size);
+    flex-shrink: 0;
     transform-style: preserve-3d;
     transition: transform 2s ease-in-out;
 

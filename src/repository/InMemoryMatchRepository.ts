@@ -1,12 +1,20 @@
-import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, PlayerTrade, Structure } from "./MatchRepository";
+import type { Field, MatchData, MatchRepository, PlayerRepresentation, PlayerResources, PlayerTrade, Structure, PlayerHueMap, Recipes } from "./MatchRepository";
 import { getStorageItem } from "@/constants/storage";
 
 class InMemoryMatchRepository implements MatchRepository{
   subscribers: any[] = [];
   matchData: MatchData | undefined;
+  recipes: Recipes | undefined;
   fields: Field[] = [];
   structures: Structure[] = [];
   playerTrades: PlayerTrade[] = [];
+  playerHueMap: PlayerHueMap = new Map<number, number>();
+
+  setRecipes = (recipes: Recipes) => {
+    this.recipes = recipes;
+  };
+
+  getRecipes = (): Recipes | undefined => this.recipes;
 
   setFields = (fields: Field[]) => {
     this.fields = fields;
@@ -38,9 +46,17 @@ class InMemoryMatchRepository implements MatchRepository{
 
   setMatchData = (matchData: MatchData) => {
     this.matchData = matchData;
-    this.structures = matchData.structures;
-  };
 
+    this.structures = matchData.structures.map(structure =>
+      this.structures.find(old => old.pos.map(h => `${h.q},${h.r}`).sort().join("|") === structure.pos.map(h => `${h.q},${h.r}`).sort().join("|") && old.type === structure.type)
+      ?? ({ ...structure, rotation: Math.random() * 20 - 10 } as Structure),
+    );
+    const hueMap = new Map<number, number>();
+    matchData.players.forEach(player => {
+      hueMap.set(player.publicId, player.playerHue);
+    });
+    this.playerHueMap = hueMap;
+  };
   getMatchData = () => this.matchData;
 
   emitChange = (): void => {
@@ -53,7 +69,7 @@ class InMemoryMatchRepository implements MatchRepository{
   };
 
   getMyRessources = (): PlayerResources | undefined => {
-    return this.matchData?.players.find(playerRessource => playerRessource.publicId === this.getMyPublicId())?.resources;
+    return this.matchData?.players.find(player => player.publicId === this.getMyPublicId())?.resources;
   };
 
   isItMyTurn = (): boolean => {
@@ -84,6 +100,9 @@ class InMemoryMatchRepository implements MatchRepository{
   isRolledDiceThisTurn = (): boolean => this.matchData?.rolledDiceThisTurn ?? false;
 
   getWinner = (): PlayerRepresentation | null => this.matchData?.winner ?? null;
-}
 
+  getPlayerHueMap = () => this.playerHueMap;
+
+  setPlayerHueMap = (map: PlayerHueMap) => this.playerHueMap = map;
+}
 export default InMemoryMatchRepository;

@@ -8,7 +8,7 @@ import InMemoryMatchRepository from "@/repository/InMemoryMatchRepository";
 import { useMatchRepository, useAuth } from "@/contexts/contexts";
 import { useHeartbeat } from "@/hooks/useHeartbeat";
 import { GameProvider } from "@/contexts/GameContext";
-import type { Field } from "@/repository/MatchRepository";
+import type { Field, Recipes } from "@/repository/MatchRepository";
 
 const MatchPage = () => {
   const params = useParams();
@@ -37,13 +37,16 @@ const MatchPage = () => {
 
   useEffect(()=>{
     const fetchFields = async () => {
-      const res = await fetchWithAuth(`/games/${matchUUID}/fields`, "GET");
-      if (!res || res.status !== 200) {
+      const fields = await fetchWithAuth(`/games/${matchUUID}/fields`, "GET");
+      const recipes = await fetchWithAuth(`/games/recipes`, "GET");
+      if (!fields || fields.status !== 200 || !recipes || recipes.status !== 200) {
         return;
       }
 
-      const resJson: Field[] = await res.json();
-      repository.setFields(resJson);
+      const fieldsJson: Field[] = await fields.json();
+      const recipesJson: Recipes = await recipes.json();
+      repository.setFields(fieldsJson);
+      repository.setRecipes(recipesJson);
     }
     fetchFields();
   }, [repository])
