@@ -227,8 +227,6 @@ const GameField: React.FC<GameFieldProps> = () => {
       edge.adjacentHexes.map(h => `${h.q},${h.r}`).sort().join("|"),
     )]));
 
-    newEdges.filter(edge => findStructureByAdjacentHexes(structures, edge.adjacentHexes))
-
     setStructureComps([
       ...newEdges
       .filter(edge => findStructureByAdjacentHexes(structures, edge.adjacentHexes))
