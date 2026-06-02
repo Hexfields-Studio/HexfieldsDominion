@@ -13,7 +13,7 @@ import { useFields } from "@/hooks/matchHooks/useFields";
 import type { Field, MatchData, Structure, StructureType } from "@/repository/MatchRepository";
 import { useStructures } from "@/hooks/matchHooks/useStructures";
 import { useIsMyTurn } from "@/hooks/matchHooks/useIsMyTurn";
-
+import { usePlayerHueMap } from "@/hooks/matchHooks/usePlayerHueMap";
 
 const radius: number = 100;
 
@@ -79,6 +79,19 @@ function computeUniqueEdges(hexagons: hexagonProps[]): Map<string, Edge> {
   return edgeMap;
 }
 
+// Helper function to find a structure that occupies a given set of adjacent hexes
+function findStructureByAdjacentHexes(
+  structures: Structure[], 
+  adjacentHexes: { q: number; r: number }[]): Structure | undefined {
+  const targetKey = adjacentHexes
+    .map(h => `${h.q},${h.r}`)
+    .sort().join("|");
+
+  return structures
+    .find(s => s.pos.map(h => `${h.q},${h.r}`)
+      .sort().join("|") === targetKey);
+};
+
 function computeUniqueCorners(hexagons: hexagonProps[]): Map<string, Corner> {
   const cornerMap = new Map<string, Corner>();
 
@@ -119,6 +132,7 @@ const GameField: React.FC<GameFieldProps> = () => {
   const { repository } = useMatchRepository();
   const fields: Field[] = useFields();
   const structures: Structure[] = useStructures();
+  const playerHueMap: Map<number, number> = usePlayerHueMap();
 
   // Build panel states
   const [selectedBuildType, setSelectedBuildType] = useState<BuildType>(null);
@@ -165,6 +179,7 @@ const GameField: React.FC<GameFieldProps> = () => {
 
   useEffect(()=>{
     if(structures.length === 0) return;
+
     const newCorners: Corner[] = [];
     const newEdges: Edge[] = [];
     structures.forEach(structure => {
@@ -187,11 +202,15 @@ const GameField: React.FC<GameFieldProps> = () => {
 
     setStructureComps([
       ...newEdges.map(edge => {
+        // Determine rotation and image source based on edge direction
         const rotation: number = edgeDirectionInDegrees[edge.direction];
         let src: string = "../structures/bridgeHorizontal.png";
         if(rotation === 90){
           src = "../structures/bridgeVertical.png";
         }
+
+        // Find the structure that occupies this edge
+        const structure = findStructureByAdjacentHexes(structures, edge.adjacentHexes);
         return {
           type: "STREET" as StructureType,
           x: edge.x,
@@ -200,9 +219,12 @@ const GameField: React.FC<GameFieldProps> = () => {
           src: src,
           width: edge.width,
           height: edge.height,
+          playerHue: structure ? playerHueMap.get(structure.ownerId) : undefined,
         };
       }),
       ...newCorners.map(corner => {
+        // Find the structure that occupies this corner
+        const structure = findStructureByAdjacentHexes(structures, corner.adjacentHexes);
         return {
           type: "SETTLEMENT" as StructureType,
           x: corner.x,
@@ -212,10 +234,11 @@ const GameField: React.FC<GameFieldProps> = () => {
           width: 120,
           height: 120,
           scale: 0.5,
+          playerHue: structure ? playerHueMap.get(structure.ownerId) : undefined,
         };
       }),
     ]);
-  }, [structures, cornerMap, edgeMap, disabledCorners, disabledEdges]);
+  }, [structures, cornerMap, edgeMap, disabledCorners, disabledEdges, playerHueMap]);
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -441,7 +464,7 @@ const GameField: React.FC<GameFieldProps> = () => {
           })}
 
           {structureComps.map((structure, i) => (
-            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale}/>
+            <StructureComp type={structure.type} key={`structure-${i}`} x={structure.x} y={structure.y} rotation={structure.rotation} src={structure.src} width={structure.width} height={structure.height} scale={structure.scale} playerHue={structure.playerHue}/>
           ))}
 
           {corners.map(corner => {
