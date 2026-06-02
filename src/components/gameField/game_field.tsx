@@ -417,7 +417,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                 onClick={()=>{
                   if (isDisabled) return;
 
-                  // Only build if road is selected
+                  // Only build if street is selected
                   if (selectedBuildType === "STREET") {
                     // TODO: Send build request to backend
                     console.log("Building STREET at:", edge.adjacentHexes);

@@ -41,7 +41,7 @@ const BuildPanel: React.FC<BuildPanelProps> = ({
         className={`${styles.buildButton} ${selectedBuildType === "STREET" ? styles.selected : ""}`}
         onClick={() => handleBuildSelect("STREET")}
       >
-        🛣️ Road
+        🛣️ Street
       </button>
       <button
         className={`${styles.buildButton} ${selectedBuildType === "TOWN" ? styles.selected : ""}`}
