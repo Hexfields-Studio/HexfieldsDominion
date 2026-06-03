@@ -27,22 +27,29 @@ export const StructureComp: React.FC<StructureCompProps> =
         const i = new window.Image();
         i.src = src;
         i.onload = () => setImg(i);
+        return () => setImg(null);
       }, [src]);
 
       useEffect(() => {
-        if (imageRef.current && img) {
-          imageRef.current.filters([Konva.Filters.HSV]);
-          if (!playerHue) {
-            // Apply grayscale filter for missing color (error state)
-            imageRef.current.filters([Konva.Filters.Grayscale]);
-            imageRef.current.cache();
-          } else {
-            // Apply hue rotation filter based on playerHue using HSV filter
-            imageRef.current.hue(360-playerHue);
-            imageRef.current.saturation(1); // Full saturation
-            imageRef.current.cache();
-          }
+        const image = imageRef.current;
+
+        if (!image || !img) return;
+
+        image.filters([Konva.Filters.HSV]);
+        if (!playerHue) {
+          // Apply grayscale filter for missing color (error state)
+          image.filters([Konva.Filters.Grayscale]);
+        } else {
+          // Apply hue rotation filter based on playerHue using HSV filter
+          image.hue(360-playerHue);
+          image.saturation(1); // Full saturation
         }
+        image.cache();
+        image.getLayer()?.batchDraw();
+        return () => {
+          image.clearCache();
+        }
+        
       }, [playerHue, img]);
 
       if (!img) {

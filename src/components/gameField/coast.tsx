@@ -14,7 +14,8 @@ export const Coast: React.FC<CoastProps> = ({coastRadius}) => {
         const img = new window.Image();
         img.src = imgPath;
         img.onload = () => setTextureImage(img);
-    });
+        return () => setTextureImage(null);
+    }, []);
 
     return (
         <>

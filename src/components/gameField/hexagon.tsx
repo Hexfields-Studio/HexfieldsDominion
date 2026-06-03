@@ -17,15 +17,26 @@ export const Hexagon: React.FC<hexagonProps> = ({ x, y, fill, radius, label, res
   const [textureImage, setTextureImage] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    if (resource) {
-      // Randomly pick between variant 1 and 2
-      const variant = Math.random() > 0.5 ? "1" : "2";
-      const imgPath = `${import.meta.env.BASE_URL}fields/${resource.toLowerCase()}Field${variant}.png`;
-      
-      const img = new window.Image();
-      img.src = imgPath;
-      img.onload = () => setTextureImage(img);
+    if (!resource) {
+      setTextureImage(null);
+      return;
     }
+
+    const variant = Math.random() > 0.5 ? "1" : "2";
+    const imgPath = `${import.meta.env.BASE_URL}fields/${resource.toLowerCase()}Field${variant}.png`;
+    
+    const img = new window.Image();
+    let cancelled: boolean = false;
+    img.onload = () => {
+      if(!cancelled){
+        setTextureImage(img);
+      }
+    };
+    img.src = imgPath;
+    return () => {
+      cancelled = true;
+      img.onload = null;
+    };
   }, [resource]);
 
   // 8-direction offsets for number aura
