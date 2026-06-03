@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Image } from "react-konva";
 
 interface BackgroundProps {
-  ref?: React.RefObject<HTMLDivElement | null>;
   imagePath: string;
   tileSize?: number;
   gridSize?: number;
@@ -11,7 +10,7 @@ interface BackgroundProps {
   offsetY?: number;
 }
 
-export const Background: React.FC<BackgroundProps> = ({ ref, imagePath, tileSize = 1024, gridSize = 1, scale = 1, offsetX = 0, offsetY = 0 }) => {
+export const Background: React.FC<BackgroundProps> = ({ imagePath, tileSize = 1024, gridSize = 1, scale = 1, offsetX = 0, offsetY = 0 }) => {
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const [tiles, setTiles] = useState<any[]>([]);
   const scaledTileSize = tileSize * scale;
