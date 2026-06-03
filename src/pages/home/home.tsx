@@ -94,6 +94,8 @@ const HomePage = () => {
         </div>
 
       </div>
+
+      <p className="images-disclaimer">Manche der in dieser Anwendung genutzten Grafiken wurden mit Unterstützung von KI erstellt.</p>
     </>
   );
 };

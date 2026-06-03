@@ -1,3 +1,15 @@
 .row-seperated {
     margin-top: 15px;
 }
+
+.images-disclaimer {
+    position: absolute;
+    top: 20vh;
+    right: 0;
+    height: 75vh;
+    font-size: 15px;
+    
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: #757575;
+}
