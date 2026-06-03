@@ -19,6 +19,7 @@ import { useRecipes } from "@/hooks/matchHooks/useRecipes";
 import { useMyRessources } from "@/hooks/matchHooks/useMyRessources";
 import { useError } from "@/hooks/useError";
 import { Coast } from "./coast";
+import { WATER_SPEED } from "@/constants/constants";
 
 const radius: number = 100;
 
@@ -175,7 +176,6 @@ const GameField: React.FC<GameFieldProps> = () => {
   // For animated background
   const [backgroundOffsetX, setBackgroundOffsetX] = useState(0);
   const backgroundDirectionRef = useRef(Math.random() > 0.5 ? 1 : -1); // 1 for east, -1 for west
-  const backgroundSpeedRef = useRef(0.5); // animation speed inpixels per frame
 
   useSseListeners(useMemo(() => [
     {
@@ -277,7 +277,7 @@ const GameField: React.FC<GameFieldProps> = () => {
         };
       }),
     ]);
-  }, [structures, cornerMap, edgeMap, disabledCorners, disabledEdges, playerHueMap]);
+  }, [structures]);
 
   useEffect(() => {
     cameraOffsetRef.current = cameraOffset;
@@ -313,21 +313,29 @@ const GameField: React.FC<GameFieldProps> = () => {
       });
     }
 
-    window.addEventListener("resize", ()=>handleResize(container));
-    
-    // Animation loop for background
+    const resizeEventHandler = ()=>handleResize(container);
+    window.addEventListener("resize", resizeEventHandler);
+
+    // Animation loop for background (time-based / platform-independent)
     let animationFrameId: number;
-    const animate = () => {
+    let lastTime = performance.now();
+
+    const animate = (time: number) => {
+      const dt = time - lastTime;
+      lastTime = time;
+
       setBackgroundOffsetX(prev => {
-        const newOffset = prev + backgroundSpeedRef.current * backgroundDirectionRef.current;
-        return newOffset % 1000000; // prevent overflow of offset number with modulo
+        const newOffset = prev + WATER_SPEED * dt * backgroundDirectionRef.current;
+        return newOffset % 1000000;
       });
+
       animationFrameId = requestAnimationFrame(animate);
     };
+
     animationFrameId = requestAnimationFrame(animate);
-    
+
     return () => {
-      window.removeEventListener("resize", ()=>handleResize(container));
+      window.removeEventListener("resize", resizeEventHandler);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -522,7 +530,7 @@ const GameField: React.FC<GameFieldProps> = () => {
                     setSelectedBuildType(null);
                   }}
                 />
-              ))}
+            ))}
 
             { (selectedBuildType === "TOWN" && showAllHitboxes) && 
               structureComps

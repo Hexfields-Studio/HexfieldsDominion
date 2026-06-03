@@ -4,3 +4,4 @@ export const HIGHLIGHT_DICE_ANIMATION_TIMEOUT = 3500;
 export const FETCH_TIMEOUT = 5000;
 export const HIGHLIGHT_GRANTED_RESOURCES_TIMEOUT = 7500;
 export const DICE_ANIMATION_DURATION = 2000;
+export const WATER_SPEED = 0.02;    // Units per millisecond
