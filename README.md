@@ -10,6 +10,8 @@ Players are supposed to access this via the browser. This code is not meant for 
 
 The game is hosted on a [GitHub Pages Website](https://hexfields-studio.github.io/HexfieldsDominion/).
 
+It might take some minutes until the backend responds as it has to start up again after some time of not being used.
+
 ## 🛠️ Development
 
 To start the dev server:
