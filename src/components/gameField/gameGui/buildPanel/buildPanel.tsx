@@ -36,6 +36,7 @@ const BuildPanel: React.FC<BuildPanelProps> = ({
     }
   };
 
+  //TODO: move buttons to seperate components
   return (
     <div className={styles.buildPanel}>
       <button
