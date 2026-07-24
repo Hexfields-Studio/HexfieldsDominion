@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./buildPanel.module.scss";
+import RecipeDisplay from "./RecipeDisplay";
+import type { StructureType } from "@/repository/MatchRepository";
 
 export type BuildType = "SETTLEMENT" | "STREET" | "TOWN" | null;
 
@@ -21,6 +23,8 @@ const BuildPanel: React.FC<BuildPanelProps> = ({
   onShowHitboxes,
   showHitboxes,
 }) => {
+  const [recipeShown, setRecipeShown] = useState<StructureType | null>(null);
+
   if (!isMyTurn) return null;
 
   const handleBuildSelect = (type: BuildType) => {
@@ -32,27 +36,43 @@ const BuildPanel: React.FC<BuildPanelProps> = ({
     }
   };
 
+  //TODO: move buttons to seperate components
   return (
     <div className={styles.buildPanel}>
       <button
         className={`${styles.buildButton} ${selectedBuildType === "SETTLEMENT" ? styles.selected : ""}`}
         disabled={disabledButtons?.get("SETTLEMENT")}
         onClick={() => handleBuildSelect("SETTLEMENT")}
+        onPointerEnter={() => setRecipeShown("SETTLEMENT")}
+        onPointerLeave={() => setRecipeShown(null)}
       >
+        { recipeShown === "SETTLEMENT" &&
+          <RecipeDisplay structureType="SETTLEMENT"></RecipeDisplay>
+        }
         🏠 Settlement
       </button>
       <button
         className={`${styles.buildButton} ${selectedBuildType === "STREET" ? styles.selected : ""}`}
         disabled={disabledButtons?.get("STREET")}
         onClick={() => handleBuildSelect("STREET")}
+        onPointerEnter={() => setRecipeShown("STREET")}
+        onPointerLeave={() => setRecipeShown(null)}
       >
+        { recipeShown === "STREET" &&
+          <RecipeDisplay structureType="STREET"></RecipeDisplay>
+        }
         🛣️ Street
       </button>
       <button
         className={`${styles.buildButton} ${selectedBuildType === "TOWN" ? styles.selected : ""}`}
         disabled={disabledButtons?.get("TOWN")}
         onClick={() => handleBuildSelect("TOWN")}
+        onPointerEnter={() => setRecipeShown("TOWN")}
+        onPointerLeave={() => setRecipeShown(null)}
       >
+        { recipeShown === "TOWN" &&
+          <RecipeDisplay structureType="TOWN"></RecipeDisplay>
+        }
         🏛️ Town
       </button>
       <button
