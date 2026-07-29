@@ -67,8 +67,15 @@ jobs:
       - name: Run TypeScript type check
         run: bun run type-check
 
-      - name: Run tests
-        run: bun run test
+      - name: Run test suite with coverage
+        run: bun test:ci
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SONAR_GITHUB_TOKEN }}
+          SONAR_HOST_URL: "https://sonarcloud.io"
 
   deploy:
     name: Deploy to GitHub Pages
