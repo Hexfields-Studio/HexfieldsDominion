@@ -2,6 +2,7 @@
     <img src="./public/logo_big.png" alt="Hexfields: Dominion Logo" width="300" height="auto" />
     <br />
     <img src="https://github.com/Hexfields-Studio/HexfieldsDominion/actions/workflows/ci-cd.yml/badge.svg" alt="Pipeline Badge" />
+    <img src="https://sonarcloud.io/api/project_badges/measure?project=Hexfields-Studio_HexfieldsDominion&metric=alert_status" alt="Sonar Badge" />
 </p>
 
 This is the frontend for our game **Hexfields: Dominion**, an online alternative to the board game *The Settlers of Catan*.
